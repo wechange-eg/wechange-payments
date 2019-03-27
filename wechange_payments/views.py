@@ -6,7 +6,6 @@ from wechange_payments.backends import get_backend
 from django.http.response import JsonResponse, HttpResponseNotAllowed
 import six
 from wechange_payments.models import Payment
-from django.views.decorators.csrf import csrf_exempt
 
 
 def make_payment(request):

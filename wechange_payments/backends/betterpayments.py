@@ -60,19 +60,12 @@ class BetterPaymentBackend(BaseBackend):
         checksum_test = "9b6b075854fc3473c09700e20e19af3fbc3ff543"
         return 'key: %s, correct is: %s' % (self.calculate_request_checksum(testparams, outgoing_key), checksum_test)
     
-    def _create_sepa_mandate(self):
+    def _create_sepa_mandate(self, order_id):
         """ /rest/create_mandate_reference 
                 api_key:668651eb6e943eb3dc14
                 payment_type:dd
-            Return:
-            {
-                "transaction_id": "597d3a4f-7955-44ad-bdd3-f16d101ba843",
-                "token": "99e7f5c4d40ad0071def1ed620226ffc",
-                "status_code": 9,
-                "status": "registered",
-                "error_code": 0,
-                "order_id": null
-            }
+                order_id:our_order
+                
             Save the transaction id and give it to the payment request!
             The token is the mandate token that has to be shown to the user.
             @return: tuple (transaction_id, sepa_mandate_token) or str if there was an error.
@@ -82,6 +75,7 @@ class BetterPaymentBackend(BaseBackend):
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
             'payment_type': 'dd',
+            'order_id': order_id,
         }
         
         req = requests.post(post_url, data=data)
@@ -131,7 +125,7 @@ class BetterPaymentBackend(BaseBackend):
         return (transaction_id, sepa_mandate_token)
     
     
-    def _make_actual_sepa_payment(self, original_transaction_id, request, params, user=None):
+    def _make_actual_sepa_payment(self, order_id, original_transaction_id, request, params, user=None):
         """ /rest/payment
         
             api_key:668651eb6e943eb3dc14
@@ -153,19 +147,13 @@ class BetterPaymentBackend(BaseBackend):
             iban:de29742940937493240340
             bic:BELADEBEXXX
             account_holder:Hans Mueller
-        Return Error:
-        {
-            "error_code": 103,
-            "error_message": "The checksum does not match."
-        }
-        
         """
         url = '/rest/payment'
         post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + url
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
             'payment_type': 'dd',
-            'order_id': str(uuid.uuid4()),
+            'order_id': order_id,
             'original_transaction_id': original_transaction_id,
             'postback_url': request.build_absolute_uri(reverse('wechange-payments:postback-endpoint')),
             
@@ -260,13 +248,14 @@ class BetterPaymentBackend(BaseBackend):
                 
             @return: str error message or model of wechange_payments.models.BasePayment if successful
          """
-        mandate_result = self._create_sepa_mandate()
+        order_id = str(uuid.uuid4())
+        mandate_result = self._create_sepa_mandate(order_id)
         if isinstance(mandate_result, six.string_types):
             # contains error message, return
             return mandate_result
         transaction_id, sepa_mandate_token = mandate_result
         
-        payment_or_error = self._make_actual_sepa_payment(transaction_id, request, params, user=user)
+        payment_or_error = self._make_actual_sepa_payment(order_id, transaction_id, request, params, user=user)
         if isinstance(payment_or_error, six.string_types):
             return payment_or_error
         payment = payment_or_error
@@ -278,6 +267,7 @@ class BetterPaymentBackend(BaseBackend):
         try:
             payment.save()
         except Exception as e:
+            raise
             logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
         return payment
     
