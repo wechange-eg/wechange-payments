@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
 from builtins import object
 from django.conf import settings  # noqa
-from django.utils.translation import ugettext_lazy as _
 
 from appconf import AppConf
 
@@ -14,7 +12,7 @@ class WechangePaymentsDefaultSettings(AppConf):
         prefix = 'PAYMENTS'
         
     BACKEND = 'wechange_payments.backends.BetterPaymentBackend'
-    
+    ACCEPTED_PAYMENT_METHODS = ['dd'] # ['cc', 'dd', 'paypal']
     
     """ Betterpayment-settings """
     
