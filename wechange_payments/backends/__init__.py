@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from .base import DummyBackend
 from .betterpayments import BetterPaymentBackend
 from wechange_payments.utils.utils import resolve_class
 
