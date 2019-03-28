@@ -7,6 +7,10 @@ from django.http.response import JsonResponse, HttpResponseNotAllowed
 import six
 from wechange_payments.models import Payment
 from django.views.decorators.csrf import csrf_exempt
+import logging
+
+logger = logging.getLogger('wechange-payments')
+
 
 @csrf_exempt
 def make_payment(request):
@@ -22,7 +26,7 @@ def make_payment(request):
     if payment_type in settings.PAYMENTS_ACCEPTED_PAYMENT_METHODS:
         if payment_type == 'dd':
             # check for complete dataset
-            missing_params = backend.check_missing_params(params, backend.REQUIRED_PARAMS_SEPA)
+            missing_params = backend.check_missing_params(params, payment_type)
             if missing_params:
                 return JsonResponse({'error': 'Missing parameters for request.', 'missing_parameters': missing_params}, status=500)
             result = backend.make_sepa_payment(request, params, user=user)
@@ -33,6 +37,16 @@ def make_payment(request):
     
     assert isinstance(result, Payment)
     payment = result
+    
+    
+    email = params.get('email', None)
+    if email:
+        try:
+            backend.send_successful_payment_email(email, payment, payment_type)
+        except Exception as e:
+            logger.warning('Payments: SEPA Payment successful, but sending the success email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
+            if settings.DEBUG:
+                raise
         
     data = {
         'sepa_mandate_token': payment.extra_data['sepa_mandate_token'],

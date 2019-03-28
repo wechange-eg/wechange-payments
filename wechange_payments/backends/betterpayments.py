@@ -267,7 +267,6 @@ class BetterPaymentBackend(BaseBackend):
         try:
             payment.save()
         except Exception as e:
-            raise
             logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
         return payment
     

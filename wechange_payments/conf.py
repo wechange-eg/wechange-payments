@@ -14,6 +14,8 @@ class WechangePaymentsDefaultSettings(AppConf):
     BACKEND = 'wechange_payments.backends.BetterPaymentBackend'
     ACCEPTED_PAYMENT_METHODS = ['dd'] # ['cc', 'dd', 'paypal']
     
+    SEND_MAIL_FUNCTION = 'django.core.mail.send_mail'
+    
     """ Betterpayment-settings """
     
     BETTERPAYMENT_API_KEY = ''
