@@ -1,12 +1,13 @@
-{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token %}Thank you!
+{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token payment_recipient_name=payment_recipient_name sepa_creditor=sepa_creditor %}Thank you!
 
 You have successfully made a SEPA payment.
 
 Amount: {{ amount }}€
 SEPA-Mandate-ID: {{ sepa_mandate }}
-Gläubiger-ID: (TODO!)
+Creditor-ID: {{ sepa_creditor }}
 
 Thank you for supporting us!
 
+{{ payment_recipient_name }}
 
 {% endblocktrans %}

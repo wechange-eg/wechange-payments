@@ -58,8 +58,13 @@ class BaseBackend(object):
         template, subject_template = self.EMAIL_TEMPLATES.get(payment_type, (None, None))
         if template and subject_template:
             mail_func = resolve_class(settings.PAYMENTS_SEND_MAIL_FUNCTION)
-            subject = render_to_string(subject_template, {'payment': payment})
-            message = render_to_string(template, {'payment': payment})
+            data = {
+                'payment': payment,
+                'payment_recipient_name': settings.PAYMENTS_PAYMENT_RECIPIENT_NAME,
+                'sepa_creditor': settings.PAYMENTS_SEPA_CREDITOR_ID,
+            }
+            subject = render_to_string(subject_template, data)
+            message = render_to_string(template, data)
             mail_func(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
     
     def make_sepa_payment(self, request, params, user=None):

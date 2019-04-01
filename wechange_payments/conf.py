@@ -16,6 +16,11 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     SEND_MAIL_FUNCTION = 'django.core.mail.send_mail'
     
+    """ Payment Source Infos """
+    
+    PAYMENT_RECIPIENT_NAME = None # 'WECHANGE eG'
+    SEPA_CREDITOR_ID = None # 
+    
     """ Betterpayment-settings """
     
     BETTERPAYMENT_API_KEY = ''
