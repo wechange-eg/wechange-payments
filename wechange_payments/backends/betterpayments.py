@@ -277,7 +277,7 @@ class BetterPaymentBackend(BaseBackend):
         valid_checksum = self.calculate_request_checksum(params, settings.PAYMENTS_BETTERPAYMENT_INCOMING_KEY)
         if not 'checksum' in params or not params['checksum'] == valid_checksum:
             params.update({'valid_checksum_should_have_been': valid_checksum})
-            logger.info('Payments: Received an invalid BetterPayments postback. Discarding data.', extra=params)
+            logger.warning('Payments: Received an invalid BetterPayments postback. Discarding data.', extra=params)
             return
             
         TransactionLog.objects.create(

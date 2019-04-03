@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from wechange_payments.models import Payment
 from wechange_payments.utils.utils import resolve_class
 from django.template.loader import render_to_string
+from wechange_payments import signals
 
 
 class BaseBackend(object):
@@ -63,9 +64,12 @@ class BaseBackend(object):
                 'payment_recipient_name': settings.PAYMENTS_PAYMENT_RECIPIENT_NAME,
                 'sepa_creditor': settings.PAYMENTS_SEPA_CREDITOR_ID,
             }
-            subject = render_to_string(subject_template, data)
-            message = render_to_string(template, data)
-            mail_func(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+            if settings.PAYMENTS_USE_HOOK_INSTEAD_OF_SEND_MAIL == True:
+                signals.success_email_sender.send(sender=self, to_email=email, template=template, subject_template=subject_template, data=data)
+            else:
+                subject = render_to_string(subject_template, data)
+                message = render_to_string(template, data)
+                mail_func(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
     
     def make_sepa_payment(self, request, params, user=None):
         """

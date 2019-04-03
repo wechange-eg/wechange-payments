@@ -15,6 +15,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     ACCEPTED_PAYMENT_METHODS = ['dd'] # ['cc', 'dd', 'paypal']
     
     SEND_MAIL_FUNCTION = 'django.core.mail.send_mail'
+    USE_HOOK_INSTEAD_OF_SEND_MAIL = False
     
     """ Payment Source Infos """
     
