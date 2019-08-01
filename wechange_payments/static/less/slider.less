@@ -1,0 +1,142 @@
+@slider-main-color: #1db2b2;
+@slider-handle-color: #735991;
+@slider-background-color: #ccc;
+
+.slider-container {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	margin: 0 auto;
+	padding: 30px 0;
+  
+	input {
+		margin: 20px auto;
+		border: none;
+		background: none;
+		padding: 0;
+		width: 100%;
+		text-align: center;
+		color: @slider-main-color;
+	}
+	
+	
+	.slider-row {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+	}
+	
+	.slider-col {
+		flex: 0 1 83%;
+		min-width: 0;
+	}
+	
+	.text-center {
+		text-align: center;
+	}
+	
+	.ui-slider {
+		position: relative;
+		text-align: left;
+		border-radius: 10px;
+		color: @slider-main-color;
+		
+		/** saves the background-color */
+		.background {
+			display: none;		
+			background-color: @slider-background-color;
+		}
+		
+		.ui-slider-handle {
+			position: absolute;
+			z-index: 2;
+			width: 18px;
+			height: 18px;
+			cursor: pointer;
+			-ms-touch-action: none;
+			touch-action: none;
+			
+			background: @slider-handle-color;
+			border: 1px solid #FFF;
+			border-radius: 50%;
+			
+			&:focus {
+				outline: none;
+			}
+		}
+		.ui-slider-range {
+			position: absolute;
+			z-index: 1;
+			font-size: .7em;
+			display: block;
+			border: 0;
+			background-position: 0 0;
+		}
+	}
+	
+	/* support: IE8 - See #6727 */
+	.ui-slider.ui-state-disabled .ui-slider-handle,
+	.ui-slider.ui-state-disabled .ui-slider-range {
+		filter: inherit;
+	}
+	
+	.ui-slider-horizontal {
+		height: .8em;
+		
+		.ui-slider-handle {
+			top: -.3em;
+			margin-left: -.6em;
+		}
+		.ui-slider-range {
+			top: 0;
+			height: 100%;
+		}
+		.ui-slider-range-min {
+			left: 0;
+		}
+		.ui-slider-range-max {
+			right: 0;
+		}
+	}
+	
+	.ui-slider-vertical {
+		width: .8em;
+		height: 100px;
+		
+		.ui-slider-handle {
+			left: -.3em;
+			margin-left: 0;
+			margin-bottom: -.6em;
+		}
+		.ui-slider-range {
+			left: 0;
+			width: 100%;
+		}
+		.ui-slider-range-min {
+			bottom: 0;
+		}
+		.ui-slider-range-max {
+			top: 0;
+		}
+	}
+	.ui-sortable-handle {
+		-ms-touch-action: none;
+		touch-action: none;
+	}
+	
+	.donation-outcome {
+		display: none;
+		margin: 20px auto;
+	}
+	
+	.under-40 {
+		display: block;
+	}
+	
+	
+  
+}

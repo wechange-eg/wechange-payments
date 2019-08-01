@@ -1,0 +1,65 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static %}
+
+{% block extrahead %}
+	{{ block.super }}
+	
+	{% localize off %}
+	<script type="text/javascript">
+		var PAYMENTS_MINIMUM_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_MINIMUM_PAYMENT_AMOUNT }};
+		var PAYMENTS_MAXIMUM_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_MAXIMUM_PAYMENT_AMOUNT }};
+		var PAYMENTS_DEFAULT_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_DEFAULT_PAYMENT_AMOUNT }};
+	</script>
+	{% endlocalize %}
+	
+	<script src="{% static "js/vendor/jquery-ui.slider.min.js" %}"></script>
+	<script src="{% static "js/slider.js" %}"></script>
+{% endblock %}
+
+
+{% block page_title %}{% trans "Payments" %}{% endblock %}
+
+{% block leftnav %}
+	{% url 'wechange-payments:payment' as payment_url %}
+	{% trans "Payments" as label %}
+	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-credit-card" label=label href=payment_url  %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "Payments" %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <form method="POST" action="" class="cosinnus-form form-horizontal">{% csrf_token %}
+        
+        <!-- a box with semi transparent background -->
+        <div class="content-box">
+        	{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
+        	
+        	
+        	<div>
+        		{{ form.country }}
+        	</div>
+        
+        </div>
+        
+        
+        <button type="submit" class="btn btn-emphasized">
+	        <ul class="media-list">
+	            <li class="media">
+	                <a class="pull-left" href="#">
+	                    <i class="fa fa-pencil"></i>
+	                </a>
+	                <div class="media-body">
+	                      {% trans "Ok" %}
+	                </div>
+	            </li>
+	        </ul>
+	    </button>
+    </form>
+    
+    
+{% endblock %}
+

@@ -5,9 +5,12 @@ this one in your root URLconf to set up the default URLs::
 """
 
 from django.conf.urls import url
-from wechange_payments import views
+from wechange_payments.views import api, frontend
 
 urlpatterns = [
-    url(r'^payments/payment/$', views.make_payment, name='make-payment'),
-    url(r'^payments/postback_endpoint/$', views.postback_endpoint, name='postback-endpoint'),
+    url(r'^payments/payment/$', api.make_payment, name='api-make-payment'),
+    url(r'^payments/postback_endpoint/$', api.postback_endpoint, name='api-postback-endpoint'),
+    
+    url(r'^account/payments/$', frontend.payment, name='payment'),
+    
 ]

@@ -1,0 +1,18 @@
+{% extends "cosinnus/base.html" %}
+{% load i18n static cosinnus_tags %}
+
+{% block breadcrumb %}
+    {{ block.super }}
+    <li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "Payments" %}</a></li>
+{% endblock breadcrumb %}
+
+{% block extrahead %}
+	{% if SETTINGS.DEBUG %}
+		<link rel="stylesheet/less" href="{% static "less/payments.less" %}">
+		<script src="{% static "js/vendor/less.min.js" %}"></script>
+	{% else %}
+    	<link href="{% static 'css/payments.css' %} rel="stylesheet">
+	{% endif %}
+{% endblock %}
+
+{% block page_title %}{% trans "Payments" %}{% endblock page_title %}
