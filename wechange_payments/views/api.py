@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings
+from django.http.response import JsonResponse, HttpResponseNotAllowed
+from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
+import six
 
 from wechange_payments.backends import get_backend
-from django.http.response import JsonResponse, HttpResponseNotAllowed
-import six
+from wechange_payments.conf import settings
 from wechange_payments.models import Payment
-from django.views.decorators.csrf import csrf_exempt
+
 import logging
 
 logger = logging.getLogger('wechange-payments')
@@ -28,11 +30,15 @@ def make_payment(request):
             # check for complete dataset
             missing_params = backend.check_missing_params(params, payment_type)
             if missing_params:
-                return JsonResponse({'error': 'Missing parameters for request.', 'missing_parameters': missing_params}, status=500)
+                return JsonResponse({'error': _('Please fill out all of the missing fields!'), 'missing_parameters': missing_params}, status=500)
             result = backend.make_sepa_payment(request, params, user=user)
         
     
     if isinstance(result, six.string_types):
+        # special error cases:
+        # 126: Invalid bank info
+        if payment_type == 'dd' and result.endswith('(126)'):
+            return JsonResponse({'error': _('The entered payment information is invalid. Please make sure you entered everything correctly!'), 'missing_parameters': ['iban', 'bic']}, status=500)
         return JsonResponse({'error': result}, status=500)
     
     assert isinstance(result, Payment)

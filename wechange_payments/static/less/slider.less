@@ -1,6 +1,8 @@
 @slider-main-color: #1db2b2;
 @slider-handle-color: #735991;
 @slider-background-color: #ccc;
+@frame-background-color: #fff;
+@amount-background-color: #f8f8f8;
 
 .slider-container {
 	display: flex;
@@ -10,17 +12,52 @@
 	width: 100%;
 	margin: 0 auto;
 	padding: 30px 0;
-  
+	background-color: @frame-background-color;
+  	
+  	.value-frame {
+  		width: 100%;
+  		display: flex;
+  		flex-direction: row;
+  		white-space: nowrap;
+  		margin-bottom: 20px;
+  		color: #333;
+  		
+		.amount-container {
+	  		flex-grow: 2;
+			text-align: center;
+		
+		  	.amount-frame {
+		  		display: inline-block;
+		  		border: 1px solid @slider-background-color;
+		  		background-color: @amount-background-color;
+				color: @slider-main-color;
+				padding: 0 10px 0 5px;	
+				font-size: 16px;			
+		  	}
+		}  		
+  	}
+  	
 	input {
-		margin: 20px auto;
+		width: 34px;
+		padding: 5px;
 		border: none;
 		background: none;
-		padding: 0;
-		width: 100%;
-		text-align: center;
 		color: @slider-main-color;
+		font-size: 16px;
+		text-align: center;
+		
+		&.missing {
+           	background-color: #ffcccc;
+		}
 	}
-	
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+	    -webkit-appearance: none;
+	    margin: 0;
+	}
+	input[type=number] {
+	    -moz-appearance:textfield; 
+	}
 	
 	.slider-row {
 		display: flex;
@@ -54,8 +91,8 @@
 		.ui-slider-handle {
 			position: absolute;
 			z-index: 2;
-			width: 18px;
-			height: 18px;
+			width: 22px;
+			height: 22px;
 			cursor: pointer;
 			-ms-touch-action: none;
 			touch-action: none;
@@ -88,8 +125,8 @@
 		height: .8em;
 		
 		.ui-slider-handle {
-			top: -.3em;
-			margin-left: -.6em;
+			top: -0.5em;
+			margin-left: -0.6em;
 		}
 		.ui-slider-range {
 			top: 0;
@@ -104,13 +141,13 @@
 	}
 	
 	.ui-slider-vertical {
-		width: .8em;
+		width: 0.8em;
 		height: 100px;
 		
 		.ui-slider-handle {
-			left: -.3em;
+			left: -0.3em;
 			margin-left: 0;
-			margin-bottom: -.6em;
+			margin-bottom: -0.6em;
 		}
 		.ui-slider-range {
 			left: 0;
@@ -131,6 +168,7 @@
 	.donation-outcome {
 		display: none;
 		margin: 20px auto;
+		color: @slider-main-color;
 	}
 	
 	.under-40 {

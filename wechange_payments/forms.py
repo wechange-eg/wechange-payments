@@ -28,7 +28,12 @@ class PaymentsForm(forms.Form):
     last_name = forms.CharField()
     email = forms.EmailField()
     
-    # note: payment-type specific fields are not included here because they will never be pre-filled!
+    tos_accept = forms.BooleanField(required=True)
+    
+    # payment-specific-fields
+    iban = forms.CharField()
+    bic = forms.CharField()
+    account_holder = forms.CharField()
     
     
     

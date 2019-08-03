@@ -155,7 +155,7 @@ class BetterPaymentBackend(BaseBackend):
             'payment_type': 'dd',
             'order_id': order_id,
             'original_transaction_id': original_transaction_id,
-            'postback_url': request.build_absolute_uri(reverse('wechange-payments:postback-endpoint')),
+            'postback_url': request.build_absolute_uri(reverse('wechange-payments:api-postback-endpoint')),
             
             'amount': params['amount'],
             'address': params['address'],

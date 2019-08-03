@@ -1,5 +1,5 @@
 {% extends "wechange_payments/base.html" %}
-{% load l10n i18n cosinnus_tags static %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
 
 {% block extrahead %}
 	{{ block.super }}
@@ -14,6 +14,7 @@
 	
 	<script src="{% static "js/vendor/jquery-ui.slider.min.js" %}"></script>
 	<script src="{% static "js/slider.js" %}"></script>
+	<script src="{% static "js/payments.js" %}"></script>
 {% endblock %}
 
 
@@ -22,7 +23,7 @@
 {% block leftnav %}
 	{% url 'wechange-payments:payment' as payment_url %}
 	{% trans "Payments" as label %}
-	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-credit-card" label=label href=payment_url  %}
+	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-credit-card" label=label show_required=True href=payment_url  %}
 {% endblock leftnav %}
 
 {% block breadcrumb %}
@@ -32,17 +33,95 @@
 
 {% block content %}
     
-    <form method="POST" action="" class="cosinnus-form form-horizontal">{% csrf_token %}
+    {% comment %} The 'onkeydown' attribute prevents form sending on enter {% endcomment %}
+    <form method="POST" action="{% url "wechange-payments:api-make-payment" %}" 
+    		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
         <!-- a box with semi transparent background -->
         <div class="content-box">
+	        <div class="error-frame alert alert-danger alert-dismissable" style="display: none;">
+	            <i class="fa fa-exclamation-triangle fa-3x"></i>
+		        <p class="error-message"></p>
+		    </div>
+		    
+		    
         	{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         	
+        	<hr>
         	
-        	<div>
-        		{{ form.country }}
-        	</div>
-        
+            <h3>{% trans "Payment Info" %}</h3>
+            
+			{% trans "Payment Type" as label %}
+			{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label show_required=True field_classes="conditional-select" %}
+			
+            <div class="conditional-select-container" data-select-name="payment_type" data-select-value="dd">
+	            <div class="row">
+	                <div class="col-sm-6 regular-space">
+						{% trans "IBAN" as label %}
+						{% include 'cosinnus/fields/default_field.html' with field=form.iban label=label show_required=True %}
+	                </div>
+	                <div class="col-sm-6 regular-space">
+						{% trans "BIC" as label %}
+						{% include 'cosinnus/fields/default_field.html' with field=form.bic label=label show_required=True %}
+	                </div>
+	            </div><!-- row -->
+	            
+	            {# email Field #}
+				{% trans "Account Holder" as label %}
+				{% include 'cosinnus/fields/default_field.html' with field=form.account_holder label=label show_required=True %}
+			</div>
+
+			<div class="conditional-select-container" data-select-name="payment_type" data-select-value="cc">			
+				<p>This is the credit card form!</p>
+			</div>
+			                
+			                
+			<hr>
+    		
+    		<h3>{% trans "Billing Address" %}</h3>
+    		
+			{% trans "E-Mail" as label %}
+			{% include 'cosinnus/fields/default_field.html' with field=form.email label=label show_required=True %}
+    		
+    		<div class="row">
+                <div class="col-sm-6 regular-space">
+					{% trans "First name" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.first_name label=label show_required=True%}
+                </div>
+                <div class="col-sm-6 regular-space">
+					{% trans "Last name" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.last_name label=label show_required=True %}
+                </div>
+            </div><!-- row -->
+            
+            {% trans "Address" as label %}
+			{% include 'cosinnus/fields/default_field.html' with field=form.address label=label show_required=True %}
+        	
+        	<div class="row">
+                <div class="col-sm-6 regular-space">
+					{% trans "Postal Code" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.postal_code label=label show_required=True%}
+                </div>
+                <div class="col-sm-6 regular-space">
+					{% trans "City" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.city label=label show_required=True %}
+                </div>
+            </div><!-- row -->
+        	
+        	{% trans "Country" as label %}
+			{% include 'cosinnus/fields/default_field.html' with field=form.country label=label show_required=True %}
+        	
+        	<div class="large-space"></div>
+        	
+            <p class="inline-list transparent">
+		        <span class="cursor-pointer-input inline-list-input">
+		            {% render_field form.tos_accept %}
+		        </span>
+		        <span class="cursor-pointer-input" onclick="$('#{{ form.tos_accept.id_for_label }}').prop('checked', !($('#{{ form.tos_accept.id_for_label }}').prop('checked'))).trigger('change');">
+		            {% trans "(TODO!!!) I accept the TOS and privacy policy and electronic processing of my data (TODO!!!)" %}
+		        </span>
+		    </p>
+        	
         </div>
         
         

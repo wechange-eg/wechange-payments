@@ -1,9 +1,21 @@
+
+
 <div class="slider-container">
     <div class="slider-row">
         <div class="slider-col text-center payment-slider">
                 
             <div class="">
-                <input id="value" name="{{ field_name }}" disabled></input>
+            	<div class="value-frame">
+            		<div>{{ SETTINGS.PAYMENTS_MINIMUM_PAYMENT_AMOUNT|floatformat }} €</div>
+            		<div class="amount-container">
+	            		<div class="amount-frame">
+	                		<input id="value" type="number" name="{{ field_name }}" 
+	                		min="{{ SETTINGS.PAYMENTS_MINIMUM_PAYMENT_AMOUNT|floatformat }}" max="{{ SETTINGS.PAYMENTS_MAXIMUM_PAYMENT_AMOUNT|floatformat }}"
+	                		pattern="^[0–9]$"></input>€
+	                	</div>
+	                </div>
+                	<div>{{ SETTINGS.PAYMENTS_MAXIMUM_PAYMENT_AMOUNT|floatformat }} €</div>
+                </div>
                 <div id="slider">
                 	<div class="background"></div>
                 </div>

@@ -11,7 +11,7 @@ $(function() {
 	    slide: function(event, ui){
 	      
 	      // set the values on slide
-	      $(".payment-slider #value").val(ui.value + ' €');
+	      $(".payment-slider #value").val(ui.value);
 	      
 	      // slide the background gradient
 	      var color = $('.payment-slider #slider').css('color');
