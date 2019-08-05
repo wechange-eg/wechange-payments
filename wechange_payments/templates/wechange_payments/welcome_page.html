@@ -1,0 +1,54 @@
+{% extends "cosinnus/base.html" %}
+{% load i18n static cosinnus_tags %}
+
+{% block page_title %}
+    {% trans "(TBD) Support us " %}
+{% endblock page_title %}
+
+{% block main_page %}
+    
+    {% include 'cosinnus/messages.html' %}
+    
+    
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header no-border">
+                <h4 class="no-select" >
+                    {% trans "(TBD) Your Contribution" %}
+                </h4>
+            </div>
+            
+            <div class="modal-body no-border">
+                <p class="no-horizontal-padding no-vertical-padding large-space">
+		            {% trans "(TBD) WECHANGE is based on a solidary pricing model..." %}
+		        </p>
+            </div>
+            <div class="modal-footer no-border">
+                <button class="submit-btn-x btn btn-emphasized btn-autosize" href="{% url 'wechange-payments:payment' %}">
+                    <ul class="media-list">
+                        <li class="media">
+                            <div class="media-body">
+                                {% trans "Choose amount" %}
+                            </div>
+                        </li>
+                    </ul>
+                </button>
+                <button type="button" class="btn btn-default btn-autosize" href="(TBD) more-URL" target="_blank">
+                    <ul class="media-list">
+                        <li class="media">
+                            <div class="media-body">
+                                {% trans "Learn more" %}
+                            </div>
+                        </li>
+                    </ul>
+                </button>
+                <a class="pull-left" href="{{ next_url }}"
+                		style="color: #333; margin-top: 22px;">
+                	{% trans "Remind me later" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    
+{% endblock main_page %}
+

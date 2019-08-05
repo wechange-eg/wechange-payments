@@ -12,5 +12,5 @@ urlpatterns = [
     url(r'^payments/postback_endpoint/$', api.postback_endpoint, name='api-postback-endpoint'),
     
     url(r'^account/payments/$', frontend.payment, name='payment'),
-    
+    url(r'^welcome/contribute/$', frontend.welcome_page, name='welcome-page'),
 ]

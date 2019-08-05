@@ -6,6 +6,7 @@ import logging
 from django.views.generic.base import TemplateView
 from cosinnus.views.mixins.group import RequireLoggedInMixin
 from wechange_payments.forms import PaymentsForm
+from cosinnus.utils.urls import get_non_cms_root_url, redirect_next_or
 
 logger = logging.getLogger('wechange-payments')
 
@@ -46,3 +47,19 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
         return context
 
 payment = PaymentView.as_view()
+
+
+class WelcomePageView(RequireLoggedInMixin, TemplateView):
+    """ A welcome page that introduces the user to payments after registering. """
+    
+    template_name = 'wechange_payments/welcome_page.html'
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(WelcomePageView, self).get_context_data(*args, **kwargs)
+        context.update({
+            'next_url': redirect_next_or(self.request, get_non_cms_root_url())
+        })
+        return context
+        
+welcome_page = WelcomePageView.as_view()
+
