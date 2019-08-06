@@ -5,6 +5,10 @@ from django.conf import settings  # noqa
 
 from appconf import AppConf
 
+PAYMENT_TYPE_DIRECT_DEBIT = 'dd'
+PAYMENT_TYPE_CREDIT_CARD = 'cc'
+PAYMENT_TYPE_PAYPAL = 'paypal'
+
 
 class WechangePaymentsDefaultSettings(AppConf):
     
@@ -12,7 +16,7 @@ class WechangePaymentsDefaultSettings(AppConf):
         prefix = 'PAYMENTS'
         
     BACKEND = 'wechange_payments.backends.BetterPaymentBackend'
-    ACCEPTED_PAYMENT_METHODS = ['dd'] # ['cc', 'dd', 'paypal']
+    ACCEPTED_PAYMENT_METHODS = [PAYMENT_TYPE_DIRECT_DEBIT] # [PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_DIRECT_DEBIT, PAYMENT_TYPE_PAYPAL]
     
     SEND_MAIL_FUNCTION = 'django.core.mail.send_mail'
     USE_HOOK_INSTEAD_OF_SEND_MAIL = False

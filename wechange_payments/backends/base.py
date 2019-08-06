@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 from django.core.exceptions import ImproperlyConfigured
 from wechange_payments.models import Payment
 from wechange_payments.utils.utils import resolve_class
@@ -15,7 +15,7 @@ class BaseBackend(object):
     
     # params for each payment type
     REQUIRED_PARAMS = {
-        'dd': [
+        PAYMENT_TYPE_DIRECT_DEBIT: [
             'amount', # 1.337
             'address', # Straße
             'city', # Berlin
@@ -33,7 +33,7 @@ class BaseBackend(object):
     # if one is given for a payment type, an email will be sent out
     # after a successful payment
     EMAIL_TEMPLATES = {
-        'dd': (
+        PAYMENT_TYPE_DIRECT_DEBIT: (
             'wechange_payments/mail/sepa_payment_success.html',
             'wechange_payments/mail/sepa_payment_success_subj.txt'
         ),
@@ -61,8 +61,6 @@ class BaseBackend(object):
             mail_func = resolve_class(settings.PAYMENTS_SEND_MAIL_FUNCTION)
             data = {
                 'payment': payment,
-                'payment_recipient_name': settings.PAYMENTS_PAYMENT_RECIPIENT_NAME,
-                'sepa_creditor': settings.PAYMENTS_SEPA_CREDITOR_ID,
             }
             if settings.PAYMENTS_USE_HOOK_INSTEAD_OF_SEND_MAIL == True:
                 signals.success_email_sender.send(sender=self, to_email=email, template=template, subject_template=subject_template, data=data)
@@ -82,7 +80,10 @@ class BaseBackend(object):
             @param params: Expected params are:
                 TOD
                 
-            @return: str error message or model of wechange_payments.models.BasePayment if successful
+            @return: tuple (
+                        model of wechange_payments.models.BasePayment if successful or None,
+                        str error message if error or None
+                    )
          """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
@@ -97,8 +98,11 @@ class DummyBackend(BaseBackend):
         pass
     
     def make_sepa_payment(self, request, params, user=None):
-        return Payment(
+        return (
+            Payment(
                 user=user,
                 amount=1.337,
                 extra_data={'sepa_mandate_token': 'sepa-token-111111111'}
-            )
+            ), 
+            None
+        )

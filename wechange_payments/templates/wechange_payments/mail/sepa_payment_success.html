@@ -1,4 +1,5 @@
-{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token payment_recipient_name=payment_recipient_name sepa_creditor=sepa_creditor %}Thank you!
+{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token payment_recipient_name=SETTINGS.PAYMENTS_PAYMENT_RECIPIENT_NAME sepa_creditor=SETTINGS.PAYMENTS_SEPA_CREDITOR_ID %}
+Thank you!
 
 You have successfully made a SEPA payment.
 

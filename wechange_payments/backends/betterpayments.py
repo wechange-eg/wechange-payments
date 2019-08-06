@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from wechange_payments.backends.base import BaseBackend
-from wechange_payments.conf import settings
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 import urllib
 import hashlib
 from wechange_payments.models import TransactionLog, Payment
@@ -74,7 +74,7 @@ class BetterPaymentBackend(BaseBackend):
         post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + url
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
-            'payment_type': 'dd',
+            'payment_type': PAYMENT_TYPE_DIRECT_DEBIT,
             'order_id': order_id,
         }
         
@@ -152,7 +152,7 @@ class BetterPaymentBackend(BaseBackend):
         post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + url
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
-            'payment_type': 'dd',
+            'payment_type': PAYMENT_TYPE_DIRECT_DEBIT,
             'order_id': order_id,
             'original_transaction_id': original_transaction_id,
             'postback_url': request.build_absolute_uri(reverse('wechange-payments:api-postback-endpoint')),
@@ -180,7 +180,7 @@ class BetterPaymentBackend(BaseBackend):
         if not req.status_code == 200:
             extra = {'post_url': post_url, 'status':req.status_code, 'content': req._content}
             logger.error('Payments: BetterPayment SEPA Payment failed, request did not return status=200.', extra=extra)
-            return 'Error: The payment provider could not be reached.'
+            return (None, 'Error: The payment provider could not be reached.')
     
         result = req.json() # success!
         TransactionLog.objects.create(
@@ -211,7 +211,7 @@ class BetterPaymentBackend(BaseBackend):
         if result.get('error_code') != 0:
             extra= {'post_url': post_url, 'data': data, 'result': result}
             logger.error('Payments: API Calling SEPA Payment returned an error!', extra=extra)
-            return 'Error: %s (%d)' % (result.get('error_message'), result.get('error_code'))
+            return (None, 'Error: %s (%d)' % (result.get('error_message'), result.get('error_code')))
         
         # TODO: handle client_action and action_data
         extra_data = {
@@ -230,10 +230,19 @@ class BetterPaymentBackend(BaseBackend):
                 internal_transaction_id=result.get('order_id'),
                 amount=float(params['amount']),
                 type=Payment.TYPE_SEPA,
+                
+                address=params['address'],
+                city=params['city'],
+                postal_code=params['postal_code'],
+                country=params['country'],
+                first_name=params['first_name'],
+                last_name=params['last_name'],
+                email=params['email'],
+                
                 backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__),
-                extra_data=extra_data
+                extra_data=extra_data,
             )
-        return payment
+        return (payment, None)
         
     
     def make_sepa_payment(self, request, params, user=None):
@@ -268,6 +277,13 @@ class BetterPaymentBackend(BaseBackend):
             payment.save()
         except Exception as e:
             logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
+            
+        try:
+            self.send_successful_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+        except Exception as e:
+            logger.warning('Payments: SEPA Payment successful, but sending the success email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
+            if settings.DEBUG:
+                raise
         return payment
     
     

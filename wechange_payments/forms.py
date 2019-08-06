@@ -4,13 +4,14 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 
 from django_countries.fields import CountryField
-from wechange_payments.conf import settings
+from wechange_payments.conf import settings, PAYMENT_TYPE_CREDIT_CARD,\
+    PAYMENT_TYPE_PAYPAL, PAYMENT_TYPE_DIRECT_DEBIT
 
 
 PAYMENT_CHOICES = {
-    'cc': _('Credit Card'),
-    'dd': _('Direct Debit'),
-    'paypal': _('Paypal'),
+    PAYMENT_TYPE_CREDIT_CARD: _('Credit Card'),
+    PAYMENT_TYPE_DIRECT_DEBIT: _('Direct Debit'),
+    PAYMENT_TYPE_PAYPAL: _('Paypal'),
 }
 
 
@@ -20,13 +21,14 @@ class PaymentsForm(forms.Form):
     
     payment_type = forms.ChoiceField(choices=[(type, PAYMENT_CHOICES[type]) for type in settings.PAYMENTS_ACCEPTED_PAYMENT_METHODS])
     amount = forms.FloatField()
+    
+    first_name = forms.CharField()
+    last_name = forms.CharField()
+    email = forms.EmailField()
     address = forms.CharField()
     city = forms.CharField()
     postal_code = forms.IntegerField()
     country = CountryField().formfield()
-    first_name = forms.CharField()
-    last_name = forms.CharField()
-    email = forms.EmailField()
     
     tos_accept = forms.BooleanField(required=True)
     

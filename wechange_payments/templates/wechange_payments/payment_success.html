@@ -1,0 +1,66 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block extrahead %}
+	{{ block.super }}
+{% endblock %}
+
+
+{% block page_title %}{% trans "Payment Success" %}{% endblock %}
+
+{% block leftnav %}
+	{% url 'wechange-payments:payment' as payment_url %}
+	{% trans "Payments" as label %}
+	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-credit-card" label=label show_required=True href=payment_url  %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "Payments" %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    {% if request.GET.subscription_error %}
+        <div class="error-frame alert alert-danger alert-dismissable">
+            <i class="fa fa-exclamation-triangle fa-3x"></i>
+	        <p class="error-message">
+	        	{% trans "Your payment was processed successfully, but your subscription could not be activated due to an internal server error. Please contact the support and do not make any additional payments for now! We apologize for the inconveniences!" %}
+	        	{% if COSINNUS_CURRENT_PORTAL.support_email %}
+	        		<a href="mailto:{{ COSINNUS_CURRENT_PORTAL.support_email }}">{{ COSINNUS_CURRENT_PORTAL.support_email }}</a>
+	        	{% endif %}
+	        </p>
+	    </div>
+    {% endif %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="content-box">
+		<h1>{% trans "(TBD) Thank you!" %}</h1>
+		
+		<p class="white-content">
+			{% trans "(TBD) Thank you text" %}
+		</p>
+		
+		{% if payment.type == 'dd' %}
+			<h2>{% trans "Your SEPA Mandate" %}</h2>
+			
+			{% include 'wechange_payments/mail/sepa_payment_success.html' with payment=payment %}
+		{% endif %}
+		
+	</div>    
+	
+	<button href="{% url "wechange-payments:subscriptions" %}" class="btn btn-emphasized btn-autosize">
+        <ul class="media-list">
+            <li class="media">
+                <a class="pull-left" href="#">
+                    <i class="fa fa-credit-card"></i>
+                </a>
+                <div class="media-body">
+                      {% trans "View your subscription" %}
+                </div>
+            </li>
+        </ul>
+    </button>
+    
+{% endblock %}
+
