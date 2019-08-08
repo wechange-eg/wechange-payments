@@ -36,8 +36,11 @@ def create_subscription_for_payment(payment):
     else:
         subscription.set_next_due_date(now().date())
         subscription.state = Subscription.STATE_2_ACTIVE
+    
     subscription.save()
-    subscription.payments.add(payment)
+    
+    payment.subscription = subscription
+    payment.save()
     
     logger.info('Payments: Successfully created a new subscription for a user.',
                 extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user})

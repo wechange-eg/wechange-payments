@@ -34,13 +34,11 @@
 {% block content %}
     
     {% comment %} The 'onkeydown' attribute prevents form sending on enter {% endcomment %}
-    <form method="POST" action="{% url "wechange-payments:api-make-payment" %}" 
+    <form method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
     		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
         <!-- a box with semi transparent background -->
         <div class="content-box">
-        	<h1>TODO: replace the form url!</h1>
-        
 	        <div class="error-frame alert alert-danger alert-dismissable" style="display: none;">
 	            <i class="fa fa-exclamation-triangle fa-3x"></i>
 		        <p class="error-message"></p>

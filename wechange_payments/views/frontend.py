@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from cosinnus.views.mixins.group import RequireLoggedInMixin
 from wechange_payments.forms import PaymentsForm
 from cosinnus.utils.urls import get_non_cms_root_url, redirect_next_or
-from wechange_payments.models import Subscription
+from wechange_payments.models import Subscription, Payment
 from annoying.functions import get_object_or_None
 from django.urls.base import reverse
 from django.views.generic.detail import DetailView
@@ -58,6 +58,7 @@ payment = PaymentView.as_view()
 
 class PaymentSuccessView(RequireLoggedInMixin, DetailView):
     
+    model = Payment
     template_name = 'wechange_payments/payment_success.html'
     
     def get_context_data(self, *args, **kwargs):

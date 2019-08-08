@@ -14,7 +14,7 @@ urlpatterns = [
     
     url(r'^account/subscription/overview/$', frontend.overview, name='overview'),
     url(r'^account/subscription/payment/$', frontend.payment, name='payment'),
-    url(r'^account/subscription/payment/(?P<payment_id>\d+)/success/$', frontend.payment_success, name='payment-success'),
+    url(r'^account/subscription/payment/(?P<pk>\d+)/success/$', frontend.payment_success, name='payment-success'),
     url(r'^account/subscription/mine/$', frontend.subscriptions, name='subscriptions'),
     url(r'^welcome/contribute/$', frontend.welcome_page, name='welcome-page'),
 ]

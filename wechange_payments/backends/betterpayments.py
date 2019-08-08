@@ -214,9 +214,15 @@ class BetterPaymentBackend(BaseBackend):
             return (None, 'Error: %s (%d)' % (result.get('error_message'), result.get('error_code')))
         
         # TODO: handle client_action and action_data
+        
+        # save iban with all digits except for the first 2 and last 4 replaced with "*"
+        obfuscated_iban = params['iban'][:2] + ('*' * (len(params['iban'])-6)) + params['iban'][-4:]
         extra_data = {
             'status': result.get('status'), 
             'status_code': result.get('status_code'),
+            
+            'iban': obfuscated_iban,
+            'account_holder': params['account_holder'],
         }
         if result.get('client_action', None) == 'redirect' and 'action_data' in result:
             extra_data.update({
@@ -264,10 +270,9 @@ class BetterPaymentBackend(BaseBackend):
             return mandate_result
         transaction_id, sepa_mandate_token = mandate_result
         
-        payment_or_error = self._make_actual_sepa_payment(order_id, transaction_id, request, params, user=user)
-        if isinstance(payment_or_error, six.string_types):
-            return payment_or_error
-        payment = payment_or_error
+        payment, error = self._make_actual_sepa_payment(order_id, transaction_id, request, params, user=user)
+        if error is not None:
+            return None, error
         
         payment.user = user
         payment.extra_data.update({
@@ -284,7 +289,7 @@ class BetterPaymentBackend(BaseBackend):
             logger.warning('Payments: SEPA Payment successful, but sending the success email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
             if settings.DEBUG:
                 raise
-        return payment
+        return payment, None
     
     
     def handle_postback(self, params):

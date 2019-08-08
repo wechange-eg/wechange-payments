@@ -44,8 +44,14 @@ def make_payment(request, on_success_func=None):
                 except Exception as e:
                     logger.error('Payments: Critical! A user made a successful payment, but there was an error while creating his subscription! Find out what happened, create a subscription for them, and contact them!',
                          extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user, 'exception': e})
+                    if settings.DEBUG:
+                        raise
                     # redirect to the success view with errors this point, so the user doesn't just resubmit the form
-                    return redirect(reverse('wechange_payments:payment-success', kwargs={'payment_id': payment.id}) + '?subscription_error=1')
+                    redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id}) + '?subscription_error=1'
+                    data = {
+                        'redirect_to': redirect_url
+                    }
+                    return JsonResponse(data)
                 return ret
     
     if payment is None:
@@ -81,7 +87,11 @@ def make_subscription_payment(request):
     # use the regular payment method and create a subscription if it was successful
     def on_success_func(payment):
         create_subscription_for_payment(payment)
-        return redirect(reverse('wechange_payments:payment-success', kwargs={'payment_id': payment.id}))
+        redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
+        data = {
+            'redirect_to': redirect_url
+        }
+        return JsonResponse(data)
     
     return make_payment(request, on_success_func=on_success_func)
     

@@ -76,8 +76,12 @@ window.PaymentForm = {
 	},
 	
 	handleSuccess: function (data) {
-		alert('success! todo: now show the sepa mandate')
-		console.log(data)
+		if ('redirect_to' in data) {
+			window.location.href = data['redirect_to']
+		} else {
+			alert('success! but no "redirect_to" in return data, so NYI what to do here.')
+			console.log(data)
+		}
 	},
 	
 }

@@ -25,7 +25,12 @@
         <div class="error-frame alert alert-danger alert-dismissable">
             <i class="fa fa-exclamation-triangle fa-3x"></i>
 	        <p class="error-message">
-	        	{% trans "Your payment was processed successfully, but your subscription could not be activated due to an internal server error. Please contact the support and do not make any additional payments for now! We apologize for the inconveniences!" %}
+	        	{% trans "Your payment was processed successfully, but your subscription could not be activated due to an internal server error." %}
+	        </p>
+			<p>	        	
+				{% trans "Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!" %}
+			</p>
+			<p>	        	
 	        	{% if COSINNUS_CURRENT_PORTAL.support_email %}
 	        		<a href="mailto:{{ COSINNUS_CURRENT_PORTAL.support_email }}">{{ COSINNUS_CURRENT_PORTAL.support_email }}</a>
 	        	{% endif %}
@@ -49,18 +54,20 @@
 		
 	</div>    
 	
-	<button href="{% url "wechange-payments:subscriptions" %}" class="btn btn-emphasized btn-autosize">
-        <ul class="media-list">
-            <li class="media">
-                <a class="pull-left" href="#">
-                    <i class="fa fa-credit-card"></i>
-                </a>
-                <div class="media-body">
-                      {% trans "View your subscription" %}
-                </div>
-            </li>
-        </ul>
-    </button>
+	{% if not request.GET.subscription_error %}
+		<button href="{% url "wechange-payments:subscriptions" %}" class="btn btn-emphasized btn-autosize">
+	        <ul class="media-list">
+	            <li class="media">
+	                <a class="pull-left" href="#">
+	                    <i class="fa fa-credit-card"></i>
+	                </a>
+	                <div class="media-body">
+	                      {% trans "View your subscription" %}
+	                </div>
+	            </li>
+	        </ul>
+	    </button>
+    {% endif %}
     
 {% endblock %}
 
