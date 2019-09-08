@@ -1,0 +1,116 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block page_title %}{% trans "Payments" %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "My Subscription" %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="content-box white-content">
+		<h2>{% trans "Payment Infos" %}</h2>
+    	<div class="large-space">
+    		<table>
+				<tr>
+					<td>{% trans "Subscription Status" %}</td>
+					<td>TODO: active/waiting/canceled</td>
+				</tr>
+				<tr>
+					<td>{% trans "Subscription Amount" %}</td>
+					<td>{{ subscription.amount|intify }} €</td>
+				</tr>
+				<tr>
+					<td>{% trans "Next Payment scheduled" %}</td>
+					<td>
+						{{ subscription.next_due_date|localize }}
+						(<i><span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span></i>)
+					</td>
+				</tr>
+			</table>
+    		
+		</div>
+    	<div class="large-space">
+    		{% with payment=subscription.reference_payment %}
+    			<table>
+    				<tr>
+    					<td>{% trans "Payment Type" %}</td>
+    					<td>{{ payment.get_type_string }}</td>
+    				</tr>
+	    			{% if payment.type == 0 %}
+    				<tr>
+    					<td>{% trans "Account Holder" %}</td>
+    					<td>{{ payment.extra_data.account_holder }}</td>
+    				</tr>
+	    			<tr>
+    					<td>{% trans "IBAN" %}</td>
+    					<td>{{ payment.extra_data.iban }}</td>
+    				</tr>
+	    			{% endif %}
+	    		</table>
+	    		
+	    		<h3>{% trans "Billing Address" %}</h3>
+	    		<table>
+	    			<tr>
+    					<td>{% trans "Name" %}</td>
+    					<td>{{ payment.first_name }} {{ payment.last_name }}</td>
+    				</tr>
+    				<tr>
+    					<td>{% trans "Address" %}</td>
+    					<td>{{ payment.address }}</td>
+    				</tr>
+    				<tr>
+    					<td>{% trans "Postal Code" %}</td>
+    					<td>{{ payment.postal_code }}</td>
+    				</tr>
+    				<tr>
+    					<td>{% trans "City" %}</td>
+    					<td>{{ payment.city }}</td>
+    				</tr>
+    				<tr>
+    					<td>{% trans "Country" %}</td>
+    					<td>{{ payment.country }}</td>
+    				</tr>
+	    		</table>
+    		{% endwith %}
+    	</div>
+    	<div>
+			{% trans "To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
+			{% trans "You will only be billed after the current subscription expires." %} 
+			<a href="{% url "wechange-payments:cancel-subscription" %}">TODO: make button{% trans "Cancel Subscription" %}</a>
+		</div>
+		<hr/>
+		
+		<h3>{% trans "Last Payment" %}</h3>
+    	<div class="large-space">
+    		<table>
+				<tr>
+					<td>{% trans "Amount" %}</td>
+					<td>{{ last_payment.amount|intify }} €</td>
+				</tr>
+				<tr>
+					<td>{% trans "Date" %}</td>
+					<td>
+						{{ last_payment.completed_at|localize }}
+						(<i><span class="moment-data-date" data-date="{{ last_payment.completed_at|date:'c' }}"></span></i>)
+					</td>
+				</tr>
+			</table>
+		</div>
+    	<div>
+    		{% trans "For more information see your invoices" %}: 
+    		<a href="{% url "wechange-payments:invoices" %}">{% trans "Invoices" %}</a>
+    	</div>
+    	
+    </div>
+        
+    
+{% endblock %}
+

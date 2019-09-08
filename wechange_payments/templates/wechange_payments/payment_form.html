@@ -21,9 +21,7 @@
 {% block page_title %}{% trans "Payments" %}{% endblock %}
 
 {% block leftnav %}
-	{% url 'wechange-payments:payment' as payment_url %}
-	{% trans "Payments" as label %}
-	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-credit-card" label=label show_required=True href=payment_url  %}
+	{% include 'wechange_payments/leftnav.html' %}
 {% endblock leftnav %}
 
 {% block breadcrumb %}

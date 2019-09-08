@@ -50,7 +50,6 @@ class Payment(models.Model):
     postal_code = models.IntegerField(blank=True, null=True)
     country = CountryField(blank=True, null=True)
     
-    
     backend = models.CharField(_('Backend class used'), max_length=255)
     extra_data = JSONField()
     
@@ -58,7 +57,10 @@ class Payment(models.Model):
         app_label = 'wechange_payments'
         verbose_name = _('Payment')
         verbose_name_plural = _('Payments')
-
+    
+    def get_type_string(self):
+        return dict(self.TYPE_CHOICES).get(self.type)
+    
 
 class TransactionLog(models.Model):
     
@@ -93,6 +95,7 @@ class Subscription(models.Model):
     # Active
     STATE_2_ACTIVE = 2
     # A new subscription waiting for next payment due date, but with another subscription with the state STATE_1_CANCELLED_BUT_ACTIVE.
+    # There can only be one subscription with state 3 active at a time.
     STATE_3_WATING_TO_BECOME_ACTIVE = 3
     
     # - A subscription can only ever go from higher number states to lower number states, never back up again!
@@ -135,8 +138,17 @@ class Subscription(models.Model):
     @classmethod
     def get_active_for_user(cls, user):
         """ Returns the currently active subscription for a user. """
+        if not user.is_authenticated:
+            return None
         return get_object_or_None(cls, user=user, state__in=[Subscription.STATE_1_CANCELLED_BUT_ACTIVE, Subscription.STATE_2_ACTIVE])
-        
+    
+    @classmethod
+    def get_waiting_for_user(cls, user):
+        """ Returns the currently waiting subscription for a user. """
+        if not user.is_authenticated:
+            return None
+        return get_object_or_None(cls, user=user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
+    
     def validate_state_and_cycle(self):
         """ This will terminate this subscription if it has been cancelled, 
             and whose next_due_date is in the past! 

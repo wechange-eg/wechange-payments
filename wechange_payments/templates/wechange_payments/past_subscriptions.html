@@ -1,0 +1,32 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block page_title %}{% trans "Past Subscriptions" %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:past-subscriptions' %}">{% trans "Past Subscriptions" %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="content-box">
+    	<h1>{% trans "Past Subscriptions" %}</h1>
+    
+    	{% for subscription in past_subscriptions %}
+    		{{ subscription.created }} - 
+    		<i><span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span></i>
+    		<br/>
+    	{% endfor %}
+    	
+    	
+    </div>
+        
+    
+{% endblock %}
+

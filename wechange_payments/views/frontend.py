@@ -13,6 +13,7 @@ from django.urls.base import reverse
 from django.views.generic.detail import DetailView
 from cosinnus.utils.permissions import check_user_superuser
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 
 logger = logging.getLogger('wechange-payments')
 
@@ -55,7 +56,6 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
 payment = PaymentView.as_view()
 
 
-
 class PaymentSuccessView(RequireLoggedInMixin, DetailView):
     
     model = Payment
@@ -72,6 +72,8 @@ class PaymentSuccessView(RequireLoggedInMixin, DetailView):
         return context
 
 payment_success = PaymentSuccessView.as_view()
+
+
 
 
 class WelcomePageView(RequireLoggedInMixin, TemplateView):
@@ -92,7 +94,7 @@ welcome_page = WelcomePageView.as_view()
 
 class OverviewView(RequireLoggedInMixin, RedirectView):
     """ Redirects to the payment view if the user has no active subscriptions
-        and to the subscription list page if there is an active subscription. """
+        and to the my subscription view if there is an active subscription. """
     
     template_name = 'wechange_payments/welcome_page.html'
     
@@ -103,31 +105,124 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
             Subscription.STATE_3_WATING_TO_BECOME_ACTIVE,
         ])
         if subscription:
-            return reverse('wechange-payments:subscriptions')
+            return reverse('wechange-payments:my-subscription')
         else:
             return reverse('wechange-payments:payment')
         
 overview = OverviewView.as_view()
 
 
-class SubscriptionsView(RequireLoggedInMixin, TemplateView):
-    """ Redirects to the payment view if the user has no active subscriptions
-        and to the subscription list page if there is an active subscription. """
+class MySubscriptionView(RequireLoggedInMixin, TemplateView):
+    """ Shows informations about the current subscription and lets the user
+        adjust the payment amount. """
     
-    template_name = 'wechange_payments/subscriptions.html'
+    template_name = 'wechange_payments/my_subscription.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('wechange-payments:payment')
+        self.active_subscription = Subscription.get_active_for_user(self.request.user)
+        self.waiting_subscription = Subscription.get_waiting_for_user(self.request.user)
+        if not self.active_subscription and not self.past_subscriptions and not self.waiting_subscriptions:
+            return redirect('wechange-payments:payment')
+        return super(MySubscriptionView, self).dispatch(request, *args, **kwargs)
     
     def get_context_data(self, *args, **kwargs):
-        context = super(SubscriptionsView, self).get_context_data(*args, **kwargs)
-        active_subscription = Subscription.get_active_for_user(self.request.user)
-        past_subscriptions = Subscription.objects.filter(user=self.request.user, state=Subscription.STATE_0_TERMINATED)
-        waiting_subscriptions = Subscription.objects.filter(user=self.request.user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
-        
+        context = super(MySubscriptionView, self).get_context_data(*args, **kwargs)
         context.update({
-            'active_subscription': active_subscription,
-            'past_subscriptions': past_subscriptions,
-            'waiting_subscriptions': waiting_subscriptions,
+            'active_subscription': self.active_subscription,
+            'waiting_subscription': self.waiting_subscription,
         })
         return context
         
-subscriptions = SubscriptionsView.as_view()
+my_subscription = MySubscriptionView.as_view()
+
+
+class PaymentInfosView(RequireLoggedInMixin, TemplateView):
+    """ Shows informations about the current subscription and lets the user
+        adjust the payment amount. """
+    
+    template_name = 'wechange_payments/payment_infos.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('wechange-payments:payment')
+        self.active_subscription = Subscription.get_active_for_user(self.request.user)
+        self.last_payment = None
+        if self.active_subscription:
+            self.last_payment = self.active_subscription.last_payment
+        self.waiting_subscription = Subscription.get_waiting_for_user(self.request.user)
+        self.subscription = self.waiting_subscription or self.active_subscription
+        if not self.subscription:
+            return redirect('wechange-payments:payment')
+        return super(PaymentInfosView, self).dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(PaymentInfosView, self).get_context_data(*args, **kwargs)
+        context.update({
+            'subscription': self.subscription,
+            'last_payment': self.last_payment,
+        })
+        return context
+        
+payment_infos = PaymentInfosView.as_view()
+
+
+class PastSubscriptionsView(RequireLoggedInMixin, TemplateView):
+    """ Shows a list of past subscriptions. """
+    
+    template_name = 'wechange_payments/past_subscriptions.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('wechange-payments:payment')
+        self.past_subscriptions = Subscription.objects.filter(user=self.request.user, state=Subscription.STATE_0_TERMINATED)
+        if not self.past_subscriptions:
+            return redirect('wechange-payments:payment')
+        return super(PastSubscriptionsView, self).dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(MySubscriptionView, self).get_context_data(*args, **kwargs)
+        context.update({
+            'past_subscriptions': self.past_subscriptions,
+        })
+        return context
+        
+past_subscriptions = PastSubscriptionsView.as_view()
+
+
+class InvoicesView(RequireLoggedInMixin, TemplateView):
+    """ TODO: invoices view. """
+    
+    template_name = 'wechange_payments/invoices.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('wechange-payments:payment')
+        self.invoices = None # TODO
+        if not self.invoices:
+            return redirect('wechange-payments:payment')
+        return super(MySubscriptionView, self).dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(MySubscriptionView, self).get_context_data(*args, **kwargs)
+        context.update({
+            'invoices': self.invoices,
+        })
+        return context
+
+invoices = InvoicesView.as_view()
+
+
+class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
+    
+    template_name = 'wechange_payments/cancel_subscription.html'
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(CancelSubscriptionView, self).get_context_data(*args, **kwargs)
+        # TODO: cancel subscription on POST
+        return context
+
+cancel_subscription = CancelSubscriptionView.as_view()
+
 

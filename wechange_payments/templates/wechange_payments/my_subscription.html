@@ -1,0 +1,26 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block page_title %}{% trans "Payments" %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "My Subscription" %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="content-box">
+    	
+    	
+    	
+    </div>
+        
+    
+{% endblock %}
+
