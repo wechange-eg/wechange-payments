@@ -47,6 +47,17 @@
         	
         	<hr>
         	
+        	{% if current_subscription %}
+        		{% comment %} 
+        			This can only be a cancelled subscription, because with an active subscription
+        			this page would redirect.
+        		{% endcomment %}
+        		<h1>
+        			{% trans "(TBD)Your subscription will end soon!" %}  
+					(<span class="moment-data-date" data-date="{{ current_subscription.next_due_date|date:'c' }}"></span>)
+				</h1>
+        	{% endif %}
+        	
             <h3>{% trans "Payment Info" %}</h3>
             
 			{% trans "Payment Type" as label %}

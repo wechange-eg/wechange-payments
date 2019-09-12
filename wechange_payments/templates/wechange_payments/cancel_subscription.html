@@ -1,0 +1,55 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block page_title %}{% trans "Payments" %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "My Subscription" %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="content-box">
+    	<legend>{% trans "Cancel Subscription" %}</legend>
+    	
+    	<p>
+    		{% trans "(TBD) Cancelling sorry text" %}
+    	</p>
+    	<p>
+			{% if current_subscription.state == 3 %}
+				{% trans "(TBD) Cancelling explanation (future subscription): No payments have been billed yet. The subscription will be canceled." %}
+			{% elif current_subscription.state == 2 %}
+				{% trans "(TBD) Cancelling explanation (active subscription): You will no longer be billed. Your subscription will remain active until" %}:
+				<span class="moment-data-date" data-date="{{ current_subscription.next_due_date|date:'c' }}"></span>
+			{% endif %}
+		</p>
+    	
+    </div>
+    
+    <button type="button" class="btn btn-emphasized btn-autosize" data-toggle="modal" data-target="#cancel_confirm_modal">
+        <ul class="media-list">
+            <li class="media">
+                <a class="pull-left" href="#">
+                    <i class="fa fa-close"></i>
+                </a>
+                <div class="media-body">
+                    {% trans "Terminate Subscription" %}
+                </div>
+            </li>
+        </ul>
+    </button>
+    
+    {% captureas label %}{% trans "(TBD) Confirm subscription canceling dialog text" %}{% endcaptureas %}
+    {% captureas title %}{% trans "Terminate Subscription" %}{% endcaptureas %}
+    {% include "cosinnus/modal_box.html" with id="cancel_confirm_modal" label=label title=title title_icon="fa-close" form_action="." %}
+    
+        
+    
+{% endblock %}
+

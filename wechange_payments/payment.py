@@ -18,7 +18,7 @@ def create_subscription_for_payment(payment):
     # if the user has an existing active sub, we will not create a second subscription
     # this case should never happen, as sanity checks on payments should prevent it!
     # (cancelled active subs are ok!)
-    active_sub = Subscription.get_active_for_user(payment.user)
+    active_sub = Subscription.get_current_for_user(payment.user)
     if active_sub and active_sub.state != Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
         logger.error('Payments: CRITICAL! create_subscription_for_payment() was called after a payment, but there is already an active payment for this user! You need to take action and make sure the payment will result in a proper subscription, or refund the user!', 
                         extra={'payment-id': payment.id, 'payment': payment, 'active-subscription-id': active_sub.id, 'active-subscription': active_sub, 'user': payment.user})
@@ -65,4 +65,16 @@ def process_due_subscription_payments():
     for active_sub in Subscription.objects.filter(state=Subscription.STATE_2_ACTIVE):
         if active_sub.check_payment_due() and active_sub.user.is_active:
             active_sub.book_next_payment()
-        
+
+
+def terminate_subscription(user):
+    """ Ends the currently active or waiting subscription for a user """
+    subscription = Subscription.get_current_for_user(user)
+    subscription.state = Subscription.STATE_0_TERMINATED
+    subscription.terminated = now()
+    subscription.save()
+    # TODO: send email!
+    return True
+    
+
+

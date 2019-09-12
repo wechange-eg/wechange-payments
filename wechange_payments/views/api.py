@@ -80,7 +80,7 @@ def make_subscription_payment(request):
         return HttpResponseForbidden('You must be logged in to do that!')
     
     # if the user has an existing active sub, deny this payment (cancelled active subs are ok!)
-    active_sub = Subscription.get_active_for_user(request.user)
+    active_sub = Subscription.get_current_for_user(request.user)
     if active_sub and active_sub.state != Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
         return JsonResponse({'error': _('You already have an active subscription and cannot start another one!')}, status=500)
     

@@ -15,18 +15,30 @@
 {% block content %}
     
     <!-- a box with semi transparent background -->
-    <div class="content-box white-content">
-		<h2>{% trans "Payment Infos" %}</h2>
+    <div class="content-box white-content payment-info-page">
+		<h2>{% trans "Payment Information" %}</h2>
     	<div class="large-space">
     		<table>
 				<tr>
 					<td>{% trans "Subscription Status" %}</td>
-					<td>TODO: active/waiting/canceled</td>
+					<td>
+						{% if subscription.state == 3 %}
+							{% trans "Will become active after your last subscription expires." context "subscription status" %}
+						{% elif subscription.state == 2 %}
+							{% trans "Active" context "subscription status" %}
+						{% elif subscription.state == 1 %}
+							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
+							{% trans "Cancelled" context "subscription status" %}.
+							{% trans "Expires" %}: 
+							<span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span>
+						{% endif %}
+					</td>
 				</tr>
 				<tr>
 					<td>{% trans "Subscription Amount" %}</td>
 					<td>{{ subscription.amount|intify }} €</td>
 				</tr>
+				{% if subscription.state >= 2 %}
 				<tr>
 					<td>{% trans "Next Payment scheduled" %}</td>
 					<td>
@@ -34,6 +46,7 @@
 						(<i><span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span></i>)
 					</td>
 				</tr>
+				{% endif %}
 			</table>
     		
 		</div>
@@ -56,7 +69,7 @@
 	    			{% endif %}
 	    		</table>
 	    		
-	    		<h3>{% trans "Billing Address" %}</h3>
+	    		<h4>{% trans "Billing Address" %}</h4>
 	    		<table>
 	    			<tr>
     					<td>{% trans "Name" %}</td>
@@ -84,7 +97,7 @@
     	<div>
 			{% trans "To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
 			{% trans "You will only be billed after the current subscription expires." %} 
-			<a href="{% url "wechange-payments:cancel-subscription" %}">TODO: make button{% trans "Cancel Subscription" %}</a>
+			<a href="{% url "wechange-payments:cancel-subscription" %}">{% trans "Cancel your Subscription" %}</a>
 		</div>
 		<hr/>
 		

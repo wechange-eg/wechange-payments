@@ -107,6 +107,11 @@ class Subscription(models.Model):
         (STATE_3_WATING_TO_BECOME_ACTIVE, _('Waiting, becoming active at next payment due date')),
     )
     
+    ACTIVE_STATES = (
+        STATE_1_CANCELLED_BUT_ACTIVE,
+        STATE_2_ACTIVE
+    )
+    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
         editable=False, related_name='subscriptions', on_delete=models.CASCADE, null=False)
     reference_payment = models.OneToOneField('wechange_payments.Payment', verbose_name=_('Reference Payment'), 
@@ -129,6 +134,7 @@ class Subscription(models.Model):
     last_payment = models.ForeignKey('wechange_payments.Payment', verbose_name=_('Last Payment'), 
         on_delete=models.PROTECT, related_name='+', null=False,
         help_text='The most recent payment made.')
+    terminated = models.DateTimeField(verbose_name=_('Created'), editable=False, blank=True, null=True)
     
     class Meta(object):
         ordering = ('created',)
@@ -136,12 +142,19 @@ class Subscription(models.Model):
         verbose_name_plural = _('Subscription')
         
     @classmethod
+    def get_current_for_user(cls, user):
+        """ Returns the currently active or waiting subscription for a user. """
+        if not user.is_authenticated:
+            return None
+        return get_object_or_None(cls, user=user, state__in=Subscription.ACTIVE_STATES)
+        
+    @classmethod
     def get_active_for_user(cls, user):
         """ Returns the currently active subscription for a user. """
         if not user.is_authenticated:
             return None
-        return get_object_or_None(cls, user=user, state__in=[Subscription.STATE_1_CANCELLED_BUT_ACTIVE, Subscription.STATE_2_ACTIVE])
-    
+        return get_object_or_None(cls, user=user, state=Subscription.STATE_2_ACTIVE)
+
     @classmethod
     def get_waiting_for_user(cls, user):
         """ Returns the currently waiting subscription for a user. """
@@ -163,7 +176,7 @@ class Subscription(models.Model):
             if waiting_sub:
                 # if there was a waiting sub, activate it and set it to the due date of the old one
                 # sanity check: there cannot be an active subscription if we want to activate this one!
-                if Subscription.get_active_for_user(waiting_sub.user) is None:
+                if Subscription.get_current_for_user(waiting_sub.user) is None:
                     waiting_sub.state = Subscription.STATE_2_ACTIVE
                     waiting_sub.next_due_date = self.next_due_date
                     waiting_sub.save()
