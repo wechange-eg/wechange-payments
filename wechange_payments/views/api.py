@@ -80,9 +80,22 @@ def make_subscription_payment(request):
         return HttpResponseForbidden('You must be logged in to do that!')
     
     # if the user has an existing active sub, deny this payment (cancelled active subs are ok!)
-    active_sub = Subscription.get_current_for_user(request.user)
-    if active_sub and active_sub.state != Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
+    active_sub = Subscription.get_active_for_user(request.user)
+    if active_sub:
         return JsonResponse({'error': _('You already have an active subscription and cannot start another one!')}, status=500)
+    
+    # if the user has a cancelled, but still active sub, we make special payment that
+    # only saves the account data with the payment provider, but does not actually 
+    # transfer any money yet. money will be transfered with the next subscription due date
+    cancelled_sub = Subscription.get_current_for_user(request.user)
+    if cancelled_sub:
+        # sanity check that we are really dealing with a cancelled sub
+        if not cancelled_sub.state == Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
+            logger.error('Critical: User seemed to have a cancelled sub, but sanity check on it failed when trying to make a waiting subscription!', 
+                         extra={'user': request.user.email})
+            return JsonResponse({'error': _('We can not create a new subscription for you at this point. Please contact the support! No payment has been made yet.')}, status=500)
+        # TODO: implement postponed subscription payment!
+        return JsonResponse({'error': 'NYI: Postponed subscription creation is not yet implemented!'}, status=500)
     
     # use the regular payment method and create a subscription if it was successful
     def on_success_func(payment):

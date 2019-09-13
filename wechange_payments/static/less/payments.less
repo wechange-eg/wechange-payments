@@ -17,7 +17,7 @@
 @background-color-secondary: @color-light-gray;
 @field-input-background-color: @color-medium-gray;
 
-h1, h2, h3 {
+h1, h2 {
 	font-size: 16px;
 	font-weight: bold;
 }
@@ -30,6 +30,8 @@ h2, .cosinnus-form h2 {
 	margin: 8px 0 32px 0;	
 }
 h3, .cosinnus-form h3 {
+	font-size: 14px;
+	font-weight: bold;
 	margin: 8px 0 16px 0;	
 }
 hr, .cosinnus-form hr {
@@ -40,17 +42,7 @@ hr, .cosinnus-form hr {
 		margin: 20px 0;
 	}
 }
-a:not(.rounded-button) {
-	color: @text-color;
-	text-decoration: none;
-	font-weight: bold;
-	
-	&:hover {
-		color: @text-color;
-		text-decoration: underline;
-		font-weight: bold;
-	}
-}
+
 p {
 	padding: 0 0 16px 0;
 }
@@ -59,6 +51,23 @@ p {
 	background-color: @background-color;
 	padding: 40px;
 	color: @text-color;
+	
+	code {
+		background-color: @background-color;
+		color: @text-color;
+	}
+	
+	a:not(.rounded-button) {
+		color: @text-color;
+		text-decoration: none;
+		font-weight: bold;
+		
+		&:hover {
+			color: @text-color;
+			text-decoration: underline;
+			font-weight: bold;
+		}
+	}
 }
 .button-section {
 	margin-top: 20px;

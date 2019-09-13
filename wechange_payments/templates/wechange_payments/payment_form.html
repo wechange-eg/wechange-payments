@@ -94,14 +94,10 @@
 					<h2>{% trans "(TBD) Almost done!" %}</h2>
 					
 					<p>
-						(TBD) Should we show the subscription amount here??
-					</p>
-					
-					<p>
 						{% trans "(TBD) Please enter your account information below." %}
 					</p>
 					
-					<hr class="invisible" />
+					<hr />
 					
 		            <h3>{% trans "Payment Info" %}</h3>
 		            
@@ -175,26 +171,27 @@
 				            *
 				        </span>
 				    </p>
+				    
+				    <hr/>
+				    
+					<p>
+						(TBD)TODO: Should we show the subscription amount again here as a confirmation for the user what they're actually paying when they click the next button??
+					</p>
 					
+				    <hr/>
+				    
 					<div class="button-section clearfix">
 						<a class="rounded-button button-color-secondary" href="#step2" class="_group-form-tab" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-					            {% trans "Modify Contribution Amount" context "payment step button" %}
+					            &lt; {% trans "Modify Contribution Amount" context "payment step button" %}
 					        </span>
-					    </a>					
+					    </a>
+					    <button type="submit" class="pull-right rounded-button button-color-primary-inverted">
+					        <span class="rounded-button-inner">
+								{% trans "(TBD) Confirm and pay" context "payment step button" %}
+					        </span>
+					    </button>		
 					
-				        <button type="submit" class="btn btn-emphasized">
-					        <ul class="media-list">
-					            <li class="media">
-					                <a class="pull-left" href="#">
-					                    <i class="fa fa-pencil"></i>
-					                </a>
-					                <div class="media-body">
-					                      {% trans "Confirm payment" context "payment step button" %}
-					                </div>
-					            </li>
-					        </ul>
-					    </button>
 					</div>
 				</div>
 				

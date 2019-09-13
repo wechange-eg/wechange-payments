@@ -112,7 +112,7 @@ class Subscription(models.Model):
         STATE_2_ACTIVE,
     )
     
-    ALLOWED_TO_MAKE_SUBSCRIPTION_STATES = (
+    ALLOWED_TO_MAKE_NEW_SUBSCRIPTION_STATES = (
         STATE_0_TERMINATED,
         STATE_1_CANCELLED_BUT_ACTIVE,
     )

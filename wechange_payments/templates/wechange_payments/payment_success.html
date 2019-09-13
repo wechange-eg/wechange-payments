@@ -9,9 +9,7 @@
 {% block page_title %}{% trans "Payment Success" %}{% endblock %}
 
 {% block leftnav %}
-	{% url 'wechange-payments:payment' as payment_url %}
-	{% trans "Payments" as label %}
-	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-credit-card" label=label show_required=True href=payment_url  %}
+	{% include 'wechange_payments/leftnav.html' %}
 {% endblock leftnav %}
 
 {% block breadcrumb %}
@@ -40,34 +38,32 @@
     
     <!-- a box with semi transparent background -->
     <div class="main-content">
-		<h1>{% trans "(TBD) Thank you!" %}</h1>
+		<h1>{% trans "(TBD) Thank you for subscribing!" %}</h1>
 		
-		<p class="white-content">
+		<p>
 			{% trans "(TBD) Thank you text" %}
 		</p>
 		
-		{% if payment.type == 'dd' %}
-			<h2>{% trans "Your SEPA Mandate" %}</h2>
+		{% if payment.type == 0 %}
+			<hr/>
+			<h3>{% trans "Your SEPA Mandate" %}</h3>
 			
-			{% include 'wechange_payments/mail/sepa_payment_success.html' with payment=payment %}
+			{% captureas embedded %}{% include 'wechange_payments/mail/sepa_payment_success.html' with payment=payment %}{% endcaptureas %}
+			<code>{{ embedded|linebreaksbr }}
+			</code>
 		{% endif %}
 		
+		{% if not request.GET.subscription_error %}
+		    <div class="button-section clearfix">
+	            <a href="{% url "wechange-payments:overview" %}" class="pull-right rounded-button button-color-primary-inverted">
+			        <span class="rounded-button-inner">
+	                    {% trans "View your subscription" %}
+			        </span>
+			    </a>
+			</div>
+	    {% endif %}
+    
 	</div>    
-	
-	{% if not request.GET.subscription_error %}
-		<button href="{% url "wechange-payments:subscriptions" %}" class="btn btn-emphasized btn-autosize">
-	        <ul class="media-list">
-	            <li class="media">
-	                <a class="pull-left" href="#">
-	                    <i class="fa fa-credit-card"></i>
-	                </a>
-	                <div class="media-body">
-	                      {% trans "View your subscription" %}
-	                </div>
-	            </li>
-	        </ul>
-	    </button>
-    {% endif %}
     
 {% endblock %}
 

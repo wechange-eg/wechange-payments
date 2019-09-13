@@ -116,26 +116,24 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
             Subscription.STATE_2_ACTIVE,
             Subscription.STATE_3_WATING_TO_BECOME_ACTIVE,
         ])
-        if subscription.state in Subscription.ALLOWED_TO_MAKE_SUBSCRIPTION_STATES:
+        if not subscription or subscription.state in Subscription.ALLOWED_TO_MAKE_NEW_SUBSCRIPTION_STATES:
             return reverse('wechange-payments:payment')
-        elif subscription:
-            return reverse('wechange-payments:my-subscription')
         else:
-            return reverse('wechange-payments:payment')
+            return reverse('wechange-payments:my-subscription')
         
 overview = OverviewView.as_view()
 
 
 class MySubscriptionView(RequireLoggedInMixin, TemplateView):
-    """ Shows informations about the current subscription and lets the user
+    """ Shows informations about the active or queued subscription and lets the user
         adjust the payment amount. """
     
     template_name = 'wechange_payments/my_subscription.html'
     
     def dispatch(self, request, *args, **kwargs):
-        self.current_subscription = Subscription.get_current_for_user(self.request.user)
+        self.current_subscription = Subscription.get_active_for_user(self.request.user)
         self.waiting_subscription = Subscription.get_waiting_for_user(self.request.user)
-        if not self.current_subscription and not self.past_subscriptions and not self.waiting_subscriptions:
+        if not self.current_subscription and not self.waiting_subscriptions:
             return redirect('wechange-payments:payment')
         return super(MySubscriptionView, self).dispatch(request, *args, **kwargs)
     
@@ -208,10 +206,10 @@ class InvoicesView(RequireLoggedInMixin, TemplateView):
         self.invoices = None # TODO
         if not self.invoices:
             return redirect('wechange-payments:payment')
-        return super(MySubscriptionView, self).dispatch(request, *args, **kwargs)
+        return super(InvoicesView, self).dispatch(request, *args, **kwargs)
     
     def get_context_data(self, *args, **kwargs):
-        context = super(MySubscriptionView, self).get_context_data(*args, **kwargs)
+        context = super(InvoicesView, self).get_context_data(*args, **kwargs)
         context.update({
             'invoices': self.invoices,
         })
@@ -235,11 +233,11 @@ class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
         try:
             success = terminate_subscription(request.user)
             if success:
-                messages.success(_('Your Subscription was terminated.'))
+                messages.success(request, _('Your current Subscription was terminated.'))
                 return redirect('wechange-payments:overview')
         except Exception as e:
             logger.error('Critical: Could not cancel a subscription!', extra={'exc': force_text(e)})
-            messages.error(_('There was an error terminating your subscription! Please contact the customer support!'))
+            messages.error(request, _('There was an error terminating your subscription! Please contact the customer support!'))
         return redirect('wechange-payments:overview')
 
 cancel_subscription = CancelSubscriptionView.as_view()
