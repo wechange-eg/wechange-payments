@@ -36,117 +36,176 @@
     		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
         <!-- a box with semi transparent background -->
-        <div class="content-box">
+        <div class="main-content">
 	        <div class="error-frame alert alert-danger alert-dismissable" style="display: none;">
 	            <i class="fa fa-exclamation-triangle fa-3x"></i>
 		        <p class="error-message"></p>
 		    </div>
 		    
+		    <div class="tab-content">
 		    
-        	{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
-        	
-        	<hr>
-        	
-        	{% if current_subscription %}
-        		{% comment %} 
-        			This can only be a cancelled subscription, because with an active subscription
-        			this page would redirect.
-        		{% endcomment %}
-        		<h1>
-        			{% trans "(TBD)Your subscription will end soon!" %}  
-					(<span class="moment-data-date" data-date="{{ current_subscription.next_due_date|date:'c' }}"></span>)
-				</h1>
-        	{% endif %}
-        	
-            <h3>{% trans "Payment Info" %}</h3>
-            
-			{% trans "Payment Type" as label %}
-			{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label show_required=True field_classes="conditional-select" %}
-			
-            <div class="conditional-select-container" data-select-name="payment_type" data-select-value="dd">
-	            <div class="row">
-	                <div class="col-sm-6 regular-space">
-						{% trans "IBAN" as label %}
-						{% include 'cosinnus/fields/default_field.html' with field=form.iban label=label show_required=True %}
-	                </div>
-	                <div class="col-sm-6 regular-space">
-						{% trans "BIC" as label %}
-						{% include 'cosinnus/fields/default_field.html' with field=form.bic label=label show_required=True %}
-	                </div>
-	            </div><!-- row -->
-	            
-	            {# email Field #}
-				{% trans "Account Holder" as label %}
-				{% include 'cosinnus/fields/default_field.html' with field=form.account_holder label=label show_required=True %}
+				<div class="tab-pane active" id="step1">
+		        	{% include 'wechange_payments/partials/conditional_payment_header.html' %}
+					
+					<div class="button-section clearfix">
+						<a href="(TBD) more-URL" class="rounded-button button-color-secondary">
+					        <span class="rounded-button-inner">
+					            {% trans "Learn more" %}
+					        </span>
+					    </a>
+		                <a class="rounded-button button-color-primary-inverted" href="#step2" class="_group-form-tab" role="tab" data-toggle="tab">
+					        <span class="rounded-button-inner">
+								{% trans "Choose Contribution" context "payment step button" %}
+					        </span>
+					    </a>
+					</div>
+				</div>
+				
+				<div class="tab-pane" id="step2">
+		        	{% include 'wechange_payments/partials/conditional_payment_header.html' %}
+					
+					<div class="button-section clearfix">
+						<a href="(TBD) more-URL" class="rounded-button button-color-secondary">
+					        <span class="rounded-button-inner">
+					            {% trans "Learn more" %}
+					        </span>
+					    </a>
+					</div>
+					
+					<hr/>
+					
+        			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
+        			
+        			<div class="button-section clearfix">
+						<a href="{% url 'wechange-payments:overview' %}" class="pull-left rounded-button button-color-tertiary">
+					        <span class="rounded-button-inner">
+		                		{% trans "Remind me later" %} (TODO: what does this link do?)
+					        </span>
+					    </a>
+		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" class="_group-form-tab" role="tab" data-toggle="tab">
+					        <span class="rounded-button-inner">
+								{% trans "Set Contribution Amount" context "payment step button" %}
+					        </span>
+					    </a>
+					</div>
+				</div>
+				
+				<div class="tab-pane" id="step3">
+					<h2>{% trans "(TBD) Almost done!" %}</h2>
+					
+					<p>
+						(TBD) Should we show the subscription amount here??
+					</p>
+					
+					<p>
+						{% trans "(TBD) Please enter your account information below." %}
+					</p>
+					
+					<hr class="invisible" />
+					
+		            <h3>{% trans "Payment Info" %}</h3>
+		            
+					{% trans "Payment Type" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label show_required=True field_classes="conditional-select" %}
+					
+		            <div class="conditional-select-container" data-select-name="payment_type" data-select-value="dd">
+			            <div class="row">
+			                <div class="col-sm-6 regular-space">
+								{% trans "IBAN" as label %}
+								{% include 'cosinnus/fields/default_field.html' with field=form.iban label=label show_required=True %}
+			                </div>
+			                <div class="col-sm-6 regular-space">
+								{% trans "BIC" as label %}
+								{% include 'cosinnus/fields/default_field.html' with field=form.bic label=label show_required=True %}
+			                </div>
+			            </div><!-- row -->
+			            
+			            {# email Field #}
+						{% trans "Account Holder" as label %}
+						{% include 'cosinnus/fields/default_field.html' with field=form.account_holder label=label show_required=True %}
+					</div>
+		
+					<div class="conditional-select-container" data-select-name="payment_type" data-select-value="cc">			
+						<p>This is the credit card form!</p>
+					</div>
+					                
+					<hr>
+		    		
+		    		<h3>{% trans "Billing Address" %}</h3>
+		    		
+					{% trans "E-Mail" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.email label=label show_required=True %}
+		    		
+		    		<div class="row">
+		                <div class="col-sm-6 regular-space">
+							{% trans "First name" as label %}
+							{% include 'cosinnus/fields/default_field.html' with field=form.first_name label=label show_required=True%}
+		                </div>
+		                <div class="col-sm-6 regular-space">
+							{% trans "Last name" as label %}
+							{% include 'cosinnus/fields/default_field.html' with field=form.last_name label=label show_required=True %}
+		                </div>
+		            </div><!-- row -->
+		            
+		            {% trans "Address" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.address label=label show_required=True %}
+		        	
+		        	<div class="row">
+		                <div class="col-sm-6 regular-space">
+							{% trans "Postal Code" as label %}
+							{% include 'cosinnus/fields/default_field.html' with field=form.postal_code label=label show_required=True%}
+		                </div>
+		                <div class="col-sm-6 regular-space">
+							{% trans "City" as label %}
+							{% include 'cosinnus/fields/default_field.html' with field=form.city label=label show_required=True %}
+		                </div>
+		            </div><!-- row -->
+		        	
+		        	{% trans "Country" as label %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.country label=label show_required=True %}
+		        	
+		        	<div class="large-space"></div>
+		        	
+		            <p class="inline-list transparent">
+				        <span class="cursor-pointer-input inline-list-input">
+				            {% render_field form.tos_accept %}
+				        </span>
+				        <span class="cursor-pointer-input" onclick="$('#{{ form.tos_accept.id_for_label }}').prop('checked', !($('#{{ form.tos_accept.id_for_label }}').prop('checked'))).trigger('change');">
+				            {% trans "(TBD!!!) I accept the TOS and privacy policy and electronic processing of my data " %}
+				            *
+				        </span>
+				    </p>
+					
+					<div class="button-section clearfix">
+						<a class="rounded-button button-color-secondary" href="#step2" class="_group-form-tab" role="tab" data-toggle="tab">
+					        <span class="rounded-button-inner">
+					            {% trans "Modify Contribution Amount" context "payment step button" %}
+					        </span>
+					    </a>					
+					
+				        <button type="submit" class="btn btn-emphasized">
+					        <ul class="media-list">
+					            <li class="media">
+					                <a class="pull-left" href="#">
+					                    <i class="fa fa-pencil"></i>
+					                </a>
+					                <div class="media-body">
+					                      {% trans "Confirm payment" context "payment step button" %}
+					                </div>
+					            </li>
+					        </ul>
+					    </button>
+					</div>
+				</div>
+				
 			</div>
-
-			<div class="conditional-select-container" data-select-name="payment_type" data-select-value="cc">			
-				<p>This is the credit card form!</p>
-			</div>
-			                
-			                
-			<hr>
-    		
-    		<h3>{% trans "Billing Address" %}</h3>
-    		
-			{% trans "E-Mail" as label %}
-			{% include 'cosinnus/fields/default_field.html' with field=form.email label=label show_required=True %}
-    		
-    		<div class="row">
-                <div class="col-sm-6 regular-space">
-					{% trans "First name" as label %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.first_name label=label show_required=True%}
-                </div>
-                <div class="col-sm-6 regular-space">
-					{% trans "Last name" as label %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.last_name label=label show_required=True %}
-                </div>
-            </div><!-- row -->
-            
-            {% trans "Address" as label %}
-			{% include 'cosinnus/fields/default_field.html' with field=form.address label=label show_required=True %}
+		    
+		    
         	
-        	<div class="row">
-                <div class="col-sm-6 regular-space">
-					{% trans "Postal Code" as label %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.postal_code label=label show_required=True%}
-                </div>
-                <div class="col-sm-6 regular-space">
-					{% trans "City" as label %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.city label=label show_required=True %}
-                </div>
-            </div><!-- row -->
-        	
-        	{% trans "Country" as label %}
-			{% include 'cosinnus/fields/default_field.html' with field=form.country label=label show_required=True %}
-        	
-        	<div class="large-space"></div>
-        	
-            <p class="inline-list transparent">
-		        <span class="cursor-pointer-input inline-list-input">
-		            {% render_field form.tos_accept %}
-		        </span>
-		        <span class="cursor-pointer-input" onclick="$('#{{ form.tos_accept.id_for_label }}').prop('checked', !($('#{{ form.tos_accept.id_for_label }}').prop('checked'))).trigger('change');">
-		            {% trans "(TBD!!!) I accept the TOS and privacy policy and electronic processing of my data " %}
-		            *
-		        </span>
-		    </p>
         	
         </div>
         
         
-        <button type="submit" class="btn btn-emphasized">
-	        <ul class="media-list">
-	            <li class="media">
-	                <a class="pull-left" href="#">
-	                    <i class="fa fa-pencil"></i>
-	                </a>
-	                <div class="media-body">
-	                      {% trans "Ok" %}
-	                </div>
-	            </li>
-	        </ul>
-	    </button>
     </form>
     
     

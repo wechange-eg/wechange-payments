@@ -22,10 +22,12 @@ $(function() {
 		
 		// Show Different Elements based on values
 		$('.payment-slider .donation-outcome').hide();
-		if (ui.value < 10) {
-			$('.payment-slider .under-10').show();
+		if (ui.value < 5) {
+			$('.payment-slider .low-amount').show();
+		} else if (ui.value < 10) {
+			$('.payment-slider .medium-amount').show();
 		} else {
-			$('.payment-slider .over-10').show();
+			$('.payment-slider .high-amount').show();
 		}
 		
 	};

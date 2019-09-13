@@ -25,7 +25,7 @@ admin.site.register(TransactionLog, TransactionLogAdmin)
 
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'state', 'amount', 'next_due_date', 'has_problems', 'created')
+    list_display = ('user', 'state', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
     list_filter = ('state', 'has_problems', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
     readonly_fields = ('state', 'amount',)

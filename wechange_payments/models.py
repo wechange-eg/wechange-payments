@@ -109,7 +109,12 @@ class Subscription(models.Model):
     
     ACTIVE_STATES = (
         STATE_1_CANCELLED_BUT_ACTIVE,
-        STATE_2_ACTIVE
+        STATE_2_ACTIVE,
+    )
+    
+    ALLOWED_TO_MAKE_SUBSCRIPTION_STATES = (
+        STATE_0_TERMINATED,
+        STATE_1_CANCELLED_BUT_ACTIVE,
     )
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
@@ -134,7 +139,7 @@ class Subscription(models.Model):
     last_payment = models.ForeignKey('wechange_payments.Payment', verbose_name=_('Last Payment'), 
         on_delete=models.PROTECT, related_name='+', null=False,
         help_text='The most recent payment made.')
-    terminated = models.DateTimeField(verbose_name=_('Created'), editable=False, blank=True, null=True)
+    terminated = models.DateTimeField(verbose_name=_('Terminated'), editable=False, blank=True, null=True)
     
     class Meta(object):
         ordering = ('created',)

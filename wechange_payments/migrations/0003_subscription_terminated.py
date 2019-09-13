@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='subscription',
             name='terminated',
-            field=models.DateTimeField(blank=True, editable=False, null=True, verbose_name='Created'),
+            field=models.DateTimeField(blank=True, editable=False, null=True, verbose_name='Terminated'),
         ),
     ]

@@ -70,7 +70,7 @@ def process_due_subscription_payments():
 def terminate_subscription(user):
     """ Ends the currently active or waiting subscription for a user """
     subscription = Subscription.get_current_for_user(user)
-    subscription.state = Subscription.STATE_0_TERMINATED
+    subscription.state = Subscription.STATE_1_CANCELLED_BUT_ACTIVE
     subscription.terminated = now()
     subscription.save()
     # TODO: send email!

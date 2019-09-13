@@ -116,7 +116,9 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
             Subscription.STATE_2_ACTIVE,
             Subscription.STATE_3_WATING_TO_BECOME_ACTIVE,
         ])
-        if subscription:
+        if subscription.state in Subscription.ALLOWED_TO_MAKE_SUBSCRIPTION_STATES:
+            return reverse('wechange-payments:payment')
+        elif subscription:
             return reverse('wechange-payments:my-subscription')
         else:
             return reverse('wechange-payments:payment')

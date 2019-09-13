@@ -1,4 +1,4 @@
-
+{% load i18n %}
 
 <div class="slider-container">
     <div class="slider-row">
@@ -28,13 +28,18 @@
             </div>
             
             
-            <div class="donation-outcome under-10">
-                The donation is under or equal to 10
+            <div class="donation-outcome low-amount">
+                {% trans "(TBD) Low amount text" %}
             </div>
             
-            <div class="donation-outcome over-10">
-                The donation is over 10
+            <div class="donation-outcome medium-amount">
+                {% trans "(TBD) Medium amount text" %}
             </div>
+            
+            <div class="donation-outcome high-amount">
+                {% trans "(TBD) High amount text" %}
+            </div>
+            
             
             
           

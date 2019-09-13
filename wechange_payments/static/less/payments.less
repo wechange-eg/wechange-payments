@@ -1,5 +1,80 @@
 @import "slider";
 
+/** TODO: cleanup unused */
+
+@color-white: #fff;
+@color-light-gray: #fafafa;
+@color-medium-gray: #efefef;
+@color-dark-medium-gray: #bebebe;
+@color-dark-gray: #9b9b9b;
+@color-black: #4a4a4a;
+
+@text-color: @color-black;
+@text-color-pale: @color-dark-gray;
+@text-highlight-color: #34b4b5;
+
+@background-color: @color-white;
+@background-color-secondary: @color-light-gray;
+@field-input-background-color: @color-medium-gray;
+
+h1, h2, h3 {
+	font-size: 16px;
+	font-weight: bold;
+}
+h1, .cosinnus-form h1 {
+	color: @text-highlight-color;
+	text-transform: uppercase;
+	margin: 8px 0 40px 0;
+}
+h2, .cosinnus-form h2 {
+	margin: 8px 0 32px 0;	
+}
+h3, .cosinnus-form h3 {
+	margin: 8px 0 16px 0;	
+}
+hr, .cosinnus-form hr {
+	border-top: 1px solid @text-color-pale;
+	
+	&.invisible {
+		border-top: none;
+		margin: 20px 0;
+	}
+}
+a:not(.rounded-button) {
+	color: @text-color;
+	text-decoration: none;
+	font-weight: bold;
+	
+	&:hover {
+		color: @text-color;
+		text-decoration: underline;
+		font-weight: bold;
+	}
+}
+p {
+	padding: 0 0 16px 0;
+}
+
+.main-content {
+	background-color: @background-color;
+	padding: 40px;
+	color: @text-color;
+}
+.button-section {
+	margin-top: 20px;
+	clear: both;
+}
+.divider {
+	margin-bottom: 44px;	
+}
+.cosinnus-field {
+	.cosinnus-field-input {
+		input, select {
+			background-color: @field-input-background-color;
+		}
+	}
+}
+
 .payments-form.disabled {
 	opacity: 0.7;
 } 

@@ -24,28 +24,21 @@
 		        </p>
             </div>
             <div class="modal-footer no-border">
-                <button class="submit-btn-x btn btn-emphasized btn-autosize" href="{% url 'wechange-payments:overview' %}">
-                    <ul class="media-list">
-                        <li class="media">
-                            <div class="media-body">
-                                {% trans "Choose amount" %}
-                            </div>
-                        </li>
-                    </ul>
-                </button>
-                <button type="button" class="btn btn-default btn-autosize" href="(TBD) more-URL" target="_blank">
-                    <ul class="media-list">
-                        <li class="media">
-                            <div class="media-body">
-                                {% trans "Learn more" %}
-                            </div>
-                        </li>
-                    </ul>
-                </button>
-                <a class="pull-left" href="{{ next_url }}"
-                		style="color: #333; margin-top: 22px;">
-                	{% trans "Remind me later" %}
-                </a>
+                <a href="(TBD) more-URL" class="rounded-button button-color-secondary">
+			        <span class="rounded-button-inner">
+			            {% trans "Learn more" %}
+			        </span>
+			    </a>
+                <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted">
+			        <span class="rounded-button-inner">
+			            {% trans "Choose amount" %}
+			        </span>
+			    </a>
+			    <a  href="{{ next_url }}" class="pull-left rounded-button button-color-tertiary">
+			        <span class="rounded-button-inner">
+                		{% trans "Remind me later" %}
+			        </span>
+			    </a>
             </div>
         </div>
     </div>
