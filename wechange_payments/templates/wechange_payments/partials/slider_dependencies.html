@@ -1,0 +1,13 @@
+{% load l10n static %}
+
+{% localize off %}
+<script type="text/javascript">
+	var PAYMENTS_MINIMUM_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_MINIMUM_PAYMENT_AMOUNT }};
+	var PAYMENTS_MAXIMUM_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_MAXIMUM_PAYMENT_AMOUNT }};
+	var PAYMENTS_SLIDER_INITIAL_PAYMENT_AMOUNT = {% if slider_initial_amount %}{{ slider_initial_amount }}{% else %}{{ SETTINGS.PAYMENTS_DEFAULT_PAYMENT_AMOUNT }}{% endif %};
+</script>
+{% endlocalize %}
+
+<script src="{% static "js/vendor/jquery-ui.slider.min.js" %}"></script>
+<script src="{% static "js/slider.js" %}"></script>
+<script src="{% static "js/payments.js" %}"></script>

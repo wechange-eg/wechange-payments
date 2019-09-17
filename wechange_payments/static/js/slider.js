@@ -30,11 +30,20 @@ $(function() {
 			$('.payment-slider .high-amount').show();
 		}
 		
+		// toggle disabled status from submit buttons if they have class .enabled-on-change and the amount changed
+		if (!ui.initial) {
+			var $submitButton = $('.payment-slider').closest('form').find('button[type=submit].enabled-on-change');
+			if (PAYMENTS_SLIDER_INITIAL_PAYMENT_AMOUNT != ui.value) {
+				$submitButton.removeAttr('disabled').removeClass('disabled');
+			} else {
+				$submitButton.attr('disabled', 'disabled').addClass('disabled');
+			}
+		}
 	};
 
     $slider = $('.payment-slider #slider');
     $slider.slider({
-	    value: PAYMENTS_DEFAULT_PAYMENT_AMOUNT,
+	    value: PAYMENTS_SLIDER_INITIAL_PAYMENT_AMOUNT,
 	    min: PAYMENTS_MINIMUM_PAYMENT_AMOUNT,
 	    max: PAYMENTS_MAXIMUM_PAYMENT_AMOUNT,
 	    step: 1,
@@ -44,9 +53,13 @@ $(function() {
     $('.slider-container #value').on('change keyup', function(){
     	$slider.slider('value', this.value);
     	$slider.slider('option', 'slide')(null, { value: this.value })
-    })
+    }).on('focus', function(){
+    	this.select();
+    });
     
     // on initial, trigger slide event to update visuals
-    $slider.slider('option', 'slide')(null, { value: $slider.slider('value') })
+    $slider.slider('option', 'slide')(null, { value: $slider.slider('value'), initial: true });
+    
+    
 });
 

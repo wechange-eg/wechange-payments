@@ -10,9 +10,12 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 
 import logging
 from wechange_payments.models import Subscription
-from wechange_payments.payment import create_subscription_for_payment
+from wechange_payments.payment import create_subscription_for_payment,\
+    change_subscription_amount
 from django.shortcuts import redirect
 from django.urls.base import reverse
+from cosinnus.utils.functions import is_number
+from django.contrib import messages
 
 logger = logging.getLogger('wechange-payments')
 
@@ -28,6 +31,11 @@ def make_payment(request, on_success_func=None):
     backend = get_backend()
     params = request.POST.copy()
     user = request.user if request.user.is_authenticated else None
+    
+    # validate amount
+    amount_or_error_response = _get_validated_amount(params['amount'])
+    if isinstance(amount_or_error_response, JsonResponse):
+        return amount_or_error_response
     
     payment_type = params.get('payment_type', None)
     error = 'Payment Type "%s" is not supported!' % payment_type 
@@ -69,7 +77,6 @@ def make_payment(request, on_success_func=None):
     return JsonResponse(data)
 
 
-
 def make_subscription_payment(request):
     """ A user-based view, that is used only by the plattform itself, used to make the 
         first payment for the start of a subscription. Will not allow making a payment 
@@ -79,9 +86,10 @@ def make_subscription_payment(request):
     if not request.user.is_authenticated:
         return HttpResponseForbidden('You must be logged in to do that!')
     
-    # if the user has an existing active sub, deny this payment (cancelled active subs are ok!)
+    # if the user has an existing active or waiting sub, deny this payment (cancelled active subs are ok!)
     active_sub = Subscription.get_active_for_user(request.user)
-    if active_sub:
+    waiting_sub = Subscription.get_waiting_for_user(request.user)
+    if active_sub or waiting_sub:
         return JsonResponse({'error': _('You already have an active subscription and cannot start another one!')}, status=500)
     
     # if the user has a cancelled, but still active sub, we make special payment that
@@ -107,6 +115,62 @@ def make_subscription_payment(request):
         return JsonResponse(data)
     
     return make_payment(request, on_success_func=on_success_func)
+
+
+def subscription_change_amount(request):
+    """ A user-based view, that is used only by the plattform itself, used to make the 
+        first payment for the start of a subscription. Will not allow making a payment 
+        while another subscription is still active! """
+    if not request.method=='POST':
+        return HttpResponseNotAllowed(['POST'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden('You must be logged in to do that!')
+    
+    # if the user has no active or waiting sub, we cannot change the amount of it
+    active_sub = Subscription.get_active_for_user(request.user)
+    waiting_sub = Subscription.get_waiting_for_user(request.user)
+    if not active_sub and not waiting_sub:
+        return JsonResponse({'error': _('You do not currently have a subscription!')}, status=500)
+    
+    # sanity check
+    if active_sub and waiting_sub:
+        logger.error('Critical: Sanity check for user subscription failed! User has both an active and a queued subscription!', extra={'user': request.user.email})
+        return JsonResponse({'error': _('An error occured, and you cannot change your subscription amount at this time. Please contact the support!')}, status=500)
+    
+    # validate amount
+    amount_or_error_response = _get_validated_amount(request.POST.get('amount', None))
+    if isinstance(amount_or_error_response, JsonResponse):
+        return amount_or_error_response
+    amount = amount_or_error_response
+    
+    subscription = active_sub or waiting_sub
+    success = change_subscription_amount(subscription, amount)
+    
+    if not success:
+        return JsonResponse({'error': _('Your subscription amount could not be changed because of an unexpected error. Please contact the support!')}, status=500)
+    
+    redirect_url = reverse('wechange_payments:my-subscription')
+    data = {
+        'redirect_to': redirect_url
+    }
+    messages.success(request, _('(TBD) Your new subscription amount was saved! Your future subscription payments will be made with this amount. Thank you for your support!'))
+    return JsonResponse(data)
+
+
+def _get_validated_amount(amount):
+    """ Validates if a given amount is valid for payment (is a number, and in limits).
+        @return: The float amount if valid, a JsonResponse with an error otherwise. """
+    
+    if not is_number(amount):
+        return JsonResponse({'error': _('The amount submitted does not seem to be a number!')}, status=500)
+    amount = float(amount)
+    
+    # check min/max payment amounts
+    if amount > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT:
+        return JsonResponse({'error': _('The payment amount is higher than the allowed maximum amount!')}, status=500)
+    if amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
+        return JsonResponse({'error': _('The payment amount is lower than the allowed minimum amount!')}, status=500)
+    return amount
     
 
 def postback_endpoint(request):

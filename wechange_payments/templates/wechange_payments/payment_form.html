@@ -4,17 +4,7 @@
 {% block extrahead %}
 	{{ block.super }}
 	
-	{% localize off %}
-	<script type="text/javascript">
-		var PAYMENTS_MINIMUM_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_MINIMUM_PAYMENT_AMOUNT }};
-		var PAYMENTS_MAXIMUM_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_MAXIMUM_PAYMENT_AMOUNT }};
-		var PAYMENTS_DEFAULT_PAYMENT_AMOUNT = {{ SETTINGS.PAYMENTS_DEFAULT_PAYMENT_AMOUNT }};
-	</script>
-	{% endlocalize %}
-	
-	<script src="{% static "js/vendor/jquery-ui.slider.min.js" %}"></script>
-	<script src="{% static "js/slider.js" %}"></script>
-	<script src="{% static "js/payments.js" %}"></script>
+	{% include 'wechange_payments/partials/slider_dependencies.html' %}
 {% endblock %}
 
 
@@ -48,12 +38,12 @@
 		        	{% include 'wechange_payments/partials/conditional_payment_header.html' %}
 					
 					<div class="button-section clearfix">
-						<a href="(TBD) more-URL" class="rounded-button button-color-secondary">
+						<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 					        <span class="rounded-button-inner">
 					            {% trans "Learn more" %}
 					        </span>
 					    </a>
-		                <a class="rounded-button button-color-primary-inverted" href="#step2" class="_group-form-tab" role="tab" data-toggle="tab">
+		                <a class="rounded-button button-color-primary-inverted" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 								{% trans "Choose Contribution" context "payment step button" %}
 					        </span>
@@ -65,7 +55,7 @@
 		        	{% include 'wechange_payments/partials/conditional_payment_header.html' %}
 					
 					<div class="button-section clearfix">
-						<a href="(TBD) more-URL" class="rounded-button button-color-secondary">
+						<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 					        <span class="rounded-button-inner">
 					            {% trans "Learn more" %}
 					        </span>
@@ -77,12 +67,7 @@
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         			
         			<div class="button-section clearfix">
-						<a href="{% url 'wechange-payments:overview' %}" class="pull-left rounded-button button-color-tertiary">
-					        <span class="rounded-button-inner">
-		                		{% trans "Remind me later" %} (TODO: what does this link do?)
-					        </span>
-					    </a>
-		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" class="_group-form-tab" role="tab" data-toggle="tab">
+		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 								{% trans "Set Contribution Amount" context "payment step button" %}
 					        </span>
@@ -181,7 +166,7 @@
 				    <hr/>
 				    
 					<div class="button-section clearfix">
-						<a class="rounded-button button-color-secondary" href="#step2" class="_group-form-tab" role="tab" data-toggle="tab">
+						<a class="rounded-button button-color-secondary" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 					            &lt; {% trans "Modify Contribution Amount" context "payment step button" %}
 					        </span>

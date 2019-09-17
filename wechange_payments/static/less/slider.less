@@ -23,6 +23,7 @@
   		color: #333;
   		
   		.side-amount {
+  			font-weight: bold;
   			line-height: 42px;
   		}
 		.amount-container {
@@ -35,19 +36,20 @@
 		  		background-color: @amount-background-color;
 				color: @slider-main-color;
 				padding: 0 10px 0 5px;	
-				font-size: 16px;			
+				font-size: 20px;
+				font-weight: bold;		
 		  	}
 		}  		
   	}
   	
 	input {
 		width: 34px;
-		padding: 5px;
 		border: none;
 		background: none;
 		color: @slider-main-color;
-		font-size: 16px;
 		text-align: center;
+		font-size: 20px;
+		outline: none;
 		
 		&.missing {
            	background-color: #ffcccc;
@@ -172,6 +174,7 @@
 		display: none;
 		margin: 20px auto;
 		color: @slider-main-color;
+		font-weight: bold;
 	}
 	
 	.under-40 {

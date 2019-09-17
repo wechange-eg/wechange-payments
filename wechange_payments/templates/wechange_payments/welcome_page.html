@@ -12,19 +12,19 @@
     
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header no-border">
+            <div class="modal-header">
                 <h4 class="no-select" >
                     {% trans "(TBD) Your Contribution" %}
                 </h4>
             </div>
             
-            <div class="modal-body no-border">
+            <div class="modal-body">
                 <p class="no-horizontal-padding no-vertical-padding large-space">
 		            {% trans "(TBD) WECHANGE is based on a solidary pricing model..." %}
 		        </p>
             </div>
-            <div class="modal-footer no-border">
-                <a href="(TBD) more-URL" class="rounded-button button-color-secondary">
+            <div class="modal-footer">
+                <a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 			        <span class="rounded-button-inner">
 			            {% trans "Learn more" %}
 			        </span>
@@ -34,7 +34,7 @@
 			            {% trans "Choose amount" %}
 			        </span>
 			    </a>
-			    <a  href="{{ next_url }}" class="pull-left rounded-button button-color-tertiary">
+			    <a href="{{ next_url }}" class="pull-left rounded-button button-color-tertiary">
 			        <span class="rounded-button-inner">
                 		{% trans "Remind me later" %}
 			        </span>

@@ -1,6 +1,8 @@
 @import "slider";
 
-/** TODO: cleanup unused */
+/** These variables are copied from cosinnus /v2/variables.less */
+
+@font-regular: 'Brandon Text', sans-serif;
 
 @color-white: #fff;
 @color-light-gray: #fafafa;
@@ -15,10 +17,11 @@
 
 @background-color: @color-white;
 @background-color-secondary: @color-light-gray;
+@divider-color: @color-medium-gray;
 @field-input-background-color: @color-medium-gray;
 
 h1, h2 {
-	font-size: 16px;
+	font-size: 18px;
 	font-weight: bold;
 }
 h1, .cosinnus-form h1 {
@@ -30,12 +33,12 @@ h2, .cosinnus-form h2 {
 	margin: 8px 0 32px 0;	
 }
 h3, .cosinnus-form h3 {
-	font-size: 14px;
+	font-size: 16px;
 	font-weight: bold;
 	margin: 8px 0 16px 0;	
 }
 hr, .cosinnus-form hr {
-	border-top: 1px solid @text-color-pale;
+	border-top: 1px solid @divider-color;
 	
 	&.invisible {
 		border-top: none;
@@ -50,7 +53,11 @@ p {
 .main-content {
 	background-color: @background-color;
 	padding: 40px;
+	
+	font-family: @font-regular;
+	font-size: 14px;
 	color: @text-color;
+	
 	
 	code {
 		background-color: @background-color;
@@ -67,6 +74,12 @@ p {
 			text-decoration: underline;
 			font-weight: bold;
 		}
+	}
+	.rounded-button {
+		text-transform: uppercase;
+		font-weight: bold;
+		height: 42px;
+    	line-height: 40px;
 	}
 }
 .button-section {

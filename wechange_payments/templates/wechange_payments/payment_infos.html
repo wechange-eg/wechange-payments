@@ -97,7 +97,11 @@
     	<div>
 			{% trans "To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
 			{% trans "You will only be billed after the current subscription expires." %} 
-			<a href="{% url "wechange-payments:cancel-subscription" %}">{% trans "Cancel your Subscription" %}</a>
+			{% if subscription.state == 1 %}
+				<a href="{% url "wechange-payments:payment" %}">{% trans "Set up a new Subscription" %}</a>
+			{% else %}
+				<a href="{% url "wechange-payments:cancel-subscription" %}">{% trans "Cancel your Subscription" %}</a>
+			{% endif %}
 		</div>
 		<hr/>
 		

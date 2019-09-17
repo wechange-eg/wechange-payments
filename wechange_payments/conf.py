@@ -28,9 +28,17 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     """ Payment Form settings """
     
+    # the displayed slider min amount
     MINIMUM_PAYMENT_AMOUNT = 1.0
+    # the displayed slider max amount
     MAXIMUM_PAYMENT_AMOUNT = 20.0
+    # the displayed slider default amount
     DEFAULT_PAYMENT_AMOUNT = 5.0
+    
+    # the lowest allowed amount for a payment transaction
+    MINIMUM_ALLOWED_PAYMENT_AMOUNT = 1.0 
+    # the highest allowed amount for a payment transaction
+    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = 99.99 
     
     """ Betterpayment-settings """
     

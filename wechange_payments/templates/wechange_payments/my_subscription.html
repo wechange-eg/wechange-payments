@@ -1,6 +1,12 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
+{% block extrahead %}
+	{{ block.super }}
+	
+	{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=subscription.amount %}
+{% endblock %}
+
 {% block page_title %}{% trans "Payments" %}{% endblock %}
 
 {% block leftnav %}
@@ -14,12 +20,47 @@
 
 {% block content %}
     
-    <!-- a box with semi transparent background -->
-    <div class="main-content">
-    	
-    	
-    	
-    </div>
+    {% comment %} The 'onkeydown' attribute prevents form sending on enter {% endcomment %}
+    <form method="POST" action="{% url "wechange-payments:api-subscription-change-amount" %}" 
+    		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
+        
+        <!-- a box with semi transparent background -->
+        <div class="main-content">
+	        <div class="error-frame alert alert-danger alert-dismissable" style="display: none;">
+	            <i class="fa fa-exclamation-triangle fa-3x"></i>
+		        <p class="error-message"></p>
+		    </div>
+		    
+		    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
+		    
+		    <h2>{% blocktrans with amount=subscription.amount|intify %}(TBD) Your current contribution is {{ amount }} euro{% endblocktrans %}</h2>
+			<p>
+				{% trans "(TBD) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" %}
+			</p>
+			<p>
+				<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}">{% trans "Learn more" %}</a>
+			</p>
+
+			<hr/>
+			
+			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
+        	
+			
+			<div class="button-section clearfix">
+                <button type="submit" class="pull-right rounded-button button-color-primary-inverted enabled-on-change disabled" disabled="disabled">
+			        <span class="rounded-button-inner">
+						{% trans "Modify Contribution Amount" context "payment step button" %}
+			        </span>
+			    </button>
+			    <a href="{% url "wechange-payments:cancel-subscription" %}" class="pull-left rounded-button button-color-tertiary">
+			        <span class="rounded-button-inner">
+                		{% trans "Cancel your Subscription" %}
+			        </span>
+			    </a>
+			</div>
+		    
+		</div>
+	</form>
         
     
 {% endblock %}

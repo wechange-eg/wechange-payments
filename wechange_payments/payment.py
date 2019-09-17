@@ -77,4 +77,16 @@ def terminate_subscription(user):
     return True
     
 
+def change_subscription_amount(subscription, amount):
+    """ Ends the currently active or waiting subscription for a user """
+    # check min/max payment amounts
+    if amount > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT or \
+            amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
+        return False
+    subscription.amount = amount
+    subscription.save()
+    # TODO: send email!
+    return True
+    
+
 

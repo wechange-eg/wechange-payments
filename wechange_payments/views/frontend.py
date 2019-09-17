@@ -50,7 +50,7 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         active_subscription = Subscription.get_active_for_user(self.request.user)
         if active_subscription:
-            return reverse('wechange-payments:my-subscription')
+            return redirect('wechange-payments:my-subscription')
         return super(PaymentView, self).dispatch(request, *args, **kwargs)
     
     def get_context_data(self, *args, **kwargs):
@@ -131,17 +131,30 @@ class MySubscriptionView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/my_subscription.html'
     
     def dispatch(self, request, *args, **kwargs):
-        self.current_subscription = Subscription.get_active_for_user(self.request.user)
-        self.waiting_subscription = Subscription.get_waiting_for_user(self.request.user)
-        if not self.current_subscription and not self.waiting_subscriptions:
+        current_subscription = Subscription.get_current_for_user(self.request.user)
+        waiting_subscription = Subscription.get_waiting_for_user(self.request.user)
+        
+        if current_subscription and current_subscription.state == Subscription.STATE_1_CANCELLED_BUT_ACTIVE and waiting_subscription:
+            self.cancelled_subscription = current_subscription
+            self.subscription = waiting_subscription
+        elif current_subscription and current_subscription.state == Subscription.STATE_2_ACTIVE:
+            self.cancelled_subscription = None
+            self.subscription = current_subscription
+        elif waiting_subscription:
+            # theoretically, we shouldn't have a waiting subscription without a cancelled
+            # on, because then the waiting one should've been activated. but maybe
+            # there were payment problems on the waiting one, so better include the case
+            self.cancelled_subscription = None
+            self.subscription = waiting_subscription
+        else:
             return redirect('wechange-payments:payment')
         return super(MySubscriptionView, self).dispatch(request, *args, **kwargs)
     
     def get_context_data(self, *args, **kwargs):
         context = super(MySubscriptionView, self).get_context_data(*args, **kwargs)
         context.update({
-            'current_subscription': self.current_subscription,
-            'waiting_subscription': self.waiting_subscription,
+            'subscription': self.subscription,
+            'cancelled_subscription': self.cancelled_subscription,
         })
         return context
         
@@ -203,7 +216,7 @@ class InvoicesView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/invoices.html'
     
     def dispatch(self, request, *args, **kwargs):
-        self.invoices = None # TODO
+        self.invoices = [1, ] # TODO
         if not self.invoices:
             return redirect('wechange-payments:payment')
         return super(InvoicesView, self).dispatch(request, *args, **kwargs)
@@ -223,7 +236,7 @@ class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/cancel_subscription.html'
     
     def dispatch(self, request, *args, **kwargs):
-        current_subscription = Subscription.get_current_for_user(self.request.user)
+        current_subscription = Subscription.get_active_for_user(self.request.user)
         if not current_subscription:
             return redirect('wechange-payments:overview')
         return super(CancelSubscriptionView, self).dispatch(request, *args, **kwargs)
