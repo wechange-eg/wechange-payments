@@ -56,6 +56,9 @@ $(function() {
     }).on('focus', function(){
     	this.select();
     });
+    $('.amount-frame').on('click', function(){
+    	$('.slider-container #value').focus();
+    })
     
     // on initial, trigger slide event to update visuals
     $slider.slider('option', 'slide')(null, { value: $slider.slider('value'), initial: true });

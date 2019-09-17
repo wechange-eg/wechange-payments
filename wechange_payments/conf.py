@@ -38,7 +38,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the lowest allowed amount for a payment transaction
     MINIMUM_ALLOWED_PAYMENT_AMOUNT = 1.0 
     # the highest allowed amount for a payment transaction
-    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = 99.99 
+    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = 100.0 
     
     """ Betterpayment-settings """
     
