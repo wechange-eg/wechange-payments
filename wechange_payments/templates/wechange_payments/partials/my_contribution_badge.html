@@ -1,0 +1,28 @@
+{% load cosinnus_tags %}
+
+<style type="text/css">
+	.my-contribution-badge {
+		min-width: 50px;
+		border-radius: 20px;
+		color: #FFF;
+		font-size: 12px;
+		padding: 2px 6px;
+    	margin-left: 5px;
+	}
+	.my-contribution-badge.red {
+		background-color: rgb(245, 85, 0);
+	}
+	.my-contribution-badge.yellow {
+		background-color: rgb(245, 215, 0);
+	}
+	.my-contribution-badge.green {
+		background-color: rgb(120, 200, 20);
+	}
+</style>
+<span class="my-contribution-badge {% if current_subscription %}{% if current_subscription.amount >= 5.0 %}green{% else %}yellow{% endif %}{% else %}red{% endif %}">
+	{% if current_subscription %}
+		{{ current_subscription.amount|intify }} €
+	{% else %}
+		0 €
+	{% endif %}
+</span>
