@@ -2,7 +2,7 @@
 {% load i18n static cosinnus_tags %}
 
 {% block page_title %}
-    {% trans "(TBD) Support us " %}
+    {% trans "(WC1) Support us " %}
 {% endblock page_title %}
 
 {% block main_page %}
@@ -14,29 +14,29 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="no-select" >
-                    {% trans "(TBD) Your Contribution" %}
+                    {% trans "(WC2) Your Contribution" %}
                 </h4>
             </div>
             
             <div class="modal-body">
                 <p class="no-horizontal-padding no-vertical-padding large-space">
-		            {% trans "(TBD) WECHANGE is based on a solidary pricing model..." %}
+		            {% trans "(WC3) WECHANGE is based on a solidary pricing model..." %}
 		        </p>
             </div>
             <div class="modal-footer">
                 <a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 			        <span class="rounded-button-inner">
-			            {% trans "Learn more" %}
+			            {% trans "(WC4) Learn more" %}
 			        </span>
 			    </a>
                 <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted">
 			        <span class="rounded-button-inner">
-			            {% trans "Choose amount" %}
+			            {% trans "(WC5) Choose amount" %}
 			        </span>
 			    </a>
 			    <a href="{{ next_url }}" class="pull-left rounded-button button-color-tertiary">
 			        <span class="rounded-button-inner">
-                		{% trans "Remind me later" %}
+                		{% trans "(WC6) Remind me later" %}
 			        </span>
 			    </a>
             </div>

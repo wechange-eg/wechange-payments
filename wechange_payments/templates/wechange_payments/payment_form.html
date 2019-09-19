@@ -8,7 +8,7 @@
 {% endblock %}
 
 
-{% block page_title %}{% trans "Payments" %}{% endblock %}
+{% block page_title %}{% trans "(PF1) Payments" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -16,7 +16,7 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "Payments" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "(PF1) Payments" %}</a></li>
 {% endblock %}
 
 {% block content %}
@@ -40,14 +40,22 @@
 					<div class="button-section clearfix">
 						<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 					        <span class="rounded-button-inner">
-					            {% trans "Learn more" %}
+					            {% trans "(PF2) Learn more" %}
 					        </span>
 					    </a>
 		                <a class="rounded-button button-color-primary-inverted" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-								{% trans "Choose Contribution" context "payment step button" %}
+								{% trans "(PF3) Choose Contribution" context "payment step button" %}
 					        </span>
 					    </a>
+					    
+					    {% if current_subscription and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
+					    <hr>
+					    <a href="{% url 'wechange-payments:debug-delete-subscription' %}">
+					    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE THE CANCELED SUBSCRIPTION WHICH IS STILL RUNNING
+					    </a>
+					    {% endif %}
+					    
 					</div>
 				</div>
 				
@@ -57,7 +65,7 @@
 					<div class="button-section clearfix">
 						<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 					        <span class="rounded-button-inner">
-					            {% trans "Learn more" %}
+					            {% trans "(PF2) Learn more" %}
 					        </span>
 					    </a>
 					</div>
@@ -69,17 +77,17 @@
         			<div class="button-section clearfix">
 		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-								{% trans "Set Contribution Amount" context "payment step button" %}
+								{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
 					        </span>
 					    </a>
 					</div>
 				</div>
 				
 				<div class="tab-pane" id="step3">
-					<h2>{% trans "(TBD) Almost done!" %}</h2>
+					<h2>{% trans "(PF5)  Almost done!" %}</h2>
 					
 					<p>
-						{% trans "(TBD) Please enter your account information below." %}
+						{% trans "(PF6)  Please enter your account information below." %}
 					</p>
 					
 					<hr />
@@ -152,7 +160,7 @@
 				            {% render_field form.tos_accept %}
 				        </span>
 				        <span class="cursor-pointer-input" onclick="$('#{{ form.tos_accept.id_for_label }}').prop('checked', !($('#{{ form.tos_accept.id_for_label }}').prop('checked'))).trigger('change');">
-				            {% trans "(TBD!!!) I accept the TOS and privacy policy and electronic processing of my data " %}
+				            {% trans "(PF15) I accept the TOS and privacy policy and electronic processing of my data " %}
 				            *
 				        </span>
 				    </p>
@@ -160,7 +168,7 @@
 				    <hr/>
 				    
 					<p>
-						(TBD)TODO: Should we show the subscription amount again here as a confirmation for the user what they're actually paying when they click the next button??
+						(PF7) TODO: Should we show the subscription amount again here as a confirmation for the user what they're actually paying when they click the next button??
 					</p>
 					
 				    <hr/>
@@ -168,12 +176,12 @@
 					<div class="button-section clearfix">
 						<a class="rounded-button button-color-secondary" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-					            &lt; {% trans "Modify Contribution Amount" context "payment step button" %}
+					            &lt; {% trans "(PF8) Modify Contribution Amount" context "payment step button" %}
 					        </span>
 					    </a>
 					    <button type="submit" class="pull-right rounded-button button-color-primary-inverted">
 					        <span class="rounded-button-inner">
-								{% trans "(TBD) Confirm and pay" context "payment step button" %}
+								{% trans "(PF9) Confirm and pay" context "payment step button" %}
 					        </span>
 					    </button>		
 					

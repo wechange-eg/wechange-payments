@@ -7,7 +7,7 @@
 	{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=subscription.amount %}
 {% endblock %}
 
-{% block page_title %}{% trans "Payments" %}{% endblock %}
+{% block page_title %}{% trans "(MS1) My Subscription" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -15,7 +15,7 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "My Subscription" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "(MS1) My Subscription" %}</a></li>
 {% endblock %}
 
 {% block content %}
@@ -33,12 +33,12 @@
 		    
 		    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
 		    
-		    <h2>{% blocktrans with amount=subscription.amount|intify %}(TBD) Your current contribution is {{ amount }} euro{% endblocktrans %}</h2>
+		    <h2>{% blocktrans with amount=subscription.amount|intify %}(MS2) Your current contribution is {{ amount }} euro{% endblocktrans %}</h2>
 			<p>
-				{% trans "(TBD) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" %}
+				{% trans "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" %}
 			</p>
 			<p>
-				<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}">{% trans "Learn more" %}</a>
+				<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}">{% trans "(MS4) Learn more" %}</a>
 			</p>
 
 			<hr/>
@@ -49,12 +49,12 @@
 			<div class="button-section clearfix">
                 <button type="submit" class="pull-right rounded-button button-color-primary-inverted enabled-on-change disabled" disabled="disabled">
 			        <span class="rounded-button-inner">
-						{% trans "Modify Contribution Amount" context "payment step button" %}
+						{% trans "(MS5) Modify Contribution Amount" context "payment step button" %}
 			        </span>
 			    </button>
 			    <a href="{% url "wechange-payments:cancel-subscription" %}" class="pull-left rounded-button button-color-tertiary">
 			        <span class="rounded-button-inner">
-                		{% trans "Cancel your Subscription" %}
+                		{% trans "(MS6) Cancel your Subscription" %}
 			        </span>
 			    </a>
 			</div>

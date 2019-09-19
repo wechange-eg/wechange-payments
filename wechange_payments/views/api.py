@@ -153,7 +153,7 @@ def subscription_change_amount(request):
     data = {
         'redirect_to': redirect_url
     }
-    messages.success(request, _('(TBD) Your new subscription amount was saved! Your future subscription payments will be made with this amount. Thank you for your support!'))
+    messages.success(request, _('(MSG3) Your new subscription amount was saved! Your future subscription payments will be made with this amount. Thank you for your support!'))
     return JsonResponse(data)
 
 

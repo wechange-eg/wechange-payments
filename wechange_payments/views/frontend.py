@@ -19,6 +19,7 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 from wechange_payments.forms import PaymentsForm
 from wechange_payments.models import Subscription, Payment
 from wechange_payments.payment import terminate_subscription
+from django.http.response import HttpResponseNotAllowed, HttpResponseForbidden
 
 
 logger = logging.getLogger('wechange-payments')
@@ -246,13 +247,25 @@ class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
         try:
             success = terminate_subscription(request.user)
             if success:
-                messages.success(request, _('Your current Subscription was terminated.'))
+                messages.success(request, _('(MSG1) Your current Subscription was terminated.'))
                 return redirect('wechange-payments:overview')
         except Exception as e:
             logger.error('Critical: Could not cancel a subscription!', extra={'exc': force_text(e)})
-            messages.error(request, _('There was an error terminating your subscription! Please contact the customer support!'))
+            messages.error(request, _('(MSG2) There was an error terminating your subscription! Please contact the customer support!'))
         return redirect('wechange-payments:overview')
 
 cancel_subscription = CancelSubscriptionView.as_view()
 
 
+def debug_delete_subscription(request):
+    """ DEBUG VIEW, completely removes a subscription. Only works during the test phase! """
+    if not getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):
+        return HttpResponseForbidden('Not available.')
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden('You must be logged in to do that!')
+    subscription = Subscription.get_current_for_user(request.user)
+    if not subscription:
+        return HttpResponseForbidden('You do not have a current subscription!')
+    subscription.state = Subscription.STATE_0_TERMINATED
+    subscription.save()
+    return redirect('wechange-payments:overview')

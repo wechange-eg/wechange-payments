@@ -1,26 +1,26 @@
 {% load i18n cosinnus_tags %}
 
 {% url 'wechange-payments:overview' as payment_url %}
-{% trans "My Contribution" as label %}
+{% trans "(LN1) My Contribution" as label %}
 {% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-eur" label=label show_required=True href=payment_url  %}
 
 {% comment %} `current_subscription` comes from the context processor {% endcomment %}
 {% if current_subscription %}
 	{% url 'wechange-payments:payment-infos' as payment_url %}
-	{% trans "Payment Information" as label %}
+	{% trans "(LN2) Payment Information" as label %}
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-credit-card" label=label show_required=True href=payment_url  %}
 {% endif %}
 
 {% if current_subscription or invoices %}
 	{% url 'wechange-payments:invoices' as payment_url %}
-	{% trans "My Invoices" as label %}
+	{% trans "(LN3) My Invoices" as label %}
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-file-text" label=label show_required=True href=payment_url  %}
 {% endif %}
 
 {% comment %} Only shown in the "MySubscriptionView" {% endcomment %}
 {% if 0 and past_subscriptions %}
 	{% url 'wechange-payments:past-subscriptions' as payment_url %}
-	{% trans "Past Subscriptions" as label %}
+	{% trans "(LN4) Past Subscriptions" as label %}
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-history" label=label show_required=True href=payment_url  %}
 {% endif %}
 
@@ -29,16 +29,16 @@
 {% if COSINNUS_CURRENT_PORTAL.support_email %}
 	{% captureas content %}
         <p>
-            {% trans "If you have any questions about your subscription or encountered any problems, please send an email to" %}:
+            {% trans "(LN7) If you have any questions about your subscription or encountered any problems, please send an email to" %}:
         </p>
         <p>
 			<a href="mailto:{{ COSINNUS_CURRENT_PORTAL.support_email }}">{{ COSINNUS_CURRENT_PORTAL.support_email }}</a>
 		</p>
 	{% endcaptureas %}
-    {% trans "Contact support" as title %}
+    {% trans "(LN5) Contact support" as title %}
     {% include "cosinnus/modal_box.html" with id="supportModal" label=content title=title title_icon="fa-envelope" %}
 	
-	{% trans "Contact our Support" as label %}
+	{% trans "(LN6) Contact our Support" as label %}
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-envelope" label=label extra_atts='href="#" data-toggle="modal" data-target="#supportModal"' %}
 {% endif %}
 

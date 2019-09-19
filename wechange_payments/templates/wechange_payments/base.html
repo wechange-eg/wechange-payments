@@ -3,7 +3,7 @@
 
 {% block breadcrumb %}
     {{ block.super }}
-    <li><a class="active" href="{% url 'wechange-payments:overview' %}">{% trans "Payments" %}</a></li>
+    <li><a class="active" href="{% url 'wechange-payments:overview' %}">{% trans "(BS1) Payments" %}</a></li>
 {% endblock breadcrumb %}
 
 {% block extrahead %}
@@ -15,4 +15,4 @@
 	{% endif %}
 {% endblock %}
 
-{% block page_title %}{% trans "Payments" %}{% endblock page_title %}
+{% block page_title %}{% trans "(BS2) Payments" %}{% endblock page_title %}
