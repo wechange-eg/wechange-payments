@@ -84,6 +84,15 @@
 				</div>
 				
 				<div class="tab-pane" id="step3">
+					
+				    {% if SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %} 
+				    	<div class="alert alert-warning alert-dismissable">
+				            <i class="fa fa-exclamation fa-3x"></i>
+				            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&#215;</button>
+					        <p style="">Testphase! Es werden keine echten Zahlungen vorgenommen und alle Transaktionen können gefahrlos getestet werden! Es werden wohlformatierte, aber keine "echten" Zahlungsinformationen benötigt!</p>
+					    </div>
+				    {% endif %}
+				
 					<h2>{% trans "(PF5)  Almost done!" %}</h2>
 					
 					<p>
@@ -197,6 +206,7 @@
         
         
     </form>
+    
     
     
 {% endblock %}

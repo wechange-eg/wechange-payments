@@ -14,6 +14,9 @@ from django_countries.fields import CountryField
 
 logger = logging.getLogger('wechange-payments')
 
+USERPROFILE_SETTING_POPUP_CLOSED = 'payment_popup_closed_date'
+
+
 class Payment(models.Model):
     
     TYPE_SEPA = 0

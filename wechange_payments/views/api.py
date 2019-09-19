@@ -9,13 +9,15 @@ from wechange_payments.backends import get_backend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 
 import logging
-from wechange_payments.models import Subscription
+from wechange_payments.models import Subscription,\
+    USERPROFILE_SETTING_POPUP_CLOSED
 from wechange_payments.payment import create_subscription_for_payment,\
     change_subscription_amount
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from cosinnus.utils.functions import is_number
 from django.contrib import messages
+from django.utils.timezone import now
 
 logger = logging.getLogger('wechange-payments')
 
@@ -178,4 +180,19 @@ def postback_endpoint(request):
     
     backend = get_backend()
     backend.handle_postback(request, request.POST.copy())
+    return JsonResponse({'status': 'ok'})
+
+
+def snooze_popup(request):
+    """ Sets the user profile settings `USERPROFILE_SETTING_POPUP_CLOSED` to now. """
+    if not request.method=='POST':
+        return HttpResponseNotAllowed(['POST'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden('You must be logged in to do that!')
+    try:
+        profile = request.user.cosinnus_profile
+        profile.settings[USERPROFILE_SETTING_POPUP_CLOSED] = now()
+        profile.save(update_fields=['settings'])
+    except Exception as e:
+        logger.error('Error in `api.snooze_popup`: %s' % e, extra={'exception': e})
     return JsonResponse({'status': 'ok'})

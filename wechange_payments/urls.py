@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^payments/api/subscription-payment/$', api.make_subscription_payment, name='api-make-subscription-payment'),
     url(r'^payments/api/subscription-change-amount/$', api.subscription_change_amount, name='api-subscription-change-amount'),
     url(r'^payments/api/postback_endpoint/$', api.postback_endpoint, name='api-postback-endpoint'),
+    url(r'^payments/api/snooze-popup/$', api.snooze_popup, name='api-snooze-popup'),
 ]

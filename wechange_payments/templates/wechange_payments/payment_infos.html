@@ -1,7 +1,7 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
-{% block page_title %}{% trans "(PF1) Payment Information" %}{% endblock %}
+{% block page_title %}{% trans "(INF1) Payment Information" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -9,38 +9,39 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:payment-infos' %}">{% trans "(PF1) Payment Information" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:payment-infos' %}">{% trans "(INF1) Payment Information" %}</a></li>
 {% endblock %}
 
 {% block content %}
     
     <!-- a box with semi transparent background -->
     <div class="v2-content white-content payment-info-page">
-		<h2>{% trans "(PF1) Payment Information" %}</h2>
+		<h2>{% trans "(INF1) Payment Information" %}</h2>
     	<div class="large-space">
     		<table>
 				<tr>
-					<td>{% trans "(PF2) Subscription Status" %}</td>
+					<td>{% trans "(INF2) Subscription Status" %}</td>
 					<td>
 						{% if subscription.state == 3 %}
-							{% trans "(PF3) Will become active after your last subscription expires." context "subscription status" %}
+							{% trans "(INF3) Will become active after your last subscription expires." context "subscription status" %}
 						{% elif subscription.state == 2 %}
-							{% trans "(PF4) Active" context "subscription status" %}
+							{% trans "(INF4) Active" context "subscription status" %}
+							({% trans "since" %} {{ subscription.created.date|localize }})
 						{% elif subscription.state == 1 %}
 							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
-							{% trans "(PF5) Cancelled" context "subscription status" %}.
+							{% trans "(INF5) Cancelled" context "subscription status" %}.
 							{% trans "Expires" %}: 
 							<span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span>
 						{% endif %}
 					</td>
 				</tr>
 				<tr>
-					<td>{% trans "(PF6) Subscription Amount" %}</td>
+					<td>{% trans "(INF6) Current Subscription Amount" %}</td>
 					<td>{{ subscription.amount|intify }} €</td>
 				</tr>
 				{% if subscription.state >= 2 %}
 				<tr>
-					<td>{% trans "(PF7) Next Payment scheduled" %}</td>
+					<td>{% trans "(INF7) Next Payment scheduled" %}</td>
 					<td>
 						{{ subscription.next_due_date|localize }}
 						(<i><span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span></i>)
@@ -95,25 +96,25 @@
     		{% endwith %}
     	</div>
     	<div>
-			{% trans "(PF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
+			{% trans "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
 			{% trans "You will only be billed after the current subscription expires." %} 
 			{% if subscription.state == 1 %}
 				<a href="{% url "wechange-payments:payment" %}">{% trans "Set up a new Subscription" %}</a>
 			{% else %}
-				<a href="{% url "wechange-payments:cancel-subscription" %}">{% trans "(PF9) Cancel your Subscription" %}</a>
+				<a href="{% url "wechange-payments:cancel-subscription" %}">{% trans "(INF9) Cancel your Subscription" %}</a>
 			{% endif %}
 		</div>
 		<hr/>
 		
-		<h3>{% trans "(PF10) Last Payment" %}</h3>
+		<h3>{% trans "(INF10) Last Payment" %}</h3>
     	<div class="large-space">
     		<table>
 				<tr>
-					<td>{% trans "(PF11) Amount" %}</td>
+					<td>{% trans "(INF11) Amount" %}</td>
 					<td>{{ last_payment.amount|intify }} €</td>
 				</tr>
 				<tr>
-					<td>{% trans "(PF12) Date" %}</td>
+					<td>{% trans "(INF12) Date" %}</td>
 					<td>
 						{{ last_payment.completed_at|localize }}
 						(<i><span class="moment-data-date" data-date="{{ last_payment.completed_at|date:'c' }}"></span></i>)
@@ -122,8 +123,8 @@
 			</table>
 		</div>
     	<div>
-    		{% trans "(PF13) For more information see your invoices" %}: 
-    		<a href="{% url "wechange-payments:invoices" %}">{% trans "(PF14) Invoices" %}</a>
+    		{% trans "(INF13) For more information see your invoices" %}: 
+    		<a href="{% url "wechange-payments:invoices" %}">{% trans "(INF14) Invoices" %}</a>
     	</div>
     	
     </div>

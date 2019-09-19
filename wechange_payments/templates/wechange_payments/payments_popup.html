@@ -32,7 +32,7 @@
 
 <script type="text/javascript">
 	$('#payments_popup button.close').on('click', function(){
-		alert('todo: set x datetime');
+		$.ajax({url: '{% url "wechange-payments:api-snooze-popup" %}', type: 'POST'});
 	});
     $('#payments_popup').modal('show');
 </script>
