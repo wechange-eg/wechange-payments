@@ -40,6 +40,9 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the highest allowed amount for a payment transaction
     MAXIMUM_ALLOWED_PAYMENT_AMOUNT = 100.0 
     
+    # how many days until the payment popup is shown again for non-subscribers, after clicking it away
+    POPUP_SHOW_AGAIN_DAYS = 30
+    
     """ Betterpayment-settings """
     
     BETTERPAYMENT_API_KEY = ''

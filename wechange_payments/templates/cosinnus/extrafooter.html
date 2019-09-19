@@ -1,0 +1,9 @@
+{% extends 'cosinnus/extrafooter.html' %}
+
+{% block extrafooter_extensions %}
+	{{ block.super }}
+	
+	{% if show_payment_popup %}
+		{% include 'wechange_payments/payments_popup.html' %}
+	{% endif %}	
+{% endblock %}

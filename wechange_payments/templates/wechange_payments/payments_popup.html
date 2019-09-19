@@ -1,0 +1,38 @@
+{% load i18n cosinnus_tags %}
+
+{% trans "(POP1) wechange is becoming even fairer" as title %}
+
+{% captureas body %}
+	<p>
+		{% trans "(POP2) Dear WECHANGE-Community," %}
+	</p>
+	<p>
+		{% trans "(POP3) solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. " %}
+	</p>
+	<hr class="invisible" />
+	<p>
+		<b>{% trans "(POP4) inspirational quote?" %}</b>
+	</p>
+{% endcaptureas %}
+
+{% captureas buttons %}
+	<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
+        <span class="rounded-button-inner">
+            {% trans "(POP5) Learn more" %}
+        </span>
+    </a>
+    <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted">
+        <span class="rounded-button-inner">
+            {% trans "(POP6) Choose amount" %}
+        </span>
+    </a>
+{% endcaptureas %}
+
+{% include "cosinnus/v2/elements/modal_box.html" with id="payments_popup" title=title body=body buttons=buttons %}
+
+<script type="text/javascript">
+	$('#payments_popup button.close').on('click', function(){
+		alert('todo: set x datetime');
+	});
+    $('#payments_popup').modal('show');
+</script>
