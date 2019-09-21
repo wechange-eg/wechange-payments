@@ -1,25 +1,30 @@
 # -*- coding: utf-8 -*-
 
+from datetime import timedelta
 import logging
 
 from annoying.functions import get_object_or_None
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.dispatch.dispatcher import receiver
+from django.http.response import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.encoding import force_text
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 
+from cosinnus.core.signals import userprofile_ceated
 from cosinnus.utils.permissions import check_user_superuser
 from cosinnus.utils.urls import get_non_cms_root_url, redirect_next_or
 from cosinnus.views.mixins.group import RequireLoggedInMixin
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 from wechange_payments.forms import PaymentsForm
-from wechange_payments.models import Subscription, Payment
+from wechange_payments.models import Subscription, Payment, \
+    USERPROFILE_SETTING_POPUP_CLOSED
 from wechange_payments.payment import terminate_subscription
-from django.http.response import HttpResponseNotAllowed, HttpResponseForbidden
 
 
 logger = logging.getLogger('wechange-payments')
@@ -269,3 +274,10 @@ def debug_delete_subscription(request):
     subscription.state = Subscription.STATE_0_TERMINATED
     subscription.save()
     return redirect('wechange-payments:overview')
+
+
+@receiver(userprofile_ceated)
+def delay_payment_popup_for_new_user(sender, profile, **kwargs):
+    """ Delays the user's payment popup window by some time after a fresh registration """
+    profile.settings[USERPROFILE_SETTING_POPUP_CLOSED] = now() + timedelta(days=settings.PAYMENTS_POPUP_DELAY_FOR_NEW_USERS_DAYS)
+    profile.save(update_fields=['settings'])

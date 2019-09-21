@@ -3,7 +3,7 @@
 {% block extrafooter_extensions %}
 	{{ block.super }}
 	
-	{% if show_payment_popup %}
+	{% if show_payment_popup or request.GET.force_payment_popup == '1' %}
 		{% include 'wechange_payments/payments_popup.html' %}
 	{% endif %}	
 {% endblock %}
