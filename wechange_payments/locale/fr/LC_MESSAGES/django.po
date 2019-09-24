@@ -1,0 +1,478 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-24 14:38+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Credit Card"
+msgstr ""
+
+msgid "Direct Debit"
+msgstr ""
+
+msgid "Paypal"
+msgstr ""
+
+msgid "SEPA"
+msgstr ""
+
+msgid "Vendor Transaction Id"
+msgstr ""
+
+msgid "Internal Transaction Id"
+msgstr ""
+
+msgid "Payment Type"
+msgstr ""
+
+msgid "Completed At"
+msgstr ""
+
+msgid "Is reference payment"
+msgstr ""
+
+msgid "Has been revoked"
+msgstr ""
+
+msgid "Backend class used"
+msgstr ""
+
+msgid "Payment"
+msgstr ""
+
+msgid "Payments"
+msgstr ""
+
+msgid "Direct Request"
+msgstr ""
+
+msgid "Received Postback"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "API Endpoint URL"
+msgstr ""
+
+msgid "Transaction Type"
+msgstr ""
+
+msgid "Payment Transaction Log"
+msgstr ""
+
+msgid "Payment Transaction Logs"
+msgstr ""
+
+msgid "Terminated."
+msgstr ""
+
+msgid "Cancelled, but still active"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Waiting, becoming active at next payment due date"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Reference Payment"
+msgstr ""
+
+msgid "Subscription State"
+msgstr ""
+
+msgid "Has Problems"
+msgstr ""
+
+msgid "Next due date"
+msgstr ""
+
+msgid "Amount"
+msgstr ""
+
+msgid "Last Payment"
+msgstr ""
+
+msgid "Terminated"
+msgstr ""
+
+msgid "Subscription"
+msgstr ""
+
+msgid "(BS1) Payments"
+msgstr ""
+
+msgid "(BS2) Payments"
+msgstr ""
+
+msgid "(TS1) Terminate your subscription"
+msgstr ""
+
+msgid "(TS1) Terminate your Subscription"
+msgstr ""
+
+msgid "(TS2) sorry and think-about-it-again-please text"
+msgstr ""
+
+msgid "(TS3) What happens when you cancel your subscription"
+msgstr ""
+
+msgid "(TS4) (explanation) No payments have been made yet. Your subscription will be cancelled."
+msgstr ""
+
+msgid "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until"
+msgstr ""
+
+msgid "(TS6) Terminate Subscription"
+msgstr ""
+
+msgid "(TS7) Confirm subscription canceling dialog text"
+msgstr ""
+
+msgid "(TS8) Terminate Subscription"
+msgstr ""
+
+#, python-format
+msgid "You can contribute any amount up to %(max_amount)s by entering it here. For larger contributions, please contact our support!"
+msgstr ""
+
+msgid "(SLD1) Low amount text"
+msgstr ""
+
+msgid "(SLD2) Medium amount text"
+msgstr ""
+
+msgid "(SLD3) High amount text"
+msgstr ""
+
+msgid "My Invoices"
+msgstr ""
+
+msgid "Invoices"
+msgstr ""
+
+msgid "(LN1) My Contribution"
+msgstr ""
+
+msgid "(LN2) Payment Information"
+msgstr ""
+
+msgid "(LN3) My Invoices"
+msgstr ""
+
+msgid "(LN4) Past Subscriptions"
+msgstr ""
+
+msgid "(LN7) If you have any questions about your subscription or encountered any problems, please send an email to"
+msgstr ""
+
+msgid "(LN5) Contact support"
+msgstr ""
+
+msgid "(LN6) Contact our Support"
+msgstr ""
+
+#, python-format
+msgid ""
+"Thank you!\n"
+"\n"
+"You have successfully made a SEPA payment.\n"
+"\n"
+"Amount: %(amount)s€\n"
+"SEPA-Mandate-ID: %(sepa_mandate)s\n"
+"Creditor-ID: %(sepa_creditor)s\n"
+"\n"
+"Thank you for supporting us!\n"
+"\n"
+"%(payment_recipient_name)s\n"
+"\n"
+msgstr ""
+
+msgid "You have successfully made a SEPA payment!"
+msgstr ""
+
+msgid "(MS1) My Subscription"
+msgstr ""
+
+#, python-format
+msgid "(MS2) Your current contribution is %(amount)s euro"
+msgstr ""
+
+msgid "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'"
+msgstr ""
+
+msgid "(MS4) Learn more"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(MS5) Modify Contribution Amount"
+msgstr ""
+
+msgid "(MS6) Cancel your Subscription"
+msgstr ""
+
+msgid "(PF10) Your subscription will end soon!"
+msgstr ""
+
+msgid "(PF11) Your subscription will end on"
+msgstr ""
+
+msgid "(PF12) We're sorry to see you go! To continue subscribing, simply create a new subscription! Don't worry, we will start charging you only when your current subscription runs out!"
+msgstr ""
+
+#, python-format
+msgid "(PF13) You are using %(portal_name)s free of charge."
+msgstr ""
+
+msgid "(PF14) Final description text for First Payment Step box"
+msgstr ""
+
+msgid "Past Subscriptions"
+msgstr ""
+
+msgid "(PF1) Payments"
+msgstr ""
+
+msgid "(PF2) Learn more"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(PF3) Choose Contribution"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(PF4) Set Contribution Amount"
+msgstr ""
+
+msgid "(PF5)  Almost done!"
+msgstr ""
+
+msgid "(PF6)  Please enter your account information below."
+msgstr ""
+
+msgid "Payment Info"
+msgstr ""
+
+msgid "IBAN"
+msgstr ""
+
+msgid "BIC"
+msgstr ""
+
+msgid "Account Holder"
+msgstr ""
+
+msgid "Billing Address"
+msgstr ""
+
+msgid "E-Mail"
+msgstr ""
+
+msgid "First name"
+msgstr ""
+
+msgid "Last name"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "Postal Code"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "(PF15) I accept the TOS and privacy policy and electronic processing of my data "
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(PF8) Modify Contribution Amount"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(PF9) Confirm and pay"
+msgstr ""
+
+msgid "(INF1) Payment Information"
+msgstr ""
+
+msgid "(INF2) Subscription Status"
+msgstr ""
+
+msgctxt "subscription status"
+msgid "(INF3) Will become active after your last subscription expires."
+msgstr ""
+
+msgctxt "subscription status"
+msgid "(INF4) Active"
+msgstr ""
+
+msgid "since"
+msgstr ""
+
+msgctxt "subscription status"
+msgid "(INF5) Cancelled"
+msgstr ""
+
+msgid "Expires"
+msgstr ""
+
+msgid "(INF6) Current Subscription Amount"
+msgstr ""
+
+msgid "(INF7) Next Payment scheduled"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!"
+msgstr ""
+
+msgid "You will only be billed after the current subscription expires."
+msgstr ""
+
+msgid "Set up a new Subscription"
+msgstr ""
+
+msgid "(INF9) Cancel your Subscription"
+msgstr ""
+
+msgid "(INF10) Last Payment"
+msgstr ""
+
+msgid "(INF11) Amount"
+msgstr ""
+
+msgid "(INF12) Date"
+msgstr ""
+
+msgid "(INF13) For more information see your invoices"
+msgstr ""
+
+msgid "(INF14) Invoices"
+msgstr ""
+
+msgid "(SC1) Payment Success"
+msgstr ""
+
+msgid "(SC2) Payments"
+msgstr ""
+
+msgid "(SC3) Your payment was processed successfully, but your subscription could not be activated due to an internal server error."
+msgstr ""
+
+msgid "(SC4) Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!"
+msgstr ""
+
+msgid "(SC5) Thank you for subscribing!"
+msgstr ""
+
+msgid "(SC6) Thank you text"
+msgstr ""
+
+msgid "Your SEPA Mandate"
+msgstr ""
+
+msgid "(SC7) View your subscription"
+msgstr ""
+
+msgid "(POP1) wechange is becoming even fairer"
+msgstr ""
+
+msgid "(POP2) Dear WECHANGE-Community,"
+msgstr ""
+
+msgid "(POP3) solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. "
+msgstr ""
+
+msgid "(POP4a) 'inspirational quote'"
+msgstr ""
+
+msgid "(POP4b) quote credit"
+msgstr ""
+
+msgid "(POP5) Learn more"
+msgstr ""
+
+msgid "(POP6) Choose amount"
+msgstr ""
+
+msgid "(WC1) Support us "
+msgstr ""
+
+msgid "(WC2) Your Contribution"
+msgstr ""
+
+msgid "(WC3) WECHANGE is based on a solidary pricing model..."
+msgstr ""
+
+msgid "(WC4) Learn more"
+msgstr ""
+
+msgid "(WC5) Choose amount"
+msgstr ""
+
+msgid "(WC6) Remind me later"
+msgstr ""
+
+msgid "Please fill out all of the missing fields!"
+msgstr ""
+
+msgid "The entered payment information is invalid. Please make sure you entered everything correctly!"
+msgstr ""
+
+msgid "You already have an active subscription and cannot start another one!"
+msgstr ""
+
+msgid "We can not create a new subscription for you at this point. Please contact the support! No payment has been made yet."
+msgstr ""
+
+msgid "You do not currently have a subscription!"
+msgstr ""
+
+msgid "An error occured, and you cannot change your subscription amount at this time. Please contact the support!"
+msgstr ""
+
+msgid "Your subscription amount could not be changed because of an unexpected error. Please contact the support!"
+msgstr ""
+
+msgid "(MSG3) Your new subscription amount was saved! Your future subscription payments will be made with this amount. Thank you for your support!"
+msgstr ""
+
+msgid "The amount submitted does not seem to be a number!"
+msgstr ""
+
+msgid "The payment amount is higher than the allowed maximum amount!"
+msgstr ""
+
+msgid "The payment amount is lower than the allowed minimum amount!"
+msgstr ""
+
+msgid "(MSG1) Your current Subscription was terminated."
+msgstr ""
+
+msgid "(MSG2) There was an error terminating your subscription! Please contact the customer support!"
+msgstr ""

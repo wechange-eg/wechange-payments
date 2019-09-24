@@ -1,0 +1,578 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: wechange-payments\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-09-24 14:38+0200\n"
+"PO-Revision-Date: 2019-09-24 14:40+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.4\n"
+
+msgid "Credit Card"
+msgstr "Kreditkarte"
+
+msgid "Direct Debit"
+msgstr "Bankeinzug"
+
+msgid "Paypal"
+msgstr "Paypal"
+
+msgid "SEPA"
+msgstr "SEPA"
+
+msgid "Vendor Transaction Id"
+msgstr "Vendor Transaction Id"
+
+msgid "Internal Transaction Id"
+msgstr "Internal Transaction Id"
+
+msgid "Payment Type"
+msgstr "Zahlungstyp"
+
+msgid "Completed At"
+msgstr "Abgeschlossen am"
+
+msgid "Is reference payment"
+msgstr "Ist Referenzzahlung"
+
+msgid "Has been revoked"
+msgstr "Wurde abgewiesen"
+
+msgid "Backend class used"
+msgstr "Backend class used"
+
+msgid "Payment"
+msgstr "Zahlung"
+
+msgid "Payments"
+msgstr "Zahlungen"
+
+msgid "Direct Request"
+msgstr "Direct Request"
+
+msgid "Received Postback"
+msgstr "Received Postback"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "API Endpoint URL"
+msgstr "API Endpoint URL"
+
+msgid "Transaction Type"
+msgstr "Transaction Type"
+
+msgid "Payment Transaction Log"
+msgstr "Payment Transaction Log"
+
+msgid "Payment Transaction Logs"
+msgstr "Payment Transaction Logs"
+
+msgid "Terminated."
+msgstr "Terminated."
+
+msgid "Cancelled, but still active"
+msgstr "Cancelled, but still active"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "Waiting, becoming active at next payment due date"
+msgstr "Waiting, becoming active at next payment due date"
+
+msgid "User"
+msgstr "Benutzer"
+
+msgid "Reference Payment"
+msgstr "Referenzzahlung"
+
+msgid "Subscription State"
+msgstr "Abo-Status"
+
+msgid "Has Problems"
+msgstr "Hat Probleme"
+
+msgid "Next due date"
+msgstr "Nächstes Buchungsdatum"
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "Last Payment"
+msgstr "Letzte Zahlung"
+
+msgid "Terminated"
+msgstr "Beendet"
+
+msgid "Subscription"
+msgstr "Abo"
+
+msgid "(BS1) Payments"
+msgstr "(BS1) Zahlungen"
+
+msgid "(BS2) Payments"
+msgstr "(BS2) Zahlungen"
+
+msgid "(TS1) Terminate your subscription"
+msgstr "(TS1) Zahlungen einstellen"
+
+msgid "(TS1) Terminate your Subscription"
+msgstr "(TS1) Zahlungen einstellen"
+
+msgid "(TS2) sorry and think-about-it-again-please text"
+msgstr ""
+"(TS2) Schade, dass du deine Unterstützung beenden willst! Magst du es dir "
+"nicht noch einmal überlegen? Du kannst auch einen geringeren Betrag wählen. "
+"Jeder kleine Beitrag hilft uns weiter. Wenn du mit etwas unzufrieden bist, "
+"freuen wir uns über ein Feedback von dir an support@wechange.de!"
+
+msgid "(TS3) What happens when you cancel your subscription"
+msgstr "(TS3) Wenn du deine Zahlungen einstellst"
+
+msgid ""
+"(TS4) (explanation) No payments have been made yet. Your subscription will "
+"be cancelled."
+msgstr ""
+
+msgid ""
+"(TS5) (explanation) Your subscription will be terminated and no future "
+"payments will be made. Your currently paid subscription status will remain "
+"active until"
+msgstr ""
+"(TS5) Es werden keine weiteren Abbuchungen mehr vorgenommen. Dein aktueller "
+"Zahlungsstatus bleibt bis zum Ablaufdatum erhalten:"
+
+msgid "(TS6) Terminate Subscription"
+msgstr "(TS6) Zahlungen beenden"
+
+msgid "(TS7) Confirm subscription canceling dialog text"
+msgstr "(TS7) Zahlungen beenden"
+
+msgid "(TS8) Terminate Subscription"
+msgstr "(TS8) Zahlungen beenden"
+
+#, python-format
+msgid ""
+"You can contribute any amount up to %(max_amount)s by entering it here. For "
+"larger contributions, please contact our support!"
+msgstr ""
+"Du kannst einen beliebigen Betrag bis maximal %(max_amount)s beisteuern, "
+"indem du ihn direkt eingibst. Für größere Beiträge, kontaktiere bitte "
+"unseren Support!"
+
+msgid "(SLD1) Low amount text"
+msgstr "(SLD1) Danke! Jeder kleine Beitrag hilft. "
+
+msgid "(SLD2) Medium amount text"
+msgstr "(SLD2) Danke, dass du uns hilfst, WECHANGE weiterzuentwickeln."
+
+msgid "(SLD3) High amount text"
+msgstr "(SLD3) Wow! Du hilfst uns wirklich sehr!"
+
+msgid "My Invoices"
+msgstr "Meine Rechnungen"
+
+msgid "Invoices"
+msgstr "Rechnungen"
+
+msgid "(LN1) My Contribution"
+msgstr "(LN1) Mein Beitrag"
+
+msgid "(LN2) Payment Information"
+msgstr "(LN2) Zahlungsinformationen"
+
+msgid "(LN3) My Invoices"
+msgstr "(LN3) Meine Rechnungen"
+
+msgid "(LN4) Past Subscriptions"
+msgstr ""
+
+msgid ""
+"(LN7) If you have any questions about your subscription or encountered any "
+"problems, please send an email to"
+msgstr ""
+
+msgid "(LN5) Contact support"
+msgstr ""
+
+msgid "(LN6) Contact our Support"
+msgstr ""
+
+#, python-format
+msgid ""
+"Thank you!\n"
+"\n"
+"You have successfully made a SEPA payment.\n"
+"\n"
+"Amount: %(amount)s€\n"
+"SEPA-Mandate-ID: %(sepa_mandate)s\n"
+"Creditor-ID: %(sepa_creditor)s\n"
+"\n"
+"Thank you for supporting us!\n"
+"\n"
+"%(payment_recipient_name)s\n"
+"\n"
+msgstr ""
+"Danke!\n"
+"\n"
+"Du hast erfolgreich eine SEPA-Zahlung veranlasst.\n"
+"\n"
+"Betrag: %(amount)s€\n"
+"SEPA-Mandats-ID: %(sepa_mandate)s\n"
+"Gläubiger-ID: %(sepa_creditor)s\n"
+"\n"
+"Danke, dass du uns unterstützt!\n"
+"\n"
+"%(payment_recipient_name)s\n"
+"\n"
+
+msgid "You have successfully made a SEPA payment!"
+msgstr "Du hast erfolgreich eine SEPA-Zahlung veranlasst!"
+
+msgid "(MS1) My Subscription"
+msgstr "(MS1) Mein regelmäßiger monatlicher Beitrag "
+
+#, python-format
+msgid "(MS2) Your current contribution is %(amount)s euro"
+msgstr "(MS2) Dein momentaner Beitrag beträgt %(amount)s euro"
+
+msgid ""
+"(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'"
+msgstr ""
+"(MS3) Wir verstehen die WECHANGE-Plattform als Gemeingut und laden dich ein "
+"für die Nutzung der WECHANGE-Plattform das zu zahlen, was sie dir wert ist. "
+"Du hast es in der Hand: Schon mit einem kleinen monatlichen Beitrag hilfst "
+"du uns, WECHANGE stetig zu verbessern. Um die Plattform kostendeckend "
+"anbieten und weiterentwickeln zu können, brauchen wir von jedem Nutzer und "
+"jeder Nutzerin einen Beitrag von etwa 5 Euro pro Monat. Wenn du nur weniger "
+"oder gar nichts beitragen kannst, tragen andere dich mit. "
+
+msgid "(MS4) Learn more"
+msgstr "(MS4) Mehr erfahren"
+
+msgctxt "payment step button"
+msgid "(MS5) Modify Contribution Amount"
+msgstr "(MS5) Deine Zahlung anpassen"
+
+msgid "(MS6) Cancel your Subscription"
+msgstr "(MS6) Abbrechen"
+
+msgid "(PF10) Your subscription will end soon!"
+msgstr "(PF10) Deine monatlichen Beitragszahlungen enden bald."
+
+msgid "(PF11) Your subscription will end on"
+msgstr "(PF11) Deine monatlichen Beitragszahlungen enden am"
+
+msgid ""
+"(PF12) We're sorry to see you go! To continue subscribing, simply create a "
+"new subscription! Don't worry, we will start charging you only when your "
+"current subscription runs out!"
+msgstr ""
+"(PF12) Schade, dass du deine Zahlung einstellst! Um die monatlichen "
+"Zahlungen fortzusetzen, lege einfach einen neuen Beitrag fest! Keine Sorge, "
+"wir berechnen dir erst etwas, wenn dein aktuelles Abonnement abgelaufen ist!"
+
+#, python-format
+msgid "(PF13) You are using %(portal_name)s free of charge."
+msgstr "(PF13) Du benutzt %(portal_name)s kostenlos."
+
+msgid "(PF14) Final description text for First Payment Step box"
+msgstr ""
+"(PF14) Du benutzt WECHANGE kostenlos. Das ist möglich, weil andere "
+"Nutzer*innen dich mitfinanzieren."
+
+msgid "Past Subscriptions"
+msgstr "Vergangene Abos"
+
+msgid "(PF1) Payments"
+msgstr "(PF1) Zahlungen"
+
+msgid "(PF2) Learn more"
+msgstr "(PF2) Mehr erfahren"
+
+msgctxt "payment step button"
+msgid "(PF3) Choose Contribution"
+msgstr "(PF3) Beitrag wählen"
+
+msgctxt "payment step button"
+msgid "(PF4) Set Contribution Amount"
+msgstr "(PF4) Höhe des Beitrags wählen"
+
+msgid "(PF5)  Almost done!"
+msgstr "(PF5)  Fast fertig!"
+
+msgid "(PF6)  Please enter your account information below."
+msgstr "(PF6)  Gib bitte deine Zahlungsinformationen ein. "
+
+msgid "Payment Info"
+msgstr "Zahlungsinformationen"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "BIC"
+msgstr "BIC"
+
+msgid "Account Holder"
+msgstr "Kontoinhaber"
+
+msgid "Billing Address"
+msgstr "Rechnungsadresse"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Postal Code"
+msgstr "Postleitzahl"
+
+msgid "City"
+msgstr "Stadt"
+
+msgid "Country"
+msgstr "Land"
+
+msgid ""
+"(PF15) I accept the TOS and privacy policy and electronic processing of my "
+"data "
+msgstr "(PF15) Ich akzeptiere die AGBs und Datenschutzbestimmungen."
+
+msgctxt "payment step button"
+msgid "(PF8) Modify Contribution Amount"
+msgstr "(PF8) Ich akzeptiere die AGBs und Datenschutzbestimmungen. "
+
+msgctxt "payment step button"
+msgid "(PF9) Confirm and pay"
+msgstr "(PF9) Bestätigen und zahlen"
+
+msgid "(INF1) Payment Information"
+msgstr "(INF1) Meine Zahlungsdaten"
+
+msgid "(INF2) Subscription Status"
+msgstr "(INF2) Status"
+
+msgctxt "subscription status"
+msgid "(INF3) Will become active after your last subscription expires."
+msgstr "(INF3) Will become active after your last subscription expires."
+
+msgctxt "subscription status"
+msgid "(INF4) Active"
+msgstr "(INF4) Aktiv"
+
+msgid "since"
+msgstr "seit"
+
+msgctxt "subscription status"
+msgid "(INF5) Cancelled"
+msgstr "(INF5) Abgebrochen"
+
+msgid "Expires"
+msgstr "Läuft ab"
+
+msgid "(INF6) Current Subscription Amount"
+msgstr "(INF6) Dein aktueller Monatsbeitrag"
+
+msgid "(INF7) Next Payment scheduled"
+msgstr "(INF7) Nächste geplante Zahlung erfolgt am"
+
+msgid "Name"
+msgstr "Name"
+
+msgid ""
+"(INF8) To change your payment method or billing address, please cancel the "
+"current subscription and set up a new one!"
+msgstr ""
+"(INF8) Wenn du die Zahlungsart oder Rechnungsadresse ändern möchtest, klicke "
+"bitte auf \"Abbrechen\" und richte die Zahlung neu ein. Die nächste Zahlung "
+"wird erst nach Ablauf deines alten Beitrags ausgelöst."
+
+msgid "You will only be billed after the current subscription expires."
+msgstr ""
+"Die nächste Zahlung wird erst nach Ablauf deines alten Beitrags ausgelöst."
+
+msgid "Set up a new Subscription"
+msgstr "Neue Zahlung einrichten"
+
+msgid "(INF9) Cancel your Subscription"
+msgstr "(INF9) Zahlungen beenden"
+
+msgid "(INF10) Last Payment"
+msgstr "(INF10) Letzte Zahlung"
+
+msgid "(INF11) Amount"
+msgstr "(INF11) Betrag"
+
+msgid "(INF12) Date"
+msgstr "(INF12) Datum"
+
+msgid "(INF13) For more information see your invoices"
+msgstr "(INF13) Für weitere Informationen sieh in deinen Rechnungen nach"
+
+msgid "(INF14) Invoices"
+msgstr "(INF14) Rechnungen"
+
+msgid "(SC1) Payment Success"
+msgstr ""
+
+msgid "(SC2) Payments"
+msgstr ""
+
+msgid ""
+"(SC3) Your payment was processed successfully, but your subscription could "
+"not be activated due to an internal server error."
+msgstr ""
+
+msgid ""
+"(SC4) Please contact the support. Don't worry, we will sort everything out! "
+"In the meantime, please do not make any additional payments! Please excuse "
+"the inconveniences!"
+msgstr ""
+
+msgid "(SC5) Thank you for subscribing!"
+msgstr "(SC5) Vielen Dank für deinen Beitrag!"
+
+msgid "(SC6) Thank you text"
+msgstr ""
+"(SC6) Du bist toll! Durch deinen Beitrag können wir WECHANGE "
+"weiterentwickeln. "
+
+msgid "Your SEPA Mandate"
+msgstr "Dein SEPA Mandat"
+
+msgid "(SC7) View your subscription"
+msgstr "(SC7) Meinen Beitrag ansehen"
+
+msgid "(POP1) wechange is becoming even fairer"
+msgstr "(POP1) WECHANGE wird jetzt noch fairer. "
+
+msgid "(POP2) Dear WECHANGE-Community,"
+msgstr "(POP2) Liebe WECHANGE-Community,"
+
+msgid ""
+"(POP3) solidary price model text. solidary price model text. solidary price "
+"model text. solidary price model text. solidary price model text. solidary "
+"price model text. "
+msgstr ""
+"(POP3) wir verstehen die WECHANGE-Plattform als Gemeingut. Ab sofort starten "
+"wir deshalb ein solidarisches Preismodell: wir machen die Gruppen kostenlos, "
+"und ihr zahlt für die Nutzung der WECHANGE-Plattform das, was sie euch wert "
+"ist. Mit jedem Euro, den ihr zahlt, helft ihr mit, WECHANGE immer besser zu "
+"machen. Um euch die Plattform kostendeckend anbieten und weiterentwickeln zu "
+"können, brauchen wir von jedem Nutzer und jeder Nutzerin einen Beitrag von "
+"etwa 5 Euro pro Monat. Wenn ihr nur weniger oder gar nichts beitragen könnt, "
+"tragen andere euch mit. "
+
+msgid "(POP4a) 'inspirational quote'"
+msgstr ""
+"(POP4a) »Die Allmende ist ein gemeinsames Picknick, zu dem jeder etwas "
+"beiträgt«"
+
+msgid "(POP4b) quote credit"
+msgstr "(POP4b) - Bernhard Pötter"
+
+msgid "(POP5) Learn more"
+msgstr "(POP5) Mehr erfahren"
+
+msgid "(POP6) Choose amount"
+msgstr "(POP6) Beitrag wählen"
+
+msgid "(WC1) Support us "
+msgstr ""
+
+msgid "(WC2) Your Contribution"
+msgstr "(WC2) Dein Beitrag"
+
+msgid "(WC3) WECHANGE is based on a solidary pricing model..."
+msgstr ""
+"(WC3) WECHANGE basiert auf einem solidarischen Preismodell: Du zahlst einen "
+"freiwilligen Betrag und ermöglichst uns damit, die Plattform kontinuierlich "
+"weiterzuentwickeln. Möchtest du jetzt einen Beitrag festlegen? Natürlich "
+"kannst du dich auch erst einmal in Ruhe umschauen."
+
+msgid "(WC4) Learn more"
+msgstr "(WC4) Mehr erfahren"
+
+msgid "(WC5) Choose amount"
+msgstr "(WC5) Beitrag festlegen"
+
+msgid "(WC6) Remind me later"
+msgstr "(WC6) Später erinnern"
+
+msgid "Please fill out all of the missing fields!"
+msgstr "Bitte fülle alle fehlenden Felder aus!"
+
+msgid ""
+"The entered payment information is invalid. Please make sure you entered "
+"everything correctly!"
+msgstr "Die eingegebenen Zahlungsinformationen sind ungültig."
+
+msgid "You already have an active subscription and cannot start another one!"
+msgstr ""
+"Du hast bereits eine Zahlung eingerichtet und kannst keine weitere "
+"einrichten!"
+
+msgid ""
+"We can not create a new subscription for you at this point. Please contact "
+"the support! No payment has been made yet."
+msgstr ""
+"Wir konnten leider aktuell keine neue Zahlung für dich einrichten. Bitte "
+"kontaktiere unseren Support! Es wurde noch keine Abbuchung vorgenommen."
+
+msgid "You do not currently have a subscription!"
+msgstr "Du hast aktuell keine laufende Zahlung!"
+
+msgid ""
+"An error occured, and you cannot change your subscription amount at this "
+"time. Please contact the support!"
+msgstr ""
+"Es ist ein Fehler aufgetreten und du kannst deinen Zahlungsbetrag aktuell "
+"nicht ändern. Bitte kontaktiere unseren Support!"
+
+msgid ""
+"Your subscription amount could not be changed because of an unexpected "
+"error. Please contact the support!"
+msgstr ""
+"Dein Zahlungsbetrag konnte aufgrund eines unerwarteten Fehlers nicht "
+"geändert werden. Bitte kontaktiere unseren Support!"
+
+msgid ""
+"(MSG3) Your new subscription amount was saved! Your future subscription "
+"payments will be made with this amount. Thank you for your support!"
+msgstr ""
+"(MSG3) Deine Änderungen wurden gespeichert! Ab jetzt wird der von dir "
+"gewählte Beitrag gezahlt. Vielen Dank für deine Unterstützung!"
+
+msgid "The amount submitted does not seem to be a number!"
+msgstr "Der eingegebene Betrag scheint keine Zahl zu sein!"
+
+msgid "The payment amount is higher than the allowed maximum amount!"
+msgstr "Der Zahlungsbetrag ist höher als der erlaubte Maximalbetrag!"
+
+msgid "The payment amount is lower than the allowed minimum amount!"
+msgstr "Der Zahlungsbetrag ist niedriger als der erlaubte Minimalbetrag!"
+
+msgid "(MSG1) Your current Subscription was terminated."
+msgstr ""
+
+msgid ""
+"(MSG2) There was an error terminating your subscription! Please contact the "
+"customer support!"
+msgstr ""
