@@ -1,0 +1,67 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block extrahead %}
+	{{ block.super }}
+{% endblock %}
+
+
+{% block page_title %}{% trans "(PRC1) Payment processing..." %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "(PRC1) Payment processing..." %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="v2-content">
+		<h3>{% trans "(PRC1) Payment processing..." %}</h3>
+		
+		{% if payment.status == 1 %}
+			<p>
+				{% trans "(PRC2) Please complete your payment with the payment provider, or restart the payment process." %}
+			</p>
+		{% elif payment.status == 2 %}
+			<meta http-equiv="refresh" content="5" />
+			<p>
+				{% trans "(PRC3) Please wait while your payment is being processed..." %}
+				<i class="fa fa-spinner fa-spin"></i>
+			</p>
+			{% if show_taking_long_message %}
+				<hr class="invisible" />
+				<p>
+					{% trans "(PRC4) Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!" %}
+				</p>
+				<p>
+					{% trans "(PRC5) If your payment has not been processed after a day, please contact our support!" %}
+					{% if COSINNUS_CURRENT_PORTAL.support_email %}
+						<a href="#" data-toggle="modal" data-target="#supportModal">{% trans "(LN6) Contact our Support" %}</a>
+					{% endif %}
+				</p>
+			{% endif %}
+		{% else %}
+		<p>
+			{% comment %} This case should never be shown here! {% endcomment %}
+			{% trans "(PRC4) An unexpected error has occured during your payment." %}
+			{% trans "Please try again or contact our support for assistance!" %}
+		</p>
+		{% endif %}
+		
+		
+		
+	    {% if payment.status == 2 and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
+	    <hr>
+	    <a href="{% url 'wechange-payments:debug-delete-subscription' %}">
+	    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE THE PROCESSING PAYMENT WHICH IS STILL RUNNING
+	    </a>
+	    {% endif %}
+	</div>    
+    
+{% endblock %}
+

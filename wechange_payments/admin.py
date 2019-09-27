@@ -5,7 +5,7 @@ from wechange_payments.models import Payment, TransactionLog, Subscription
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('internal_transaction_id', 'user', 'amount', 'type', 'completed_at', 'vendor_transaction_id',)
+    list_display = ('internal_transaction_id', 'status', 'user', 'amount', 'type', 'completed_at', 'vendor_transaction_id',)
     list_filter = ('type',)
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
     readonly_fields = ('backend', 'vendor_transaction_id', 'internal_transaction_id', 'amount', 'completed_at', 'extra_data')

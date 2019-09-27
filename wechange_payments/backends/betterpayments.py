@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from wechange_payments.backends.base import BaseBackend
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
+    PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
 import urllib
 import hashlib
 from wechange_payments.models import TransactionLog, Payment
@@ -10,8 +11,17 @@ import requests
 import six
 import uuid
 from django.urls.base import reverse
+from django.shortcuts import redirect
+from django.core.exceptions import PermissionDenied
+from cosinnus.models.group import CosinnusPortal
+from annoying.functions import get_object_or_None
+from django.utils.timezone import now
+from django.contrib import messages
 
 logger = logging.getLogger('wechange-payments')
+
+
+BETTERPAYMENTS_API_ENDPOINT_PAYMENT = '/rest/payment'
 
 
 class BetterPaymentBackend(BaseBackend):
@@ -32,7 +42,7 @@ class BetterPaymentBackend(BaseBackend):
             Use `PAYMENTS_BETTERPAYMENT_OUTGOING_KEY` for requests sent out to Betterpayments from us,
             and `PAYMENTS_BETTERPAYMENT_INCOMING_KEY` to validate Postback requests made to us from them.
         """
-        hash_params = dict([(k, v or '') for k,v in params.items()])
+        hash_params = dict([(k, v or '') for k,v in params.items() if not k == 'checksum'])
         query = urllib.parse.urlencode(hash_params) + incoming_or_outgoing_key
         sha1 = hashlib.sha1()
         sha1.update(query.encode('utf-8'))
@@ -125,7 +135,7 @@ class BetterPaymentBackend(BaseBackend):
         return (transaction_id, sepa_mandate_token)
     
     
-    def _make_actual_sepa_payment(self, order_id, original_transaction_id, request, params, user=None):
+    def _make_actual_payment(self, payment_type, order_id, request, params, user=None, original_transaction_id=None):
         """ /rest/payment
         
             api_key:668651eb6e943eb3dc14
@@ -148,13 +158,12 @@ class BetterPaymentBackend(BaseBackend):
             bic:BELADEBEXXX
             account_holder:Hans Mueller
         """
-        url = '/rest/payment'
-        post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + url
+        post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
+        
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
-            'payment_type': PAYMENT_TYPE_DIRECT_DEBIT,
+            'payment_type': payment_type,
             'order_id': order_id,
-            'original_transaction_id': original_transaction_id,
             'postback_url': request.build_absolute_uri(reverse('wechange-payments:api-postback-endpoint')),
             
             'amount': params['amount'],
@@ -165,10 +174,20 @@ class BetterPaymentBackend(BaseBackend):
             'first_name': params['first_name'],
             'last_name': params['last_name'],
             'email': params['email'],
+            
             'iban': params['iban'],
             'bic': params['bic'],
             'account_holder': params['account_holder'],
         }
+        if original_transaction_id:
+            data.update({
+                'original_transaction_id': original_transaction_id,
+            })
+        if payment_type in REDIRECTING_PAYMENT_TYPES:
+            data.update({
+                'success_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-success-endpoint'), 
+                'error_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-error-endpoint'),
+            })
         if user:
             data.update({
                 'customer_id': user.id,
@@ -179,15 +198,16 @@ class BetterPaymentBackend(BaseBackend):
         req = requests.post(post_url, data=data)
         if not req.status_code == 200:
             extra = {'post_url': post_url, 'status':req.status_code, 'content': req._content}
-            logger.error('Payments: BetterPayment SEPA Payment failed, request did not return status=200.', extra=extra)
+            logger.error('Payments: BetterPayment Payment of type "%s" failed, request did not return status=200.' % payment_type, extra=extra)
             return (None, 'Error: The payment provider could not be reached.')
     
         result = req.json() # success!
+        result['payment_type'] = payment_type
         TransactionLog.objects.create(
-                type=TransactionLog.TYPE_REQUEST,
-                url=post_url,
-                data=result
-            )
+            type=TransactionLog.TYPE_REQUEST,
+            url=post_url,
+            data=result
+        )
         
         """
             Result on error:
@@ -202,54 +222,64 @@ class BetterPaymentBackend(BaseBackend):
               "error_code":0,
               "status_code":1,
               "status":"started",
+              # optional for redirecting types:
               "client_action":"redirect",
-              "action_data": {"url":"https://some-target-url"}
+              "action_data":{  
+                "url":"https://www.sofort.com/payment/go/94296bbd19b39b806bc9dc540b9e4a8aa00eae1b"
+              }
             }
         """
-
-        assert result.get('error_code', None) is not None
+        # result should always have an error code, which is 0 on success
+        if not 'error_code' in result:
+            return (None, 'Error: %s (%d)' % (_('Unexpected response from payment provider.'), -1))
+        
         if result.get('error_code') != 0:
-            extra= {'post_url': post_url, 'data': data, 'result': result}
-            logger.error('Payments: API Calling SEPA Payment returned an error!', extra=extra)
+            # ignore some errors for sentry warnings (126: invalid account info)
+            if result.get('error_code') not in [126,]: 
+                extra= {'post_url': post_url, 'data': data, 'result': result}
+                logger.warn('Payments: API Calling SEPA Payment returned an error!', extra=extra)
             return (None, 'Error: %s (%d)' % (result.get('error_message'), result.get('error_code')))
         
-        # TODO: handle client_action and action_data
-        
-        # save iban with all digits except for the first 2 and last 4 replaced with "*"
-        obfuscated_iban = params['iban'][:2] + ('*' * (len(params['iban'])-6)) + params['iban'][-4:]
-        extra_data = {
-            'status': result.get('status'), 
-            'status_code': result.get('status_code'),
-            
-            'iban': obfuscated_iban,
-            'account_holder': params['account_holder'],
-        }
+        extra_data = {}
+        # handle client_action and action_data
         if result.get('client_action', None) == 'redirect' and 'action_data' in result:
             extra_data.update({
-                'redirect_to': result.get('action_data'), 
+                'redirect_to': result.get('action_data').get('url'), 
+            })
+        
+        # save iban with all digits except for the first 2 and last 4 replaced with "*"
+        extra_data.update({
+            'status': result.get('status'), 
+            'status_code': result.get('status_code'),
+        })
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
+            obfuscated_iban = params['iban'][:2] + ('*' * (len(params['iban'])-6)) + params['iban'][-4:]
+            extra_data.update({
+                'iban': obfuscated_iban,
+                'account_holder': params['account_holder'],
             })
 
         # save successful payment
         payment = Payment(
-                user=user,
-                vendor_transaction_id=result.get('transaction_id'),
-                internal_transaction_id=result.get('order_id'),
-                amount=float(params['amount']),
-                type=Payment.TYPE_SEPA,
-                
-                address=params['address'],
-                city=params['city'],
-                postal_code=params['postal_code'],
-                country=params['country'],
-                first_name=params['first_name'],
-                last_name=params['last_name'],
-                email=params['email'],
-                
-                backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__),
-                extra_data=extra_data,
-            )
+            user=user,
+            vendor_transaction_id=result.get('transaction_id'),
+            internal_transaction_id=result.get('order_id'),
+            amount=float(params['amount']),
+            type=Payment.TYPE_MAP.get(payment_type),
+            status=Payment.STATUS_STARTED,
+            
+            address=params['address'],
+            city=params['city'],
+            postal_code=params['postal_code'],
+            country=params['country'],
+            first_name=params['first_name'],
+            last_name=params['last_name'],
+            email=params['email'],
+            
+            backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__),
+            extra_data=extra_data,
+        )
         return (payment, None)
-        
     
     def make_sepa_payment(self, request, params, user=None):
         """
@@ -267,44 +297,117 @@ class BetterPaymentBackend(BaseBackend):
         mandate_result = self._create_sepa_mandate(order_id)
         if isinstance(mandate_result, six.string_types):
             # contains error message, return
-            return mandate_result
+            return None, mandate_result
         transaction_id, sepa_mandate_token = mandate_result
         
-        payment, error = self._make_actual_sepa_payment(order_id, transaction_id, request, params, user=user)
+        payment, error = self._make_actual_payment(PAYMENT_TYPE_DIRECT_DEBIT, order_id, request, params, user=user, original_transaction_id=transaction_id)
         if error is not None:
             return None, error
         
-        payment.user = user
         payment.extra_data.update({
             'sepa_mandate_token': sepa_mandate_token 
         })
         try:
             payment.save()
         except Exception as e:
-            logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
+            logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e})
             
         try:
             self.send_successful_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
         except Exception as e:
-            logger.warning('Payments: SEPA Payment successful, but sending the success email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, 'exception': e})
+            logger.warning('Payments: SEPA Payment successful, but sending the success email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, order_id: 'order_id',  'exception': e})
             if settings.DEBUG:
                 raise
         return payment, None
     
+    def make_creditcard_payment(self, request, params, user=None):
+        """ Initiate a credit card payment. """
+        return self._make_redirected_payment(request, params, PAYMENT_TYPE_CREDIT_CARD, user=user)
     
-    def handle_postback(self, params):
-        """ Does Checksum validation and if valid saves the postback data as TransactionLog """
+    def make_paypal_payment(self, request, params, user=None):
+        """ Initiate a paypal payment. """
+        return self._make_redirected_payment(request, params, PAYMENT_TYPE_PAYPAL, user=user)
         
+    def _make_redirected_payment(self, request, params, payment_type, user=None):
+        """ 
+            Initiate a payment where the user gets redirected to an external site for
+            a part of the payment process.
+            Return expects an error message or an object of base model
+            `wechange_payments.models.BasePayment` if successful.
+            Note: Never save any payment information in our DB!
+            
+            @param user: The user for which this payment should be made. Can be null.
+            @param params: Expected params are:
+                
+            @return: str error message or model of wechange_payments.models.BasePayment if successful
+        """
+        order_id = str(uuid.uuid4())
+        payment, error = self._make_actual_payment(payment_type, order_id, request, params, user=user)
+        if error is not None:
+            return None, error
+        try:
+            payment.save()
+        except Exception as e:
+            logger.warning('Payments: Payment object could not be saved for a transaction of type "%s"!' % payment_type, extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
+        return payment, None
+        
+    def handle_success_redirect(self, request, params):
+        """ The user gets navigated here after completing a transaction on a popup/external payment provider.
+            @return: The targetted Payment if the redirect was valid and active, False if it was an expired or inactive session. 
+        """
+        if self._validate_incoming_checksum(params, 'success_redirect'):
+            # check for payment with order_id, set the payment to STATUS_COMPLETED_BUT_UNCONFIRMED,
+            # and redirect to that payments status page (payment success comes in form of a postback)
+            payment = get_object_or_None(Payment, internal_transaction_id=params.get('order_id'))
+            if payment and payment.status in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED, Payment.STATUS_PAID]:
+                if payment.status == Payment.STATUS_STARTED:
+                    payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
+                    payment.save()
+                return payment
+            return False
+        else:
+            raise PermissionDenied('The checksum validation failed.')
+        
+    def handle_error_redirect(self, request, params):
+        """ The user gets navigated here after completing a transaction on a popup/external payment provider.
+            @return: True if the redirect was valid and active, False if it was an expired or inactive session. 
+        """
+        if self._validate_incoming_checksum(params, 'error_redirect'):
+            # check for payment with order_id and set the payment to STATUS_FAILED 
+            payment = get_object_or_None(Payment, internal_transaction_id=params.get('order_id'))
+            if payment and payment.status == Payment.STATUS_STARTED:
+                payment.status = Payment.STATUS_FAILED
+                payment.save()
+                return True
+            return False
+        else:
+            raise PermissionDenied('The checksum validation failed.')
+    
+    def handle_postback(self, request, params):
+        """ Does Checksum validation and if valid saves the postback data as TransactionLog """
+        if self._validate_incoming_checksum(params, 'postback'):
+            TransactionLog.objects.create(
+                type=TransactionLog.TYPE_POSTBACK,
+                data=params,
+            )
+        # TODO: check for payment completion and set the payment status to STATUS_PAID!
+        return
+    
+    def _validate_incoming_checksum(self, params, endpoint):
+        """ Validates an incoming request's checksum to make sure it was not faked.
+            
+            The following data are appended to the URL, which is used when redirecting back to 
+            the shop’s success/error URLs.
+                order_id
+                transaction_id
+                checksum
+            It is recommended to verify the authenticity of the data by validating the checksum. 
+            This checksum is calculated like with outgoing data, only the incoming key is used this time.
+            See https://testdashboard.betterpayment.de/docs/#authentication-and-data-authenticity. """
         valid_checksum = self.calculate_request_checksum(params, settings.PAYMENTS_BETTERPAYMENT_INCOMING_KEY)
         if not 'checksum' in params or not params['checksum'] == valid_checksum:
             params.update({'valid_checksum_should_have_been': valid_checksum})
-            logger.warning('Payments: Received an invalid BetterPayments postback. Discarding data.', extra=params)
-            return
-            
-        TransactionLog.objects.create(
-            type=TransactionLog.TYPE_POSTBACK,
-            data=params,
-        )
+            logger.warning('Payments: Received an invalid or faked BetterPayments request on "%s". Discarding data.' % endpoint, extra=params)
+            return False
+        return True
         
-        
-    

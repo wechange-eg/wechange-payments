@@ -57,6 +57,9 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
         active_subscription = Subscription.get_active_for_user(self.request.user)
         if active_subscription:
             return redirect('wechange-payments:my-subscription')
+        processing_payment = get_object_or_None(Payment, user=request.user, status=Payment.STATUS_COMPLETED_BUT_UNCONFIRMED)
+        if processing_payment:
+            return redirect(reverse('wechange-payments:payment-process', kwargs={'pk': processing_payment.pk}))
         return super(PaymentView, self).dispatch(request, *args, **kwargs)
     
     def get_context_data(self, *args, **kwargs):
@@ -75,6 +78,7 @@ payment = PaymentView.as_view()
 
 
 class PaymentSuccessView(RequireLoggedInMixin, DetailView):
+    """ This view shows the "thank-you" screen once the Payment+Subscription is complete. """
     
     model = Payment
     template_name = 'wechange_payments/payment_success.html'
@@ -92,6 +96,35 @@ class PaymentSuccessView(RequireLoggedInMixin, DetailView):
 payment_success = PaymentSuccessView.as_view()
 
 
+class PaymentProcessView(RequireLoggedInMixin, DetailView):
+    """ A view that will be redirected to while a payment is still being processed.
+        It will automatically refresh itself, wait for the Payment to be set to STATUS_PAID
+        (in the background, initiated by a postback request from Better Payment) and
+        then redirect to the payment success view. """
+    
+    model = Payment
+    template_name = 'wechange_payments/payment_process.html'
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(PaymentProcessView, self).get_context_data(*args, **kwargs)
+        # must be owner of the payment
+        if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
+            raise PermissionDenied()
+        # if the payment has been completed, redirect to the success page
+        if self.object.status == Payment.STATUS_PAID:
+            return redirect('wechange-payments:payment-success', kwargs={'pk': self.object.pk})
+        elif self.object.status not in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
+            messages.error(self.request, str(_('This payment session has expired.')) + ' ' + str(_('Please try again or contact our support for assistance!')))
+            return redirect('wechange-payments:overview')
+        
+        late_process = self.object.last_action_at < now() - timedelta(seconds=settings.PAYMENTS_LATE_PAYMENT_PROCESS_MESSAGE_SECONDS)
+        context.update({
+            'show_taking_long_message': late_process,
+            'payment': self.object,
+        })
+        return context
+
+payment_process = PaymentProcessView.as_view()
 
 
 class WelcomePageView(RequireLoggedInMixin, TemplateView):
@@ -263,16 +296,19 @@ cancel_subscription = CancelSubscriptionView.as_view()
 
 
 def debug_delete_subscription(request):
-    """ DEBUG VIEW, completely removes a subscription. Only works during the test phase! """
+    """ DEBUG VIEW, completely removes a subscription or processing payment. Only works during the test phase! """
     if not getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):
         return HttpResponseForbidden('Not available.')
     if not request.user.is_authenticated:
         return HttpResponseForbidden('You must be logged in to do that!')
     subscription = Subscription.get_current_for_user(request.user)
-    if not subscription:
-        return HttpResponseForbidden('You do not have a current subscription!')
-    subscription.state = Subscription.STATE_0_TERMINATED
-    subscription.save()
+    if subscription:
+        subscription.state = Subscription.STATE_0_TERMINATED
+        subscription.save()
+    processing_payment = get_object_or_None(Payment, user=request.user, status=Payment.STATUS_COMPLETED_BUT_UNCONFIRMED)
+    if processing_payment:
+        processing_payment.status = Payment.STATUS_FAILED
+        processing_payment.save()
     return redirect('wechange-payments:overview')
 
 

@@ -6,11 +6,13 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 
 from wechange_payments.backends import get_backend
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
+    PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL,\
+    INSTANT_SUBSCRIPTION_PAYMENT_TYPES
 
 import logging
 from wechange_payments.models import Subscription,\
-    USERPROFILE_SETTING_POPUP_CLOSED
+    USERPROFILE_SETTING_POPUP_CLOSED, Payment
 from wechange_payments.payment import create_subscription_for_payment,\
     change_subscription_amount
 from django.shortcuts import redirect
@@ -46,24 +48,17 @@ def make_payment(request, on_success_func=None):
         missing_params = backend.check_missing_params(params, payment_type)
         if missing_params:
             return JsonResponse({'error': _('Please fill out all of the missing fields!'), 'missing_parameters': missing_params}, status=500)
+        
         if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
             payment, error = backend.make_sepa_payment(request, params, user=user)
-            if payment is not None and on_success_func is not None:
-                try:
-                    ret = on_success_func(payment)
-                except Exception as e:
-                    logger.error('Payments: Critical! A user made a successful payment, but there was an error while creating his subscription! Find out what happened, create a subscription for them, and contact them!',
-                         extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user, 'exception': e})
-                    if settings.DEBUG:
-                        raise
-                    # redirect to the success view with errors this point, so the user doesn't just resubmit the form
-                    redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id}) + '?subscription_error=1'
-                    data = {
-                        'redirect_to': redirect_url
-                    }
-                    return JsonResponse(data)
-                return ret
-    
+        elif payment_type == PAYMENT_TYPE_CREDIT_CARD:
+            payment, error = backend.make_creditcard_payment(request, params, user=user)
+        elif payment_type == PAYMENT_TYPE_PAYPAL:
+            payment, error = backend.make_paypal_payment(request, params, user=user)
+            
+        if payment is not None and on_success_func is not None:
+            return on_success_func(payment)
+            
     if payment is None:
         # special error cases:
         # 126: Invalid bank info
@@ -74,7 +69,8 @@ def make_payment(request, on_success_func=None):
     data = {}
     if 'redirect_to' in payment.extra_data:
         data.update({
-            'redirect_to': payment.extra_data['redirect_to']
+            'redirect_to': payment.extra_data['redirect_to'],
+            'redirect_in_popup': True,
         })
     return JsonResponse(data)
 
@@ -107,15 +103,35 @@ def make_subscription_payment(request):
         # TODO: implement postponed subscription payment!
         return JsonResponse({'error': 'NYI: Postponed subscription creation is not yet implemented!'}, status=500)
     
-    # use the regular payment method and create a subscription if it was successful
-    def on_success_func(payment):
-        create_subscription_for_payment(payment)
-        redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
-        data = {
-            'redirect_to': redirect_url
-        }
-        return JsonResponse(data)
-    
+    params = request.POST.copy()
+    payment_type = params.get('payment_type', None)
+    if payment_type in INSTANT_SUBSCRIPTION_PAYMENT_TYPES:
+        # use the regular payment method and create a subscription if it was successful
+        def on_success_func(payment):
+            try:
+                payment.status = Payment.STATUS_PAID
+                payment.save()
+                create_subscription_for_payment(payment)
+                redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
+                data = {
+                    'redirect_to': redirect_url
+                }
+            except Exception as e:
+                logger.error('Payments: Critical! A user made a successful payment, but there was an error while creating his subscription! Find out what happened, create a subscription for them, and contact them!',
+                     extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user, 'exception': e})
+                if settings.DEBUG:
+                    raise
+                # redirect to the success view with errors this point, so the user doesn't just resubmit the form
+                redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id}) + '?subscription_error=1'
+                data = {
+                    'redirect_to': redirect_url
+                }
+            
+            return JsonResponse(data)
+    else:
+        # use the regular payment method and redirect to a site the vendor provides
+        on_success_func = None
+        
     return make_payment(request, on_success_func=on_success_func)
 
 
@@ -173,13 +189,34 @@ def _get_validated_amount(amount):
     if amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
         return JsonResponse({'error': _('The payment amount is lower than the allowed minimum amount!')}, status=500)
     return amount
-    
+
+
+def success_endpoint(request):
+    """ For providers with payment flows that redirect back to our site after a success """
+    backend = get_backend()
+    valid_payment = backend.handle_success_redirect(request, request.GET.dict())
+    if valid_payment:
+        return redirect(reverse('wechange-payments:payment-process', kwargs={'pk': valid_payment.pk}))
+    messages.warning(request, _('The payment session could not be found. Please contact our support for assistance!'))
+    return redirect('wechange-payments:overview')
+
+
+def error_endpoint(request):
+    """ For providers with payment flows that redirect back to our site after an error """
+    backend = get_backend()
+    valid_error_target = backend.handle_error_redirect(request, request.GET.dict())
+    if valid_error_target:
+        messages.error(request, str(_('The payment process was cancelled or could not be completed.')) + ' ' + str(_('Please try again or contact our support for assistance!')))
+    else:
+        messages.error(request, str(_('This payment session has expired.')) + ' ' + str(_('Please try again or contact our support for assistance!')))
+    return redirect('wechange-payments:overview')
+
 
 def postback_endpoint(request):
     """ For providers that offer a postback URL as logging/validation """
-    
     backend = get_backend()
-    backend.handle_postback(request, request.POST.copy())
+    backend.handle_postback(request, request.POST.dict())
+    # TODO: why is request being passed here, when there isnt that parameter in the backend??
     return JsonResponse({'status': 'ok'})
 
 

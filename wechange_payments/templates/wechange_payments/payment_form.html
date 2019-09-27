@@ -90,6 +90,14 @@
 				            <i class="fa fa-exclamation fa-3x"></i>
 				            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&#215;</button>
 					        <p style="">Testphase! Es werden keine echten Zahlungen vorgenommen und alle Transaktionen können gefahrlos getestet werden! Es werden wohlformatierte, aber keine "echten" Zahlungsinformationen benötigt!</p>
+					        <p>
+					        	<h2>Die folgenden Testdaten können zum Accounts testen benutzt werden:</h2>
+					        	<ul>
+					        		<li>SEPA: IBAN: DE89370400440532013000, BIC: COBADEFFXXX</li>
+					        		<li>Kreditkarte: Nr: 4907639999990022, CCV: 029, beliebiger Name, Datum in der Zukunft</li>
+					        		<li>Paypal: Benutzer: paula.penny@example.com, Passwort: paypaltest1</li>
+					        	</ul>
+					        </p>
 					    </div>
 				    {% endif %}
 				
@@ -104,7 +112,19 @@
 		            <h3>{% trans "Payment Info" %}</h3>
 		            
 					{% trans "Payment Type" as label %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label show_required=True field_classes="conditional-select" %}
+					{% captureas select_field_html %}
+						<style>
+							select:invalid { color: gray; }
+						</style>
+						<select name="{{ form.payment_type.html_name }}" autocomplete="off" required id="{{ form.payment_type.id_for_label }}">
+                            <option value="" disabled selected hidden>- {% trans "Select Payment Method" %} -</option>
+                            {% for value, label in form.payment_type.field.choices %}
+			                    <option value="{{ value }}">{{ label }}</option>
+			                {% endfor %}
+                        </select>
+					{% endcaptureas %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label field_html=select_field_html show_required=True field_classes="conditional-select" %}
+					
 					
 		            <div class="conditional-select-container" data-select-name="payment_type" data-select-value="dd">
 			            <div class="row">
@@ -124,9 +144,15 @@
 					</div>
 		
 					<div class="conditional-select-container" data-select-name="payment_type" data-select-value="cc">			
-						<p>This is the credit card form!</p>
+						<hr class="invisible"/>
+						<p>{% blocktrans with payment_provider="Better Payment Germany" %}In the next step, you will be redirected to complete the payment process with the payment provider {{ payment_provider }}.{% endblocktrans %}</p>
 					</div>
-					                
+					
+					<div class="conditional-select-container" data-select-name="payment_type" data-select-value="paypal">			
+						<hr class="invisible"/>
+						<p>{% blocktrans with payment_provider="Paypal" %}In the next step, you will be redirected to complete the payment process with the payment provider {{ payment_provider }}.{% endblocktrans %}</p>
+					</div>
+					
 					<hr>
 		    		
 		    		<h3>{% trans "Billing Address" %}</h3>

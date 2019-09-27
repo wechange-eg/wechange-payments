@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
+    PAYMENT_TYPE_PAYPAL, PAYMENT_TYPE_CREDIT_CARD
 from django.core.exceptions import ImproperlyConfigured
 from wechange_payments.models import Payment
 from wechange_payments.utils.utils import resolve_class
@@ -27,6 +28,26 @@ class BaseBackend(object):
             'iban', # de29742940937493240340
             'bic', # BELADEBEXXX
             'account_holder', # Hans Mueller
+        ],
+        PAYMENT_TYPE_CREDIT_CARD: [
+            'amount', # 1.337
+            'address', # Straße
+            'city', # Berlin
+            'postal_code', # 11111
+            'country', # DE // ISO 3166-1 code
+            'first_name', # Hans
+            'last_name', # Mueller
+            'email', # saschanarr@gmail.com
+        ],
+        PAYMENT_TYPE_PAYPAL: [
+            'amount', # 1.337
+            'address', # Straße
+            'city', # Berlin
+            'postal_code', # 11111
+            'country', # DE // ISO 3166-1 code
+            'first_name', # Hans
+            'last_name', # Mueller
+            'email', # saschanarr@gmail.com
         ],
     }
     
@@ -77,8 +98,7 @@ class BaseBackend(object):
             Note: Never save any payment information in our DB!
             
             @param user: The user for which this payment should be made. Can be null.
-            @param params: Expected params are:
-                TOD
+            @param params: Expected params can be found in `REQUIRED_PARAMS`
                 
             @return: tuple (
                         model of wechange_payments.models.BasePayment if successful or None,
@@ -87,7 +107,55 @@ class BaseBackend(object):
          """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
+    def make_creditcard_payment(self, request, params, user=None):
+        """
+            Initiate a credit card payment. 
+            Return expects an error message or an object of base model
+            `wechange_payments.models.BasePayment` if successful.
+            Note: Never save any payment information in our DB!
+            
+            @param user: The user for which this payment should be made. Can be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`
+                
+            @return: tuple (
+                        model of wechange_payments.models.BasePayment if successful or None,
+                        str error message if error or None
+                    )
+         """
+        raise NotImplemented('Use a proper payment provider backend for this function!')
+    
+    def make_paypal_payment(self, request, params, user=None):
+        """
+            Initiate a paypal payment.  
+            Return expects an error message or an object of base model
+            `wechange_payments.models.BasePayment` if successful.
+            Note: Never save any payment information in our DB!
+            
+            @param user: The user for which this payment should be made. Can be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`
+                
+            @return: tuple (
+                        model of wechange_payments.models.BasePayment if successful or None,
+                        str error message if error or None
+                    )
+         """
+        raise NotImplemented('Use a proper payment provider backend for this function!')
+    
+    def handle_success_redirect(self, request, params):
+        """ Endpoint the user gets redirected to, after a transaction was successful that happened
+            in an external website. 
+            @return: Return a proper redirect for the user on our site. """
+        raise NotImplemented('Use a proper payment provider backend for this function!')
+        
+    def handle_error_redirect(self, request, params):
+        """ Endpoint the user gets redirected to, after a transaction failed that happened
+            in an external website. 
+            @return: Return a proper redirect for the user on our site. """
+        raise NotImplemented('Use a proper payment provider backend for this function!')
+        
     def handle_postback(self, request, params):
+        """ For a provider backend-only postback to post feedback on a transaction. 
+            Always return 200 on this and save the data. """
         raise NotImplemented('Use a proper payment provider backend for this function!')
         
 

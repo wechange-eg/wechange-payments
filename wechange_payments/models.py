@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
+    PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL
 from django.db import models
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.utils.translation import ugettext_lazy as _
@@ -20,10 +21,35 @@ USERPROFILE_SETTING_POPUP_CLOSED = 'payment_popup_closed_date'
 class Payment(models.Model):
     
     TYPE_SEPA = 0
+    TYPE_CC = 1
+    TYPE_PAYPAL = 2
     
-    #: Choices for :attr:`type`: ``(int, str)``
     TYPE_CHOICES = (
         (TYPE_SEPA, _('SEPA')),
+        (TYPE_CC, _('Credit Card')),
+        (TYPE_PAYPAL, _('PayPal')),
+    )
+    TYPE_MAP = {
+        PAYMENT_TYPE_DIRECT_DEBIT: TYPE_SEPA,
+        PAYMENT_TYPE_CREDIT_CARD: TYPE_CC,
+        PAYMENT_TYPE_PAYPAL: TYPE_PAYPAL,
+    }
+    
+    STATUS_NOT_STARTED = 0
+    STATUS_STARTED = 1
+    STATUS_COMPLETED_BUT_UNCONFIRMED = 2
+    STATUS_PAID = 3
+    STATUS_FAILED = 101
+    STATUS_RETRACTED = 102
+    
+    STATUS_CHOICES = (
+        (STATUS_NOT_STARTED, _('Not started')),
+        (STATUS_STARTED, _('Payment initiated but not completed by user yet')),
+        (STATUS_COMPLETED_BUT_UNCONFIRMED, _('Payment processing')),
+        (STATUS_PAID, _('Successfully paid')),
+        (STATUS_FAILED, _('Failed')),
+        (STATUS_RETRACTED, _('Retracted')),
+        
     )
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False,
@@ -38,7 +64,11 @@ class Payment(models.Model):
     amount = models.FloatField(default='0.0')
     type = models.PositiveSmallIntegerField(_('Payment Type'), blank=False,
         default=TYPE_SEPA, choices=TYPE_CHOICES, editable=False)
-    completed_at = models.DateTimeField(verbose_name=_('Completed At'), editable=False, auto_now_add=True)
+    last_action_at = models.DateTimeField(verbose_name=_('Completed At'), editable=False, auto_now=True)
+    completed_at = models.DateTimeField(verbose_name=_('Completed At'), editable=False, blank=True, null=True)
+    status = models.PositiveSmallIntegerField(_('Payment Status'), blank=False,
+        default=STATUS_NOT_STARTED, choices=STATUS_CHOICES, editable=False)
+    
     
     is_reference_payment = models.BooleanField(verbose_name=_('Is reference payment'), default=True, editable=False, 
         help_text='Is this the reference (first) payment in a series or a subscription payment derived from a reference payment?') 
