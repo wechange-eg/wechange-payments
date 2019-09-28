@@ -6,10 +6,10 @@ window.PaymentForm = {
 		// make hidden fields not required
 		var makeRequired = function(name, value){
     		$('.conditional-select-container[data-select-name="' + name + '"] input').each(function(){
-    			this.setAttribute ("required", "false");
+    			this.removeAttribute("required");
     		});
     		$('.conditional-select-container[data-select-name="' + name + '"][data-select-value="' + value + '"] input').each(function(){
-    			this.setAttribute ("required", "true");
+    			this.setAttribute("required", "true");
     		});
     	};
 		// onchange trigger

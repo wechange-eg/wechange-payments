@@ -164,7 +164,7 @@ class BetterPaymentBackend(BaseBackend):
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
             'payment_type': payment_type,
             'order_id': order_id,
-            'postback_url': request.build_absolute_uri(reverse('wechange-payments:api-postback-endpoint')),
+            'postback_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-postback-endpoint'),
             
             'amount': params['amount'],
             'address': params['address'],
@@ -174,11 +174,13 @@ class BetterPaymentBackend(BaseBackend):
             'first_name': params['first_name'],
             'last_name': params['last_name'],
             'email': params['email'],
-            
-            'iban': params['iban'],
-            'bic': params['bic'],
-            'account_holder': params['account_holder'],
         }
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
+            data.update({
+                'iban': params['iban'],
+                'bic': params['bic'],
+                'account_holder': params['account_holder'],
+            })
         if original_transaction_id:
             data.update({
                 'original_transaction_id': original_transaction_id,
