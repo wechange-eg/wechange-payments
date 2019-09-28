@@ -17,11 +17,31 @@ from cosinnus.models.group import CosinnusPortal
 from annoying.functions import get_object_or_None
 from django.utils.timezone import now
 from django.contrib import messages
+from copy import copy
 
 logger = logging.getLogger('wechange-payments')
 
 
 BETTERPAYMENTS_API_ENDPOINT_PAYMENT = '/rest/payment'
+
+# a list of sensitive parameter keys that should be dropped from postback data and not saved in our DB
+BETTERPAYMENT_SENSITIVE_POSTBACK_PARAMS = [
+    'card_brand',
+    'card_last_four',
+    'card_expiry_year',
+    'card_expiry_month',
+    'bic',
+    'iban',
+    'account_holder'
+]
+
+def _strip_sensitive_data(params):
+    """ Strips out sensitive data from a data dict that should not be saved in our DB """
+    params = copy(params)
+    for sensitive_key in BETTERPAYMENT_SENSITIVE_POSTBACK_PARAMS:
+        if sensitive_key in params:
+            del params[sensitive_key]
+    return params
 
 
 class BetterPaymentBackend(BaseBackend):
@@ -96,10 +116,10 @@ class BetterPaymentBackend(BaseBackend):
     
         result = req.json() # success!
         TransactionLog.objects.create(
-                type=TransactionLog.TYPE_REQUEST,
-                url=post_url,
-                data=result
-            )
+            type=TransactionLog.TYPE_REQUEST,
+            url=post_url,
+            data=_strip_sensitive_data(result),
+        )
         
         """
             Result on error:
@@ -123,12 +143,12 @@ class BetterPaymentBackend(BaseBackend):
         
         assert result.get('error_code', None) is not None
         if result.get('error_code') != 0:
-            extra= {'post_url': post_url, 'data': data, 'result': result}
+            extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
             logger.error('Payments: API Calling SEPA Mandate Creation returned an error!', extra=extra)
             return 'Error: %s" (%d)' % (result.get('error_message'), result.get('error_code'))
         
         if result.get('error_code') == 0 and not transaction_id or not sepa_mandate_token:
-            extra= {'post_url': post_url, 'data': data, 'result': result}
+            extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
             logger.error('Payments: API Error while calling SEPA Mandate Creation, missing transaction id or sepa mandate token!', extra=extra)
             return 'Error: Payment provider did not supply expected data.' 
         
@@ -238,7 +258,7 @@ class BetterPaymentBackend(BaseBackend):
         if result.get('error_code') != 0:
             # ignore some errors for sentry warnings (126: invalid account info)
             if result.get('error_code') not in [126,]: 
-                extra= {'post_url': post_url, 'data': data, 'result': result}
+                extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
                 logger.warn('Payments: API Calling SEPA Payment returned an error!', extra=extra)
             return (None, 'Error: %s (%d)' % (result.get('error_message'), result.get('error_code')))
         
@@ -387,12 +407,23 @@ class BetterPaymentBackend(BaseBackend):
     
     def handle_postback(self, request, params):
         """ Does Checksum validation and if valid saves the postback data as TransactionLog """
+        # drop sensitive data from postback
+        params = _strip_sensitive_data(params)
         if self._validate_incoming_checksum(params, 'postback'):
-            TransactionLog.objects.create(
-                type=TransactionLog.TYPE_POSTBACK,
-                data=params,
-            )
-        # TODO: check for payment completion and set the payment status to STATUS_PAID!
+            try:
+                TransactionLog.objects.create(
+                    type=TransactionLog.TYPE_POSTBACK,
+                    data=params,
+                )
+            except Exception as e:
+                logger.error('Payments: Error during postback processing! Postbacked data could not be saved!', extra={'params': params, 'exception': e})
+            
+            try:
+                # TODO: check for payment completion and set the payment status to STATUS_PAID!
+                pass
+            except Exception as e:
+                logger.error('Payments: Error during postback processing! Postbacked data was saved, but payment status could not be updated!', extra={'params': params, 'exception': e})
+            
         return
     
     def _validate_incoming_checksum(self, params, endpoint):

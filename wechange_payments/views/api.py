@@ -21,12 +21,14 @@ from cosinnus.utils.functions import is_number
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 
 logger = logging.getLogger('wechange-payments')
 
 
 @csrf_exempt
 @never_cache
+@sensitive_post_parameters
 def make_payment(request, on_success_func=None):
     """ A non-user-based payment API function, that can be used for anonymous (or user-based),
         one-time donations. """
@@ -215,6 +217,7 @@ def error_endpoint(request):
 
 @csrf_exempt
 @never_cache
+@sensitive_post_parameters
 def postback_endpoint(request):
     """ For providers that offer a postback URL as logging/validation """
     backend = get_backend()
