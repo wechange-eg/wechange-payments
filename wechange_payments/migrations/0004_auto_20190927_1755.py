@@ -13,12 +13,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='payment',
             name='last_action_at',
-            field=models.DateTimeField(auto_now=True, verbose_name='Completed At'),
+            field=models.DateTimeField(auto_now=True, verbose_name='Last Action At'),
         ),
         migrations.AddField(
             model_name='payment',
             name='status',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'Not started'), (1, 'Payment initiated but not completed by user yet'), (2, 'Payment processing'), (3, 'Successfully paid'), (101, 'Failed'), (102, 'Retracted')], default=0, editable=False, verbose_name='Payment Status'),
+            field=models.PositiveSmallIntegerField(choices=[(0, 'Not started'), (1, 'Payment initiated but not completed by user yet'), (2, 'Payment processing'), (3, 'Successfully paid'), (101, 'Failed'), (102, 'Retracted'), (103, 'Canceled')], default=0, editable=False, verbose_name='Payment Status'),
         ),
         migrations.AlterField(
             model_name='payment',

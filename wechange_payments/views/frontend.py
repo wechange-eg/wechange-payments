@@ -83,11 +83,21 @@ class PaymentSuccessView(RequireLoggedInMixin, DetailView):
     model = Payment
     template_name = 'wechange_payments/payment_success.html'
     
-    def get_context_data(self, *args, **kwargs):
-        context = super(PaymentSuccessView, self).get_context_data(*args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
         # must be owner of the payment
         if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
             raise PermissionDenied()
+        # if the payment has not been completed, redirect to the process page
+        if self.object.status == Payment.STATUS_STARTED or self.object.status == Payment.STATUS_COMPLETED_BUT_UNCONFIRMED:
+            return redirect(reverse('wechange-payments:payment-process', kwargs={'pk': self.object.pk}))
+        elif self.object.status != Payment.STATUS_PAID:
+            messages.error(request, str(_('There was an error with your payment.')) + ' ' + str(_('Please contact our support for assistance!')))
+            return redirect('wechange-payments:overview')
+        return super(PaymentSuccessView, self).dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(PaymentSuccessView, self).get_context_data(*args, **kwargs)
         context.update({
             'payment': self.object,
         })
@@ -105,18 +115,21 @@ class PaymentProcessView(RequireLoggedInMixin, DetailView):
     model = Payment
     template_name = 'wechange_payments/payment_process.html'
     
-    def get_context_data(self, *args, **kwargs):
-        context = super(PaymentProcessView, self).get_context_data(*args, **kwargs)
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
         # must be owner of the payment
         if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
             raise PermissionDenied()
         # if the payment has been completed, redirect to the success page
         if self.object.status == Payment.STATUS_PAID:
-            return redirect('wechange-payments:payment-success', kwargs={'pk': self.object.pk})
+            return redirect(reverse('wechange-payments:payment-success', kwargs={'pk': self.object.pk}))
         elif self.object.status not in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
             messages.error(self.request, str(_('This payment session has expired.')) + ' ' + str(_('Please try again or contact our support for assistance!')))
             return redirect('wechange-payments:overview')
-        
+        return super(PaymentProcessView, self).dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(PaymentProcessView, self).get_context_data(*args, **kwargs)
         late_process = self.object.last_action_at < now() - timedelta(seconds=settings.PAYMENTS_LATE_PAYMENT_PROCESS_MESSAGE_SECONDS)
         context.update({
             'show_taking_long_message': late_process,

@@ -21,12 +21,14 @@ from cosinnus.utils.functions import is_number
 from django.contrib import messages
 from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
 
 logger = logging.getLogger('wechange-payments')
 
 
 @csrf_exempt
 @never_cache
+@sensitive_post_parameters('iban', 'bic', 'account_holder')
 def make_payment(request, on_success_func=None):
     """ A non-user-based payment API function, that can be used for anonymous (or user-based),
         one-time donations. """
@@ -111,10 +113,11 @@ def make_subscription_payment(request):
         # use the regular payment method and create a subscription if it was successful
         def on_success_func(payment):
             try:
-                payment.status = Payment.STATUS_PAID
-                payment.save()
-                create_subscription_for_payment(payment)
-                redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
+                if payment.type == Payment.TYPE_SEPA and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+                    create_subscription_for_payment(payment)
+                    redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
+                else:
+                    redirect_url = reverse('wechange_payments:payment-process', kwargs={'pk': payment.id})
                 data = {
                     'redirect_to': redirect_url
                 }
@@ -199,7 +202,7 @@ def success_endpoint(request):
     valid_payment = backend.handle_success_redirect(request, request.GET.dict())
     if valid_payment:
         return redirect(reverse('wechange-payments:payment-process', kwargs={'pk': valid_payment.pk}))
-    messages.warning(request, _('The payment session could not be found. Please contact our support for assistance!'))
+    messages.warning(request, str(_('The payment session could not be found.')) + ' ' + str(_('Please contact our support for assistance!')))
     return redirect('wechange-payments:overview')
 
 
