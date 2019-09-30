@@ -58,6 +58,9 @@ class WechangePaymentsDefaultSettings(AppConf):
     # how many seconds till the "processing payment" page shows a "we're taking long..." message
     LATE_PAYMENT_PROCESS_MESSAGE_SECONDS = 30
     
+    # should SEPA payments be treated as instantly paid, or wait for a success postback from betterpayments?
+    SEPA_IS_INSTANTLY_SUCCESSFUL = True
+    
     """ Betterpayment-settings """
     
     BETTERPAYMENT_API_KEY = ''

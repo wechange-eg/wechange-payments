@@ -22,7 +22,8 @@ def create_subscription_for_payment(payment):
     if active_sub and active_sub.state != Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
         logger.error('Payments: CRITICAL! create_subscription_for_payment() was called after a payment, but there is already an active payment for this user! You need to take action and make sure the payment will result in a proper subscription, or refund the user!', 
                         extra={'payment-id': payment.id, 'payment': payment, 'active-subscription-id': active_sub.id, 'active-subscription': active_sub, 'user': payment.user})
-
+        return
+    
     subscription = Subscription(
         user=payment.user,
         reference_payment=payment,

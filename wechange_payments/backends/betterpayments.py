@@ -18,6 +18,7 @@ from annoying.functions import get_object_or_None
 from django.utils.timezone import now
 from django.contrib import messages
 from copy import copy
+from wechange_payments.payment import create_subscription_for_payment
 
 logger = logging.getLogger('wechange-payments')
 
@@ -52,6 +53,24 @@ class BetterPaymentBackend(BaseBackend):
         'PAYMENTS_BETTERPAYMENT_OUTGOING_KEY',
         'PAYMENTS_BETTERPAYMENT_API_DOMAIN',
     ]
+    
+    # statuses see https://testdashboard.betterpayment.de/docs/#transaction-statuses
+    BETTERPAYMENT_STATUS_STARTED = 1
+    BETTERPAYMENT_STATUS_PENDING = 2
+    BETTERPAYMENT_STATUS_SUCCESS = 3
+    BETTERPAYMENT_STATUS_ERROR = 4
+    BETTERPAYMENT_STATUS_CANCELED = 5
+    BETTERPAYMENT_STATUS_DECLINED = 6
+    BETTERPAYMENT_STATUS_REFUNDED = 7
+    BETTERPAYMENT_STATUS_CHARGEBACK = 13
+    
+    
+    EMAIL_TEMPLATES_STATUS_MAP = {
+        BETTERPAYMENT_STATUS_SUCCESS: BaseBackend.EMAIL_TEMPLATES_SUCCESS,
+        BETTERPAYMENT_STATUS_ERROR: BaseBackend.EMAIL_TEMPLATES_ERROR,
+        BETTERPAYMENT_STATUS_DECLINED: BaseBackend.EMAIL_TEMPLATES_ERROR,
+    }
+    
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -330,16 +349,17 @@ class BetterPaymentBackend(BaseBackend):
             'sepa_mandate_token': sepa_mandate_token 
         })
         try:
+            if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+                payment.status = Payment.STATUS_PAID
+            else:
+                payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
             payment.save()
         except Exception as e:
             logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e})
             
-        try:
-            self.send_successful_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
-        except Exception as e:
-            logger.warning('Payments: SEPA Payment successful, but sending the success email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, order_id: 'order_id',  'exception': e})
-            if settings.DEBUG:
-                raise
+        if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+            self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+            
         return payment, None
     
     def make_creditcard_payment(self, request, params, user=None):
@@ -408,9 +428,9 @@ class BetterPaymentBackend(BaseBackend):
     def handle_postback(self, request, params):
         """ Does Checksum validation and if valid saves the postback data as TransactionLog """
         if self._validate_incoming_checksum(params, 'postback'):
-            # drop sensitive data from postback
-            params = _strip_sensitive_data(params)
             try:
+                # drop sensitive data from postback
+                params = _strip_sensitive_data(params)
                 TransactionLog.objects.create(
                     type=TransactionLog.TYPE_POSTBACK,
                     data=params,
@@ -419,8 +439,48 @@ class BetterPaymentBackend(BaseBackend):
                 logger.error('Payments: Error during postback processing! Postbacked data could not be saved!', extra={'params': params, 'exception': e})
             
             try:
-                # TODO: check for payment completion and set the payment status to STATUS_PAID!
-                pass
+                missing_params = [param for param in ['transaction_id', 'order_id', 'status_code'] if param not in params]
+                if missing_params:
+                    logger.error('BetterPayments Postback: Missing parameters: [%s]. Could not handle postback!' % ', '.join(missing_params), extra={'params': params})
+                    return
+                
+                # find referenced payment
+                payment = get_object_or_None(Payment, 
+                    vendor_transaction_id=params['transaction_id'],
+                    internal_transaction_id=params['order_id']
+                )
+                if payment is None:
+                    logger.error('BetterPayments Postback: Could not match a Payment object for given Postback!', extra={'params': params})
+                    return
+                
+                # Transaction Statuses see https://testdashboard.betterpayment.de/docs/#transaction-statuses
+                status = int(params['status_code'])
+                if status in [self.BETTERPAYMENT_STATUS_STARTED, self.BETTERPAYMENT_STATUS_PENDING]:
+                    # case 'started', 'pending': no further action required, we are waiting for the transaction to complete
+                    return
+                elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
+                    # case 'succcess': the payment was successful, update the Payment and start a subscription
+                    payment.status = Payment.STATUS_PAID
+                    payment.save()
+                    # IMPORTANT: if this is a recurring payment for a running subscription, don't start a subscription!
+                    if payment.is_reference_payment:
+                        create_subscription_for_payment(payment)
+                    self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                elif status == self.BETTERPAYMENT_STATUS_CANCELED:
+                    # case 'error', 'canceled', 'declined': mark the payment as canceled. no further action is required.
+                    payment.status = Payment.STATUS_CANCELED
+                    payment.save()
+                elif status in [self.BETTERPAYMENT_STATUS_ERROR, self.BETTERPAYMENT_STATUS_DECLINED]:
+                    # case 'error', 'declined': mark the payment as failed
+                    payment.status = Payment.STATUS_FAILED
+                    payment.save()
+                    self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
+                    # TODO: add refund logic, cancel subscription probably?
+                    logger.error('NYI: Received a postback for a refund, but refunding logic not yet implemented!', extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                else:
+                    # we do not know what to do with this status
+                    logger.error('NYI: Received postback with a status we cannot handle (Status: %d)!' % status, extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
             except Exception as e:
                 logger.error('Payments: Error during postback processing! Postbacked data was saved, but payment status could not be updated!', extra={'params': params, 'exception': e})
             

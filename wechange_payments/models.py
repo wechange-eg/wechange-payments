@@ -41,6 +41,7 @@ class Payment(models.Model):
     STATUS_PAID = 3
     STATUS_FAILED = 101
     STATUS_RETRACTED = 102
+    STATUS_CANCELED = 103
     
     STATUS_CHOICES = (
         (STATUS_NOT_STARTED, _('Not started')),
@@ -49,7 +50,7 @@ class Payment(models.Model):
         (STATUS_PAID, _('Successfully paid')),
         (STATUS_FAILED, _('Failed')),
         (STATUS_RETRACTED, _('Retracted')),
-        
+        (STATUS_CANCELED, _('Canceled')),
     )
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False,
@@ -64,11 +65,10 @@ class Payment(models.Model):
     amount = models.FloatField(default='0.0')
     type = models.PositiveSmallIntegerField(_('Payment Type'), blank=False,
         default=TYPE_SEPA, choices=TYPE_CHOICES, editable=False)
-    last_action_at = models.DateTimeField(verbose_name=_('Completed At'), editable=False, auto_now=True)
+    last_action_at = models.DateTimeField(verbose_name=_('Last Action At'), editable=False, auto_now=True)
     completed_at = models.DateTimeField(verbose_name=_('Completed At'), editable=False, blank=True, null=True)
     status = models.PositiveSmallIntegerField(_('Payment Status'), blank=False,
         default=STATUS_NOT_STARTED, choices=STATUS_CHOICES, editable=False)
-    
     
     is_reference_payment = models.BooleanField(verbose_name=_('Is reference payment'), default=True, editable=False, 
         help_text='Is this the reference (first) payment in a series or a subscription payment derived from a reference payment?') 
@@ -93,7 +93,7 @@ class Payment(models.Model):
     
     def get_type_string(self):
         return dict(self.TYPE_CHOICES).get(self.type)
-    
+
 
 class TransactionLog(models.Model):
     
