@@ -1,0 +1,87 @@
+{
+	"creditcard_direct_response": {
+		"status": "started",
+		"order_id": "e4a86be4-d99b-4b09-990a-693acced4ffd",
+		"error_code": 0, 
+		"action_data": {
+			"url": "https://testapi.betterpayment.de/payment/186c8b94-b086-43d5-97b8-f271a3b317db"
+		}, 
+		"status_code": 1, 
+		"payment_type": "cc",
+		"client_action": "redirect",
+		"transaction_id": "186c8b94-b086-43d5-97b8-f271a3b317db"
+	},
+	"creditcard_postback": {
+		"status": "completed",
+		"message": "Request successfully processed in \"Merchant in Integrator Test Mode\" (000.100.110)",
+		"checksum": "0fe37d9cea29a5d65b05913036cb98a09c8d4753",
+		"order_id": "e4a86be4-d99b-4b09-990a-693acced4ffd",
+		"card_brand": "VISA",
+		"status_code": "3",
+		"card_last_four": "0022",
+		"transaction_id": "186c8b94-b086-43d5-97b8-f271a3b317db",
+		"card_expiry_year": "2020",
+		"card_expiry_month": "9"
+	},
+	"paypal_direct_response": {
+		"status": "started",
+		"order_id": "fab7897a-3a74-4b7d-bf57-517ff0d3bac7",
+		"error_code": 0, 
+		"action_data": {
+			"url": "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=EC-47649443FT844342G"
+		}, 
+		"status_code": 1, 
+		"payment_type": "paypal",
+		"client_action": "redirect",
+		"transaction_id": "364ab356-a033-4d43-990f-78e9d48d24c5"
+	},
+	"paypal_postback": {
+		"status": "completed",
+		"message": "",
+		"checksum": "7a61fb15b14ce1dc239ec175451894e57988fd9d",
+		"order_id": "fab7897a-3a74-4b7d-bf57-517ff0d3bac7",
+		"status_code": "3",
+		"transaction_id": "364ab356-a033-4d43-990f-78e9d48d24c5"
+	},
+	"sepa_mandate_direct_response": {
+		"token": "51556826d58f56cee190c15fda5bf173",
+		"status": "registered",
+		"order_id": "15e0eaeb-0eae-4766-9a44-0a6e79ed40b0",
+		"error_code": 0, 
+		"status_code": 9, 
+		"transaction_id": "1cb295a8-20c7-4996-b5c3-08940ab4a545"
+	},
+	"sepa_direct_response": {
+		"bic": "***",
+		"iban": "***",
+		"status": "started",
+		"order_id": "15e0eaeb-0eae-4766-9a44-0a6e79ed40b0",
+		"error_code": 0, 
+		"mandate_id": "51556826d58f56cee190c15fda5bf173",
+		"status_code": 1, 
+		"payment_type": "dd",
+		"execution_date": "2019-09-28",
+		"transaction_id": "1cb295a8-20c7-4996-b5c3-08940ab4a545",
+		"recurring_mandate": 0
+	},
+	"sepa_postback_primary": {
+		"bic": "***",
+		"iban": "***",
+		"status": "started",
+		"message": "",
+		"checksum": "00d1944cda91d66e266b5033134e269aad8c37f4",
+		"order_id": "15e0eaeb-0eae-4766-9a44-0a6e79ed40b0",
+		"mandate_id": "51556826d58f56cee190c15fda5bf173",
+		"status_code": "1",
+		"transaction_id": "1cb295a8-20c7-4996-b5c3-08940ab4a545"
+	},
+	"creditcard_user_canceled": {
+		"status": "canceled",
+		"message": "invalid or missing parameter (200.300.404)",
+		"checksum": "d3be376d90a7223b98c326c7de1416fc901c0d89",
+		"order_id": "55d94cb1-9ee1-4eab-a5db-1f7aa044171d",
+		"status_code": "5",
+		"transaction_id": "02dc4295-a710-421a-bb11-4508b3b23fd4"
+	}
+
+}

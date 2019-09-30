@@ -407,9 +407,9 @@ class BetterPaymentBackend(BaseBackend):
     
     def handle_postback(self, request, params):
         """ Does Checksum validation and if valid saves the postback data as TransactionLog """
-        # drop sensitive data from postback
-        params = _strip_sensitive_data(params)
         if self._validate_incoming_checksum(params, 'postback'):
+            # drop sensitive data from postback
+            params = _strip_sensitive_data(params)
             try:
                 TransactionLog.objects.create(
                     type=TransactionLog.TYPE_POSTBACK,
