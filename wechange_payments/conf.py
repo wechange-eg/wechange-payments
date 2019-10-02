@@ -22,7 +22,9 @@ class WechangePaymentsDefaultSettings(AppConf):
     class Meta(object):
         prefix = 'PAYMENTS'
         
-    BACKEND = 'wechange_payments.backends.BetterPaymentBackend'
+    BACKEND = 'wechange_payments.backends.payment.BetterPaymentBackend'
+    INVOICE_BACKEND = 'wechange_payments.backends.invoice.LexOfficeBackend'
+    
     ACCEPTED_PAYMENT_METHODS = [
         PAYMENT_TYPE_DIRECT_DEBIT,
         PAYMENT_TYPE_CREDIT_CARD,
@@ -61,16 +63,18 @@ class WechangePaymentsDefaultSettings(AppConf):
     # should SEPA payments be treated as instantly paid, or wait for a success postback from betterpayments?
     SEPA_IS_INSTANTLY_SUCCESSFUL = True
     
-    """ Betterpayment-settings """
+    """ Betterpayment settings """
     
     BETTERPAYMENT_API_KEY = ''
     BETTERPAYMENT_INCOMING_KEY = ''
     BETTERPAYMENT_OUTGOING_KEY = ''
     BETTERPAYMENT_API_DOMAIN = ''
 
+    """ Lexoffice settings """
+    
+    LEXOFFICE_API_DOMAIN = 'https://api.lexoffice.io'
+    LEXOFFICE_API_KEY = ''
 
-    
-    
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from wechange_payments.backends.base import BaseBackend
+from wechange_payments.backends.payment.base import BaseBackend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
 import urllib
