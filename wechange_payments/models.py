@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
-    PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL
-from django.db import models
-from django.contrib.postgres.fields.jsonb import JSONField
-from django.utils.translation import ugettext_lazy as _
 import datetime
-from dateutil import relativedelta
-from django.utils.timezone import now
-from annoying.functions import get_object_or_None
-
-import logging
-from django_countries.fields import CountryField
 import hashlib
+import logging
 from os import path
-from django.utils.encoding import force_text
-from cosinnus.utils.files import get_cosinnus_media_file_folder
 from uuid import uuid4
+
+from annoying.functions import get_object_or_None
+from dateutil import relativedelta
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.db import models
+from django.utils.encoding import force_text
+from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
+from django_countries.fields import CountryField
+
+from cosinnus.utils.files import get_cosinnus_media_file_folder
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
+    PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL
+from wechange_payments.utils.utils import _get_invoice_filename
+from django.urls.base import reverse
+
 
 logger = logging.getLogger('wechange-payments')
 
@@ -89,7 +93,7 @@ class Payment(models.Model):
     country = CountryField(blank=True, null=True)
     
     backend = models.CharField(_('Backend class used'), max_length=255)
-    extra_data = JSONField()
+    extra_data = JSONField(null=True, blank=True)
     
     class Meta(object):
         app_label = 'wechange_payments'
@@ -269,7 +273,6 @@ class Subscription(models.Model):
 
 class Invoice(models.Model):
     
-    # 
     # not created yet at the provider. if an invoice is stuck at this state, the api might not be available
     STATE_0_NOT_CREATED = 0
     # created at the payment provider, but not finalized or downloaded
@@ -288,7 +291,7 @@ class Invoice(models.Model):
     )
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
-        editable=False, related_name='subscriptions', on_delete=models.CASCADE, null=False)
+        editable=False, related_name='invoices', on_delete=models.CASCADE, null=False)
     payment = models.OneToOneField('wechange_payments.Payment', verbose_name=_('Payment'), 
         on_delete=models.PROTECT, related_name='invoice', null=False, editable=False, unique=True,
         help_text='The first payment for this subscription, which is also used to book any future payments.')
@@ -302,8 +305,8 @@ class Invoice(models.Model):
     file = models.FileField(_('File'), blank=True, null=True, max_length=250, upload_to=_get_invoice_filename, editable=False)
     provider_id = models.CharField(_('Provider Invoice ID'), max_length=255, blank=True, null=True, editable=False)
     backend = models.CharField(_('Invoice Provider Backend class used'), max_length=255, editable=False)
-    extra_data = JSONField(help_text='This may contain the download path or similar IDs to retrieve the file from the provider.')
-    
+    extra_data = JSONField(null=True, blank=True,
+        help_text='This may contain the download path or similar IDs to retrieve the file from the provider.')
     
     created = models.DateTimeField(verbose_name=_('Created'), editable=False, auto_now_add=True)
     last_action_at = models.DateTimeField(verbose_name=_('Last Action At'), editable=False, auto_now=True,
@@ -313,12 +316,9 @@ class Invoice(models.Model):
         ordering = ('created',)
         verbose_name = _('Invoice')
         verbose_name_plural = _('Invoices')
-        
-        
-def _get_invoice_filename(instance, filename, folder_type, base_folder='payments'):
-    _, ext = path.splitext(filename)
-    filedir = path.join(get_cosinnus_media_file_folder(), base_folder, folder_type)
-    my_uuid = force_text(uuid4())
-    name = '%s%s%s' % (settings.SECRET_KEY, my_uuid , filename)
-    newfilename = 'invoice_' + hashlib.sha1(name.encode('utf-8')).hexdigest() + ext
-    return path.join(filedir, newfilename)
+    
+    def get_absolute_url(self):
+        return reverse('wechange-payments:invoice-detail', kwargs={'pk': self.pk})
+
+    def get_download_url(self):
+        return reverse('wechange-payments:invoice-download', kwargs={'pk': self.pk})

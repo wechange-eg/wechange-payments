@@ -19,6 +19,7 @@ from django.utils.timezone import now
 from django.contrib import messages
 from copy import copy
 from wechange_payments.payment import create_subscription_for_payment
+from wechange_payments import signals
 
 logger = logging.getLogger('wechange-payments')
 
@@ -351,6 +352,7 @@ class BetterPaymentBackend(BaseBackend):
         try:
             if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
                 payment.status = Payment.STATUS_PAID
+                payment.completed_at = now()
             else:
                 payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
             payment.save()
@@ -358,6 +360,7 @@ class BetterPaymentBackend(BaseBackend):
             logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e})
             
         if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+            signals.successful_payment_made.send(sender=self, payment=payment)
             self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
             
         return payment, None
@@ -461,7 +464,9 @@ class BetterPaymentBackend(BaseBackend):
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription
                     payment.status = Payment.STATUS_PAID
+                    payment.completed_at = now()
                     payment.save()
+                    signals.successful_payment_made.send(sender=self, payment=payment)
                     # IMPORTANT: if this is a recurring payment for a running subscription, don't start a subscription!
                     if payment.is_reference_payment:
                         create_subscription_for_payment(payment)

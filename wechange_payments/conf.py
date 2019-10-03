@@ -22,8 +22,8 @@ class WechangePaymentsDefaultSettings(AppConf):
     class Meta(object):
         prefix = 'PAYMENTS'
         
-    BACKEND = 'wechange_payments.backends.payment.BetterPaymentBackend'
-    INVOICE_BACKEND = 'wechange_payments.backends.invoice.LexOfficeBackend'
+    BACKEND = 'wechange_payments.backends.payment.betterpayments.BetterPaymentBackend'
+    INVOICE_BACKEND = 'wechange_payments.backends.invoice.lexoffice.LexofficeInvoiceBackend'
     
     ACCEPTED_PAYMENT_METHODS = [
         PAYMENT_TYPE_DIRECT_DEBIT,

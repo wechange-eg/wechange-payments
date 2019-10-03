@@ -9,6 +9,7 @@ from wechange_payments import signals
 
 import logging
 from annoying.functions import get_object_or_None
+import threading
 logger = logging.getLogger('wechange-payments')
 
 class BaseInvoiceBackend(object):
@@ -23,23 +24,39 @@ class BaseInvoiceBackend(object):
                 raise ImproperlyConfigured('Setting "%s" is required for backend "%s"!' 
                             % (key, self.__class__.__name__))
     
-    def create_invoice_for_payment(self, payment):
+    def create_invoice_for_payment(self, payment, threaded=False):
         """ Tries to create a finalized invoice in Lexoffice with all required data for a given payment.
             @return: An Invoice instance if the invoice was created in Lexoffice, raise Exception otherwise """
-        invoice = get_object_or_None(Invoice, payment=payment)
-        if not invoice:
-            invoice = Invoice.objects.create(
-                payment=payment,
-                user=payment.user,
-                backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__)
-            )
-        self.create_invoice(invoice)
-    
-    def create_invoice(self, invoice):
+        if threaded:
+            thread = threading.Thread(target=self.create_invoice_for_payment, args=(payment, False))
+            thread.start()
+            return
+        
+        try:
+            invoice = get_object_or_None(Invoice, payment=payment)
+            if not invoice:
+                invoice = Invoice.objects.create(
+                    payment=payment,
+                    user=payment.user,
+                    backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__)
+                )
+            self.create_invoice(invoice, threaded=False)
+        except Exception as e:
+            logger.error('Payments: Critical: Error during (our) invoice creation: Could not create an `Invoice` instance for a Payment! This must be manually repeated!', extra={'exception': e, 'payment_internal_transaction_id': payment.internal_transaction_id})
+            if settings.DEBUG:
+                raise
+        
+    def create_invoice(self, invoice, threaded=False):
         """ Tries to create, finalize and download an invoice at the invoice provider 
             (given an instance of our `Invoice`) if the invoice is not finished yet.
             For unfinished invoices, will only call the API for missing steps.
+            @param threaded: If True, will run in a thread.
             @return The finished instance of `Invoice` or None if *any* step failed """
+        if threaded:
+            thread = threading.Thread(target=self.create_invoice, args=(self, invoice, False))
+            thread.start()
+            return
+            
         if invoice.is_ready or invoice.state == Invoice.STATE_3_DOWNLOADED:
             return invoice
         try:
@@ -53,8 +70,11 @@ class BaseInvoiceBackend(object):
                 logger.info('Payments: Successfully created an invoice at the invoice provider!', extra={'invoice_id': invoice.id})
                 return invoice
         except Exception as e:
-            pass
+            if settings.DEBUG:
+                raise
         logger.error('Payments: Error during invoice creation: Stopped at invoice state %d!' % invoice.state, extra={'state': invoice.state, 'exception': e, 'invoice_id': invoice.id, 'payment_internal_transaction_id': invoice.payment.internal_transaction_id})
+        # save the invoice to trigger updating its `last_action_at`, so we can delay repeated API calls.
+        invoice.save()
         return None
     
     def _create_invoice_at_provider(self, invoice):

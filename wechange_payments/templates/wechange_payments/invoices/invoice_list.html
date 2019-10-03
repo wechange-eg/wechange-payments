@@ -1,5 +1,5 @@
 {% extends "wechange_payments/base.html" %}
-{% load l10n i18n cosinnus_tags static widget_tweaks %}
+{% load i18n %}
 
 {% block page_title %}{% trans "My Invoices" %}{% endblock %}
 
@@ -15,18 +15,13 @@
 {% block content %}
     
     <!-- a box with semi transparent background -->
-    <div class="v2-content">
+    <div class="v2-content app-main">
     	<h1>{% trans "Invoices" %}</h1>
     	
-    	<p>
-    		TODO: invoices
-    	</p>
     	{% for invoice in invoices %}
-    		{% comment %} TODO: invoice {% endcomment %}
+    		{% include 'wechange_payments/invoices/invoice_list_item.html' with object=invoice %}
     	{% endfor %}
-    	
     </div>
-        
     
 {% endblock %}
 

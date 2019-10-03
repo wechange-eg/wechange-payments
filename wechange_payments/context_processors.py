@@ -9,19 +9,17 @@ from cosinnus.core.middleware.cosinnus_middleware import LOGIN_URLS
 from cosinnus.models.group import CosinnusPortal
 from wechange_payments.conf import settings
 from wechange_payments.models import Subscription,\
-    USERPROFILE_SETTING_POPUP_CLOSED
+    USERPROFILE_SETTING_POPUP_CLOSED, Invoice
 
 
 logger = logging.getLogger('wechange-payments')
 
 def current_subscription(request):
     context = dict()
-    # TODO: add invoices logic
     
     current_subscription = Subscription.get_current_for_user(request.user)
     context.update({
         'current_subscription': current_subscription,
-        'invoices': [], # todo
     })
     # determine if payment popup should be shown
     if not current_subscription:

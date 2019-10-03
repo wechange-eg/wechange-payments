@@ -15,7 +15,6 @@ from annoying.functions import get_object_or_None
 from django.utils.timezone import now
 from django.contrib import messages
 from copy import copy
-from wechange_payments.payment import create_subscription_for_payment
 from wechange_payments.backends.invoice.base import BaseInvoiceBackend
 
 logger = logging.getLogger('wechange-payments')
@@ -29,8 +28,9 @@ LEXOFFICE_API_ENDPOINT_DOWNLOAD_INVOICE = '/v1/files/%(id)s'
 class LexofficeInvoiceBackend(BaseInvoiceBackend):
     
     required_setting_keys = [
-        'LEXOFFICE_API_DOMAIN',
-        'LEXOFFICE_API_KEY',
+        #'LEXOFFICE_API_DOMAIN',
+        #'LEXOFFICE_API_KEY',
+        # TODO!
     ]
     
     def __init__(self, *args, **kwargs):
