@@ -63,6 +63,11 @@ class WechangePaymentsDefaultSettings(AppConf):
     # should SEPA payments be treated as instantly paid, or wait for a success postback from betterpayments?
     SEPA_IS_INSTANTLY_SUCCESSFUL = True
     
+    # how many minutes since the last `last_action_at` should we wait before attempting another
+    # invoice retrieval via API if the last one has failed. retrieval re-attempts are done when
+    # the user tries to access their unretrieved invoice, or with a gather-all-missing cronjob
+    INVOICE_PROVIDER_RETRY_MINUTES = 5
+    
     """ Betterpayment settings """
     
     BETTERPAYMENT_API_KEY = ''

@@ -2,12 +2,13 @@
 
 from wechange_payments.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from wechange_payments.models import Payment
+from wechange_payments.models import Payment, Invoice
 from wechange_payments.utils.utils import resolve_class
 from django.template.loader import render_to_string
 from wechange_payments import signals
 
 import logging
+from annoying.functions import get_object_or_None
 logger = logging.getLogger('wechange-payments')
 
 class BaseInvoiceBackend(object):
@@ -22,28 +23,60 @@ class BaseInvoiceBackend(object):
                 raise ImproperlyConfigured('Setting "%s" is required for backend "%s"!' 
                             % (key, self.__class__.__name__))
     
-    
-        
     def create_invoice_for_payment(self, payment):
-        """ Creates a finalized invoice in Lexoffice with all required data.
+        """ Tries to create a finalized invoice in Lexoffice with all required data for a given payment.
             @return: An Invoice instance if the invoice was created in Lexoffice, raise Exception otherwise """
-        raise NotImplemented('Use a proper invoice provider backend for this function!')
+        invoice = get_object_or_None(Invoice, payment=payment)
+        if not invoice:
+            invoice = Invoice.objects.create(
+                payment=payment,
+                user=payment.user,
+                backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__)
+            )
+        self.create_invoice(invoice)
     
-    def render_invoice_for_payment(self, invoice):
+    def create_invoice(self, invoice):
+        """ Tries to create, finalize and download an invoice at the invoice provider 
+            (given an instance of our `Invoice`) if the invoice is not finished yet.
+            For unfinished invoices, will only call the API for missing steps.
+            @return The finished instance of `Invoice` or None if *any* step failed """
+        if invoice.is_ready or invoice.state == Invoice.STATE_3_DOWNLOADED:
+            return invoice
+        try:
+            if invoice.state == Invoice.STATE_0_NOT_CREATED:
+                self._create_invoice_at_provider(invoice)
+            if invoice.state == Invoice.STATE_1_CREATED:
+                self._finalize_invoice_at_provider(invoice)
+            if invoice.state == Invoice.STATE_2_FINALIZED:
+                self._download_invoice_from_provider(invoice)
+            if invoice.state == Invoice.STATE_3_DOWNLOADED:
+                logger.info('Payments: Successfully created an invoice at the invoice provider!', extra={'invoice_id': invoice.id})
+                return invoice
+        except Exception as e:
+            pass
+        logger.error('Payments: Error during invoice creation: Stopped at invoice state %d!' % invoice.state, extra={'state': invoice.state, 'exception': e, 'invoice_id': invoice.id, 'payment_internal_transaction_id': invoice.payment.internal_transaction_id})
+        return None
+    
+    def _create_invoice_at_provider(self, invoice):
         """ Calls the action to render an invoice as PDF on the server. 
+            This must set the `provider_id` field of the Invoice!
             @return: True if successful, raise Exception otherwise. """
         raise NotImplemented('Use a proper invoice provider backend for this function!')
     
-    def download_invoice_for_payment(self, invoice):
-        """ Download a PDF file for a finalized, rendered invoice.
-            @param documentFileId: The documentFileId for the invoice, which is returned from
-                Lexoffice after calling the render invoice endpoint.
-            @return: A file response? """
+    def _finalize_invoice_at_provider(self, invoice):
+        """ Calls the action to render an invoice as PDF on the server. 
+            Expects the `provider_id` field of the Invoice set!
+            This must set in `extra_data` such attributes, that are needed to download the rendered invoice
+            document by `self._download_invoice_from_provider()`
+            @return: True if successful, raise Exception otherwise. """
         raise NotImplemented('Use a proper invoice provider backend for this function!')
-        
-    def handle_postback(self, request, params):
-        """ For a provider backend-only postback to post feedback on a transaction. 
-            Always return 200 on this and save the data. """
-        raise NotImplemented('Use a proper payment provider backend for this function!')
+    
+    def _download_invoice_from_provider(self, invoice):
+        """ Download a PDF file for a finalized, rendered invoice.
+            Expects fields in `extra_data` set in the invoice, that are needed to download the rendered invoice
+            document from the provider.
+            This must set the `file` field to the invoice download.
+            @return: True if successful, raise Exception otherwise. """
+        raise NotImplemented('Use a proper invoice provider backend for this function!')
         
 
