@@ -130,7 +130,7 @@ class BetterPaymentBackend(BaseBackend):
         
         req = requests.post(post_url, data=data)
         if not req.status_code == 200:
-            extra = {'post_url': post_url, 'status':req.status_code, 'content': req._content}
+            extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: BetterPayment SEPA Mandate creation failed, request did not return status=200.', extra=extra)
             return 'Error: The payment provider could not be reached.'
     

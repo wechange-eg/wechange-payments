@@ -7,8 +7,7 @@ from annoying.functions import get_object_or_None
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.dispatch.dispatcher import receiver
-from django.http.response import HttpResponseForbidden, HttpResponseNotFound,\
-    HttpResponse, FileResponse
+from django.http.response import HttpResponseForbidden, HttpResponseNotFound, FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.encoding import force_text

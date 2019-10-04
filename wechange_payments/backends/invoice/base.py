@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from wechange_payments.models import Payment, Invoice
-from wechange_payments.utils.utils import resolve_class
-from django.template.loader import render_to_string
-from wechange_payments import signals
-
 import logging
-from annoying.functions import get_object_or_None
 import threading
+
+from annoying.functions import get_object_or_None
+from django.core.exceptions import ImproperlyConfigured
+
+from wechange_payments.conf import settings
+from wechange_payments.models import Invoice
+
+
 logger = logging.getLogger('wechange-payments')
 
 class BaseInvoiceBackend(object):
@@ -53,7 +53,7 @@ class BaseInvoiceBackend(object):
             @param threaded: If True, will run in a thread.
             @return The finished instance of `Invoice` or None if *any* step failed """
         if threaded:
-            thread = threading.Thread(target=self.create_invoice, args=(self, invoice, False))
+            thread = threading.Thread(target=self.create_invoice, args=(invoice, False))
             thread.start()
             return
             
@@ -80,23 +80,23 @@ class BaseInvoiceBackend(object):
     def _create_invoice_at_provider(self, invoice):
         """ Calls the action to render an invoice as PDF on the server. 
             This must set the `provider_id` field of the Invoice!
-            @return: True if successful, raise Exception otherwise. """
-        raise NotImplemented('Use a proper invoice provider backend for this function!')
+            @return: the same invoice instance if successful, raise Exception otherwise. """
+        raise Exception('NYI: Use a proper invoice provider backend for this function!')
     
     def _finalize_invoice_at_provider(self, invoice):
         """ Calls the action to render an invoice as PDF on the server. 
             Expects the `provider_id` field of the Invoice set!
             This must set in `extra_data` such attributes, that are needed to download the rendered invoice
             document by `self._download_invoice_from_provider()`
-            @return: True if successful, raise Exception otherwise. """
-        raise NotImplemented('Use a proper invoice provider backend for this function!')
+            @return: the same invoice instance if successful, raise Exception otherwise. """
+        raise Exception('NYI: Use a proper invoice provider backend for this function!')
     
     def _download_invoice_from_provider(self, invoice):
         """ Download a PDF file for a finalized, rendered invoice.
             Expects fields in `extra_data` set in the invoice, that are needed to download the rendered invoice
             document from the provider.
             This must set the `file` field to the invoice download.
-            @return: True if successful, raise Exception otherwise. """
-        raise NotImplemented('Use a proper invoice provider backend for this function!')
+            @return: the same invoice instance if successful, raise Exception otherwise. """
+        raise Exception('NYI: Use a proper invoice provider backend for this function!')
         
 
