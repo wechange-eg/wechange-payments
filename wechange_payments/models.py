@@ -313,7 +313,7 @@ class Invoice(models.Model):
         help_text='Used to indicate when the last attempt to retrieve the invoice from the provider was made, so not to spam them in case their API is down.')
     
     class Meta(object):
-        ordering = ('created',)
+        ordering = ('-created',)
         verbose_name = _('Invoice')
         verbose_name_plural = _('Invoices')
     

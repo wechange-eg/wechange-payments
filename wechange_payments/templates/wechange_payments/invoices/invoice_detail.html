@@ -22,9 +22,14 @@
     	<div class="large-space">
     		<table>
 				<tr>
-					<td>{% trans "Payment Type" %}</td>
+					<td>{% trans "Payment Purpose" %}</td>
 					<td>{% trans "Subscription Payment (monthly, recurring)" %}</td>
 				</tr>
+				<tr>
+					<td>{% trans "Payment Type" %}</td>
+					<td>{{ invoice.payment.get_type_string }}</td>
+				</tr>
+				
 				<tr>
 					<td>{% trans "(INF11) Amount" %}</td>
 					<td>{{ invoice.payment.amount|intify }} €</td>

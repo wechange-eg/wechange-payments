@@ -21,7 +21,7 @@ def resolve_class(path_to_class):
     return cls
 
 
-def _get_invoice_filename(instance, filename, folder_type, base_folder='payments'):
+def _get_invoice_filename(instance, filename, folder_type='invoices', base_folder='payments'):
     _, ext = path.splitext(filename)
     filedir = path.join(get_cosinnus_media_file_folder(), base_folder, folder_type)
     my_uuid = force_text(uuid4())
