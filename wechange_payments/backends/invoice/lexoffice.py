@@ -1,28 +1,18 @@
 # -*- coding: utf-8 -*-
-import urllib
 import hashlib
-from wechange_payments.models import TransactionLog, Payment, Invoice
-
 import logging
+from uuid import uuid1
+
+from django.core.files.base import ContentFile
+from django.utils.encoding import force_text
+from django.utils.translation import pgettext_lazy
 import requests
-import six
-import uuid
-from django.urls.base import reverse
-from django.shortcuts import redirect
-from django.core.exceptions import PermissionDenied
+
 from cosinnus.models.group import CosinnusPortal
-from annoying.functions import get_object_or_None
-from django.utils.timezone import now
-from django.contrib import messages
-from copy import copy
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from wechange_payments.backends.invoice.base import BaseInvoiceBackend
 from wechange_payments.conf import settings
-import json
-from django.utils.encoding import force_text
-from cosinnus.utils.http import request_to_string
-from django.core.files.base import ContentFile
-from uuid import uuid1
+from wechange_payments.models import Invoice
+
 
 logger = logging.getLogger('wechange-payments')
 
@@ -98,7 +88,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         }
         
         data = self._make_invoice_request_params(invoice)
-        #logger.warn(request_to_string('POST', post_url, headers=headers, json=data))
         req = requests.post(post_url, headers=headers, json=data)
         
         if not req.status_code == 201:
