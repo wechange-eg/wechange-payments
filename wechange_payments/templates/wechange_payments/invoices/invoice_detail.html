@@ -1,0 +1,70 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags %}
+
+{% block page_title %}{% blocktrans with date=object.created.date|localize %}Invoice from {{ date }}{% endblocktrans %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a href="{% url 'wechange-payments:invoices' %}">{% trans "My Invoices" %}</a></li>
+	<li><a class="active" href="{{ object.get_absolute_url }}">{% blocktrans with date=object.created.date|localize %}Invoice from {{ date }}{% endblocktrans %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="v2-content payment-info-page">
+    	<h2>{% blocktrans with date=object.created.date|localize %}Invoice from {{ date }}{% endblocktrans %}</h2>
+    	
+    	<div class="large-space">
+    		<table>
+				<tr>
+					<td>{% trans "Payment Purpose" %}</td>
+					<td>{% trans "Subscription Payment (monthly, recurring)" %}</td>
+				</tr>
+				<tr>
+					<td>{% trans "Payment Type" %}</td>
+					<td>{{ invoice.payment.get_type_string }}</td>
+				</tr>
+				
+				<tr>
+					<td>{% trans "(INF11) Amount" %}</td>
+					<td>{{ invoice.payment.amount|intify }} €</td>
+				</tr>
+			</table>
+		</div>
+    	
+    	{% if invoice.is_ready %}
+    		<hr class="invisible" />
+	    	<p class="large-space">
+	    		<button type="button" class="btn btn-emphasized btn-autosize pull-left no-margin" href="{{ invoice.get_download_url }}">
+				    <ul class="media-list">
+				        <li class="media">
+				            <a class="pull-left" href="{{ invoice.get_download_url }}">
+				                <i class="fa fa-download"></i>
+				            </a>
+				            <div class="media-body">
+				                {% trans "Download Invoice (PDF)" %}
+				            </div>
+				        </li>
+				    </ul>
+				</button>
+	    	</p>
+	    {% else %}
+	    	<hr/>
+	    	<p>
+	    		{% if long_creation_notice %}
+	    			{% trans "Creating your invoice download is taking longer than expected." %}
+	    			{% trans "Please contact our support for assistance!" %}
+	    		{% else %}
+	    			{% trans "Your invoice is still being prepared and will be ready for download shortly. Please return to this page in a few minutes." %}
+	    		{% endif %}
+	    	</p>
+	    {% endif %}
+    </div>
+    
+{% endblock %}
+

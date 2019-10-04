@@ -22,6 +22,7 @@ from django.contrib import messages
 from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
+from wechange_payments import signals
 
 logger = logging.getLogger('wechange-payments')
 
@@ -103,7 +104,7 @@ def make_subscription_payment(request):
         if not cancelled_sub.state == Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
             logger.error('Critical: User seemed to have a cancelled sub, but sanity check on it failed when trying to make a waiting subscription!', 
                          extra={'user': request.user.email})
-            return JsonResponse({'error': _('We can not create a new subscription for you at this point. Please contact the support! No payment has been made yet.')}, status=500)
+            return JsonResponse({'error': _('We can not create a new subscription for you at this point. Please contact our support! No payment has been made yet.')}, status=500)
         # TODO: implement postponed subscription payment!
         return JsonResponse({'error': 'NYI: Postponed subscription creation is not yet implemented!'}, status=500)
     
@@ -158,7 +159,7 @@ def subscription_change_amount(request):
     # sanity check
     if active_sub and waiting_sub:
         logger.error('Critical: Sanity check for user subscription failed! User has both an active and a queued subscription!', extra={'user': request.user.email})
-        return JsonResponse({'error': _('An error occured, and you cannot change your subscription amount at this time. Please contact the support!')}, status=500)
+        return JsonResponse({'error': _('An error occured, and you cannot change your subscription amount at this time. Please contact our support!')}, status=500)
     
     # validate amount
     amount_or_error_response = _get_validated_amount(request.POST.get('amount', None))
@@ -170,7 +171,7 @@ def subscription_change_amount(request):
     success = change_subscription_amount(subscription, amount)
     
     if not success:
-        return JsonResponse({'error': _('Your subscription amount could not be changed because of an unexpected error. Please contact the support!')}, status=500)
+        return JsonResponse({'error': _('Your subscription amount could not be changed because of an unexpected error. Please contact our support!')}, status=500)
     
     redirect_url = reverse('wechange_payments:my-subscription')
     data = {

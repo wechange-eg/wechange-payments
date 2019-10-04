@@ -1,17 +1,26 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
-    PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL
-from django.db import models
-from django.contrib.postgres.fields.jsonb import JSONField
-from django.utils.translation import ugettext_lazy as _
 import datetime
-from dateutil import relativedelta
-from django.utils.timezone import now
-from annoying.functions import get_object_or_None
-
+import hashlib
 import logging
+from os import path
+from uuid import uuid4
+
+from annoying.functions import get_object_or_None
+from dateutil import relativedelta
+from django.contrib.postgres.fields.jsonb import JSONField
+from django.db import models
+from django.utils.encoding import force_text
+from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
+
+from cosinnus.utils.files import get_cosinnus_media_file_folder
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
+    PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL
+from wechange_payments.utils.utils import _get_invoice_filename
+from django.urls.base import reverse
+
 
 logger = logging.getLogger('wechange-payments')
 
@@ -84,7 +93,7 @@ class Payment(models.Model):
     country = CountryField(blank=True, null=True)
     
     backend = models.CharField(_('Backend class used'), max_length=255)
-    extra_data = JSONField()
+    extra_data = JSONField(null=True, blank=True)
     
     class Meta(object):
         app_label = 'wechange_payments'
@@ -262,4 +271,54 @@ class Subscription(models.Model):
         logger.info('Payments: Advanced the due_date of a subscription and saved it after a payment was made. ', extra={'user': self.user, 'subscription': self})
 
 
+class Invoice(models.Model):
     
+    # not created yet at the provider. if an invoice is stuck at this state, the api might not be available
+    STATE_0_NOT_CREATED = 0
+    # created at the payment provider, but not finalized or downloaded
+    STATE_1_CREATED = 1
+    # finalized at the provider and ready to download (depending on the provider, this step may not be necessary)
+    STATE_2_FINALIZED = 2
+    # final state. the invoice file was downloaded. when this state is reached, `is_ready` is set to True
+    STATE_3_DOWNLOADED = 3
+    
+    # An invoice's states can only increase.
+    STATES = (
+        (STATE_0_NOT_CREATED, _('Not created at provider.')),
+        (STATE_1_CREATED, _('Created, but not finalized')),
+        (STATE_2_FINALIZED, _('Finalized, but not downloaded')),
+        (STATE_3_DOWNLOADED, _('Downloaded and ready')),
+    )
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
+        editable=False, related_name='invoices', on_delete=models.CASCADE, null=False)
+    payment = models.OneToOneField('wechange_payments.Payment', verbose_name=_('Payment'), 
+        on_delete=models.PROTECT, related_name='invoice', null=False, editable=False, unique=True,
+        help_text='The first payment for this subscription, which is also used to book any future payments.')
+    
+    state = models.PositiveSmallIntegerField(_('Invoice State'), blank=False,
+        default=STATE_0_NOT_CREATED, choices=STATES, editable=False,
+        help_text='An invoice\'s state can only ever increase.')
+    is_ready = models.BooleanField(verbose_name=_('Is Ready'), default=False,
+        help_text='An indicator flag to show that the invoice has been created in the invoice provider and can be downloaded')
+    
+    file = models.FileField(_('File'), blank=True, null=True, max_length=250, upload_to=_get_invoice_filename, editable=False)
+    provider_id = models.CharField(_('Provider Invoice ID'), max_length=255, blank=True, null=True, editable=False)
+    backend = models.CharField(_('Invoice Provider Backend class used'), max_length=255, editable=False)
+    extra_data = JSONField(null=True, blank=True,
+        help_text='This may contain the download path or similar IDs to retrieve the file from the provider.')
+    
+    created = models.DateTimeField(verbose_name=_('Created'), editable=False, auto_now_add=True)
+    last_action_at = models.DateTimeField(verbose_name=_('Last Action At'), editable=False, auto_now=True,
+        help_text='Used to indicate when the last attempt to retrieve the invoice from the provider was made, so not to spam them in case their API is down.')
+    
+    class Meta(object):
+        ordering = ('-created',)
+        verbose_name = _('Invoice')
+        verbose_name_plural = _('Invoices')
+    
+    def get_absolute_url(self):
+        return reverse('wechange-payments:invoice-detail', kwargs={'pk': self.pk})
+
+    def get_download_url(self):
+        return reverse('wechange-payments:invoice-download', kwargs={'pk': self.pk})

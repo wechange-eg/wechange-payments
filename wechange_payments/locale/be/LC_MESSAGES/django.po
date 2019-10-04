@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-24 14:38+0200\n"
+"POT-Creation-Date: 2019-10-04 17:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,32 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#, python-format
+msgid "Started invoice creation for %(number)d payment(s) in background."
+msgstr ""
+
+msgid "Create invoice in Invoice API (threaded)"
+msgstr ""
+
+msgid "Run/continue invoice in Invoice API (threaded)"
+msgstr ""
+
+#, python-format
+msgctxt "Invoice PDF, important!"
+msgid "Freely chosen user fee for %(portal_name)s"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "Electronic service"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "We charge you for our services as follows:"
+msgstr ""
+
+msgid "Unexpected response from payment provider."
+msgstr ""
 
 msgid "Credit Card"
 msgstr ""
@@ -30,6 +56,30 @@ msgstr ""
 msgid "SEPA"
 msgstr ""
 
+msgid "PayPal"
+msgstr ""
+
+msgid "Not started"
+msgstr ""
+
+msgid "Payment initiated but not completed by user yet"
+msgstr ""
+
+msgid "Payment processing"
+msgstr ""
+
+msgid "Successfully paid"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Retracted"
+msgstr ""
+
+msgid "Canceled"
+msgstr ""
+
 msgid "Vendor Transaction Id"
 msgstr ""
 
@@ -39,7 +89,13 @@ msgstr ""
 msgid "Payment Type"
 msgstr ""
 
+msgid "Last Action At"
+msgstr ""
+
 msgid "Completed At"
+msgstr ""
+
+msgid "Payment Status"
 msgstr ""
 
 msgid "Is reference payment"
@@ -117,6 +173,39 @@ msgstr ""
 msgid "Subscription"
 msgstr ""
 
+msgid "Not created at provider."
+msgstr ""
+
+msgid "Created, but not finalized"
+msgstr ""
+
+msgid "Finalized, but not downloaded"
+msgstr ""
+
+msgid "Downloaded and ready"
+msgstr ""
+
+msgid "Invoice State"
+msgstr ""
+
+msgid "Is Ready"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "Provider Invoice ID"
+msgstr ""
+
+msgid "Invoice Provider Backend class used"
+msgstr ""
+
+msgid "Invoice"
+msgstr ""
+
+msgid "Invoices"
+msgstr ""
+
 msgid "(BS1) Payments"
 msgstr ""
 
@@ -163,10 +252,36 @@ msgstr ""
 msgid "(SLD3) High amount text"
 msgstr ""
 
+#, python-format
+msgid "Invoice from %(date)s"
+msgstr ""
+
 msgid "My Invoices"
 msgstr ""
 
-msgid "Invoices"
+msgid "Payment Purpose"
+msgstr ""
+
+msgid "Subscription Payment (monthly, recurring)"
+msgstr ""
+
+msgid "(INF11) Amount"
+msgstr ""
+
+msgid "Download Invoice (PDF)"
+msgstr ""
+
+msgid "Creating your invoice download is taking longer than expected."
+msgstr ""
+
+msgid "Please contact our support for assistance!"
+msgstr ""
+
+msgid "Your invoice is still being prepared and will be ready for download shortly. Please return to this page in a few minutes."
+msgstr ""
+
+#, python-format
+msgid "Invoice for %(amount)s€ from %(date)s"
 msgstr ""
 
 msgid "(LN1) My Contribution"
@@ -271,6 +386,9 @@ msgstr ""
 msgid "Payment Info"
 msgstr ""
 
+msgid "Select Payment Method"
+msgstr ""
+
 msgid "IBAN"
 msgstr ""
 
@@ -278,6 +396,10 @@ msgid "BIC"
 msgstr ""
 
 msgid "Account Holder"
+msgstr ""
+
+#, python-format
+msgid "In the next step, you will be redirected to complete the payment process with the payment provider %(payment_provider)s."
 msgstr ""
 
 msgid "Billing Address"
@@ -363,9 +485,6 @@ msgstr ""
 msgid "(INF10) Last Payment"
 msgstr ""
 
-msgid "(INF11) Amount"
-msgstr ""
-
 msgid "(INF12) Date"
 msgstr ""
 
@@ -373,6 +492,27 @@ msgid "(INF13) For more information see your invoices"
 msgstr ""
 
 msgid "(INF14) Invoices"
+msgstr ""
+
+msgid "(PRC1) Payment processing..."
+msgstr ""
+
+msgid "(PRC2) Please complete your payment with the payment provider, or restart the payment process."
+msgstr ""
+
+msgid "(PRC3) Please wait while your payment is being processed..."
+msgstr ""
+
+msgid "(PRC4) Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!"
+msgstr ""
+
+msgid "(PRC5) If your payment has not been processed after a day, please contact our support!"
+msgstr ""
+
+msgid "(PRC4) An unexpected error has occured during your payment."
+msgstr ""
+
+msgid "Please try again or contact our support for assistance!"
 msgstr ""
 
 msgid "(SC1) Payment Success"
@@ -447,16 +587,16 @@ msgstr ""
 msgid "You already have an active subscription and cannot start another one!"
 msgstr ""
 
-msgid "We can not create a new subscription for you at this point. Please contact the support! No payment has been made yet."
+msgid "We can not create a new subscription for you at this point. Please contact our support! No payment has been made yet."
 msgstr ""
 
 msgid "You do not currently have a subscription!"
 msgstr ""
 
-msgid "An error occured, and you cannot change your subscription amount at this time. Please contact the support!"
+msgid "An error occured, and you cannot change your subscription amount at this time. Please contact our support!"
 msgstr ""
 
-msgid "Your subscription amount could not be changed because of an unexpected error. Please contact the support!"
+msgid "Your subscription amount could not be changed because of an unexpected error. Please contact our support!"
 msgstr ""
 
 msgid "(MSG3) Your new subscription amount was saved! Your future subscription payments will be made with this amount. Thank you for your support!"
@@ -469,6 +609,18 @@ msgid "The payment amount is higher than the allowed maximum amount!"
 msgstr ""
 
 msgid "The payment amount is lower than the allowed minimum amount!"
+msgstr ""
+
+msgid "The payment session could not be found."
+msgstr ""
+
+msgid "The payment process was cancelled or could not be completed."
+msgstr ""
+
+msgid "This payment session has expired."
+msgstr ""
+
+msgid "There was an error with your payment."
 msgstr ""
 
 msgid "(MSG1) Your current Subscription was terminated."

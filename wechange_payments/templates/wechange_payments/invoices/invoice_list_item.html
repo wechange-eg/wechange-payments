@@ -1,0 +1,17 @@
+{% load l10n i18n cosinnus_tags %}
+
+<a class="btn btn-emphasized w100 regular-space" href="{{ object.get_absolute_url }}">
+    <ul class="media-list">
+        <li class="media">
+            <span class="pull-left">
+                <i class="fa fa-file-text"></i>
+            </span>
+            <div class="media-body">
+                <span class="annotation">
+                    <span class="moment-data-date" data-date="{{ object.created|date:'c' }}"></span>
+                </span>
+            	{% blocktrans with date=object.created.date|localize amount=object.payment.amount|intify %}Invoice for {{ amount }}€ from {{ date }}{% endblocktrans %}
+            </div>
+        </li>
+    </ul>
+</a>

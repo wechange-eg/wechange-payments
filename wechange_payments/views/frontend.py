@@ -7,7 +7,7 @@ from annoying.functions import get_object_or_None
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.dispatch.dispatcher import receiver
-from django.http.response import HttpResponseForbidden
+from django.http.response import HttpResponseForbidden, HttpResponseNotFound, FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.encoding import force_text
@@ -23,12 +23,15 @@ from cosinnus.views.mixins.group import RequireLoggedInMixin
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 from wechange_payments.forms import PaymentsForm
 from wechange_payments.models import Subscription, Payment, \
-    USERPROFILE_SETTING_POPUP_CLOSED
+    USERPROFILE_SETTING_POPUP_CLOSED, Invoice
 from wechange_payments.payment import terminate_subscription
-
+from wechange_payments.backends import get_invoice_backend
+import mimetypes
+import urllib
+from cosinnus.models.group import CosinnusPortal
+from django.utils.formats import date_format
 
 logger = logging.getLogger('wechange-payments')
-
 
 
 class PaymentView(RequireLoggedInMixin, TemplateView):
@@ -263,14 +266,14 @@ past_subscriptions = PastSubscriptionsView.as_view()
 
 
 class InvoicesView(RequireLoggedInMixin, TemplateView):
-    """ TODO: invoices view. """
+    """ Invoices list view """
     
-    template_name = 'wechange_payments/invoices.html'
+    template_name = 'wechange_payments/invoices/invoice_list.html'
     
     def dispatch(self, request, *args, **kwargs):
-        self.invoices = [1, ] # TODO
-        if not self.invoices:
-            return redirect('wechange-payments:payment')
+        self.invoices = Invoice.objects.filter(user=request.user)
+        if self.invoices.count() == 0:
+            return redirect('wechange-payments:overview')
         return super(InvoicesView, self).dispatch(request, *args, **kwargs)
     
     def get_context_data(self, *args, **kwargs):
@@ -281,6 +284,80 @@ class InvoicesView(RequireLoggedInMixin, TemplateView):
         return context
 
 invoices = InvoicesView.as_view()
+
+
+class InvoiceDetailView(DetailView):
+    """ Invoice detail view. 
+        If the invoice accessed is not yet ready, we call the provider API invoice creation API
+        in the background (honoring the API retry delay) and show the user a message. """
+
+    model = Invoice
+    template_name = 'wechange_payments/invoices/invoice_detail.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # must be owner of the invoice
+        self.object = self.get_object()
+        if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
+            raise PermissionDenied()
+        
+        # for non-ready invoices, re-try API invoice creation in background if the retry delay is up
+        if not self.object.is_ready:
+            if now() > self.object.last_action_at + timedelta(minutes=settings.PAYMENTS_INVOICE_PROVIDER_RETRY_MINUTES):
+                invoice_backend = get_invoice_backend()
+                invoice_backend.create_invoice(self.object, threaded=True)
+        
+        return super(InvoiceDetailView, self).dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(InvoiceDetailView, self).get_context_data(*args, **kwargs)
+        # determine if we show a "it's taking longer than expected, there might be a problem" message
+        context.update({
+            'long_creation_notice': bool(now() > self.object.created + timedelta(days=1)),
+        })
+        return context
+
+invoice_detail = InvoiceDetailView.as_view()
+
+
+class InvoiceDownloadView(DetailView):
+    """ Lets the user download the FileField file of an Invoice
+        while the user never gets to see the server file path.
+        Mime type is always pdf. """
+        
+    model = Invoice
+    
+    def dispatch(self, request, *args, **kwargs):
+        # must be owner of the invoice
+        self.object = self.get_object()
+        if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
+            raise PermissionDenied()
+        if not self.object.is_ready or not self.object.file:
+            return HttpResponseNotFound()
+        return super(InvoiceDownloadView, self).dispatch(request, *args, **kwargs)
+    
+    def render_to_response(self, context, **response_kwargs):
+        invoice = self.object
+        path = invoice.file and invoice.file.path
+        if not path:
+            return HttpResponseNotFound()
+    
+        response = FileResponse(open(path, 'rb'), content_type='application/pdf')
+        short_date = date_format(invoice.created, format='SHORT_DATE_FORMAT', use_l10n=True)
+        filename = '%s-%s-%s.pdf' % (CosinnusPortal.get_current().name, force_text(_('Invoice')), short_date)
+        # To inspect details for the below code, see http://greenbytes.de/tech/tc2231/
+        user_agent = self.request.META.get('HTTP_USER_AGENT', [])
+        if u'WebKit' in user_agent:
+            # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
+            filename_header = 'filename=%s' % filename
+        elif u'MSIE' in user_agent:
+            filename_header = ''
+        else:
+            # For others like Firefox, we follow RFC2231 (encoding extension in HTTP headers).
+            filename_header = 'filename*=UTF-8\'\'%s' % filename
+        response['Content-Disposition'] = 'attachment; ' + filename_header
+        return response
+    
+invoice_download = InvoiceDownloadView.as_view()
 
 
 class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):

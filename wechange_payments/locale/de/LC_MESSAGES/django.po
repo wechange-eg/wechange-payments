@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-24 14:38+0200\n"
-"PO-Revision-Date: 2019-09-24 14:49+0100\n"
+"POT-Creation-Date: 2019-10-04 17:04+0200\n"
+"PO-Revision-Date: 2019-10-04 17:05+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -17,6 +17,32 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.5.4\n"
+
+#, python-format
+msgid "Started invoice creation for %(number)d payment(s) in background."
+msgstr ""
+
+msgid "Create invoice in Invoice API (threaded)"
+msgstr ""
+
+msgid "Run/continue invoice in Invoice API (threaded)"
+msgstr ""
+
+#, python-format
+msgctxt "Invoice PDF, important!"
+msgid "Freely chosen user fee for %(portal_name)s"
+msgstr "Frei gewählte Nutzungsgebühr für %(portal_name)s"
+
+msgctxt "Invoice PDF, important!"
+msgid "Electronic service"
+msgstr "Elektronische Dienstleistung"
+
+msgctxt "Invoice PDF, important!"
+msgid "We charge you for our services as follows:"
+msgstr "Unsere Leistungen stellen wir Ihnen wie folgt in Rechnung:"
+
+msgid "Unexpected response from payment provider."
+msgstr ""
 
 msgid "Credit Card"
 msgstr "Kreditkarte"
@@ -30,6 +56,35 @@ msgstr "Paypal"
 msgid "SEPA"
 msgstr "SEPA"
 
+msgid "PayPal"
+msgstr "PayPal"
+
+msgid "Not started"
+msgstr ""
+
+msgid "Payment initiated but not completed by user yet"
+msgstr ""
+
+#, fuzzy
+#| msgid "Payment Type"
+msgid "Payment processing"
+msgstr "Zahlungsart"
+
+msgid "Successfully paid"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Retracted"
+msgstr ""
+
+#, fuzzy
+#| msgctxt "subscription status"
+#| msgid "(INF5) Cancelled"
+msgid "Canceled"
+msgstr "(INF5) Abgebrochen"
+
 msgid "Vendor Transaction Id"
 msgstr "Vendor Transaction Id"
 
@@ -39,8 +94,16 @@ msgstr "Internal Transaction Id"
 msgid "Payment Type"
 msgstr "Zahlungsart"
 
+msgid "Last Action At"
+msgstr ""
+
 msgid "Completed At"
 msgstr "Abgeschlossen am"
+
+#, fuzzy
+#| msgid "Payments"
+msgid "Payment Status"
+msgstr "Zahlungen"
 
 msgid "Is reference payment"
 msgstr "Ist Referenzzahlung"
@@ -117,6 +180,45 @@ msgstr "Beendet"
 msgid "Subscription"
 msgstr "Abo"
 
+msgid "Not created at provider."
+msgstr ""
+
+msgid "Created, but not finalized"
+msgstr ""
+
+msgid "Finalized, but not downloaded"
+msgstr ""
+
+msgid "Downloaded and ready"
+msgstr ""
+
+#, fuzzy
+#| msgid "Invoices"
+msgid "Invoice State"
+msgstr "Rechnungen"
+
+msgid "Is Ready"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "Provider Invoice ID"
+msgstr ""
+
+#, fuzzy
+#| msgid "Backend class used"
+msgid "Invoice Provider Backend class used"
+msgstr "Backend class used"
+
+#, fuzzy
+#| msgid "Invoices"
+msgid "Invoice"
+msgstr "Rechnungen"
+
+msgid "Invoices"
+msgstr "Rechnungen"
+
 msgid "(BS1) Payments"
 msgstr "(BS1) Zahlungen"
 
@@ -179,11 +281,40 @@ msgstr "(SLD2) Danke, dass du uns hilfst, WECHANGE weiterzuentwickeln."
 msgid "(SLD3) High amount text"
 msgstr "(SLD3) Wow! Du hilfst uns wirklich sehr!"
 
+#, python-format
+msgid "Invoice from %(date)s"
+msgstr "Rechnung vom %(date)s"
+
 msgid "My Invoices"
 msgstr "Meine Rechnungen"
 
-msgid "Invoices"
-msgstr "Rechnungen"
+#| msgid "Payment Type"
+msgid "Payment Purpose"
+msgstr "Zahlungszweck"
+
+msgid "Subscription Payment (monthly, recurring)"
+msgstr "Beitragszahlung (monatlich wiederkehrend)"
+
+msgid "(INF11) Amount"
+msgstr "(INF11) Betrag"
+
+msgid "Download Invoice (PDF)"
+msgstr "Rechnung herunterladen (PDF)"
+
+msgid "Creating your invoice download is taking longer than expected."
+msgstr ""
+
+msgid "Please contact our support for assistance!"
+msgstr ""
+
+msgid ""
+"Your invoice is still being prepared and will be ready for download shortly. "
+"Please return to this page in a few minutes."
+msgstr ""
+
+#, python-format
+msgid "Invoice for %(amount)s€ from %(date)s"
+msgstr "Rechnung über %(amount)s€ vom %(date)s"
 
 msgid "(LN1) My Contribution"
 msgstr "(LN1) Mein Beitrag"
@@ -317,6 +448,9 @@ msgstr "(PF6)  Gib bitte deine Zahlungsinformationen ein. "
 msgid "Payment Info"
 msgstr "Zahlungsinformationen"
 
+msgid "Select Payment Method"
+msgstr ""
+
 msgid "IBAN"
 msgstr "IBAN"
 
@@ -325,6 +459,12 @@ msgstr "BIC"
 
 msgid "Account Holder"
 msgstr "Kontoinhaber"
+
+#, python-format
+msgid ""
+"In the next step, you will be redirected to complete the payment process "
+"with the payment provider %(payment_provider)s."
+msgstr ""
 
 msgid "Billing Address"
 msgstr "Rechnungsadresse"
@@ -417,9 +557,6 @@ msgstr "(INF9) Zahlungen beenden"
 msgid "(INF10) Last Payment"
 msgstr "(INF10) Letzte Zahlung"
 
-msgid "(INF11) Amount"
-msgstr "(INF11) Betrag"
-
 msgid "(INF12) Date"
 msgstr "(INF12) Datum"
 
@@ -428,6 +565,36 @@ msgstr "(INF13) Für weitere Informationen sieh in deinen Rechnungen nach"
 
 msgid "(INF14) Invoices"
 msgstr "(INF14) Rechnungen"
+
+#, fuzzy
+#| msgid "(PF1) Payments"
+msgid "(PRC1) Payment processing..."
+msgstr "(PF1) Zahlungen"
+
+msgid ""
+"(PRC2) Please complete your payment with the payment provider, or restart "
+"the payment process."
+msgstr ""
+
+msgid "(PRC3) Please wait while your payment is being processed..."
+msgstr ""
+
+msgid ""
+"(PRC4) Payment processing is taking longer than expected. You may close this "
+"page and return to it any time. Please apologize the delay and thank you for "
+"your patience!"
+msgstr ""
+
+msgid ""
+"(PRC5) If your payment has not been processed after a day, please contact "
+"our support!"
+msgstr ""
+
+msgid "(PRC4) An unexpected error has occured during your payment."
+msgstr ""
+
+msgid "Please try again or contact our support for assistance!"
+msgstr ""
 
 msgid "(SC1) Payment Success"
 msgstr ""
@@ -529,9 +696,13 @@ msgstr ""
 "Du hast bereits eine Zahlung eingerichtet und kannst keine weitere "
 "einrichten!"
 
+#, fuzzy
+#| msgid ""
+#| "We can not create a new subscription for you at this point. Please "
+#| "contact the support! No payment has been made yet."
 msgid ""
 "We can not create a new subscription for you at this point. Please contact "
-"the support! No payment has been made yet."
+"our support! No payment has been made yet."
 msgstr ""
 "Wir konnten leider aktuell keine neue Zahlung für dich einrichten. Bitte "
 "kontaktiere unseren Support! Es wurde noch keine Abbuchung vorgenommen."
@@ -539,16 +710,24 @@ msgstr ""
 msgid "You do not currently have a subscription!"
 msgstr "Du hast aktuell keine laufende Zahlung!"
 
+#, fuzzy
+#| msgid ""
+#| "An error occured, and you cannot change your subscription amount at this "
+#| "time. Please contact the support!"
 msgid ""
 "An error occured, and you cannot change your subscription amount at this "
-"time. Please contact the support!"
+"time. Please contact our support!"
 msgstr ""
 "Es ist ein Fehler aufgetreten und du kannst deinen Zahlungsbetrag aktuell "
 "nicht ändern. Bitte kontaktiere unseren Support!"
 
+#, fuzzy
+#| msgid ""
+#| "Your subscription amount could not be changed because of an unexpected "
+#| "error. Please contact the support!"
 msgid ""
 "Your subscription amount could not be changed because of an unexpected "
-"error. Please contact the support!"
+"error. Please contact our support!"
 msgstr ""
 "Dein Zahlungsbetrag konnte aufgrund eines unerwarteten Fehlers nicht "
 "geändert werden. Bitte kontaktiere unseren Support!"
@@ -568,6 +747,18 @@ msgstr "Der Zahlungsbetrag ist höher als der erlaubte Maximalbetrag!"
 
 msgid "The payment amount is lower than the allowed minimum amount!"
 msgstr "Der Zahlungsbetrag ist niedriger als der erlaubte Minimalbetrag!"
+
+msgid "The payment session could not be found."
+msgstr ""
+
+msgid "The payment process was cancelled or could not be completed."
+msgstr ""
+
+msgid "This payment session has expired."
+msgstr ""
+
+msgid "There was an error with your payment."
+msgstr ""
 
 msgid "(MSG1) Your current Subscription was terminated."
 msgstr ""
