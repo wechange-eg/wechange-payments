@@ -50,7 +50,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 {
                     'type': 'custom',
                     'name': force_text(pgettext_lazy('Invoice PDF, important!', 'Freely chosen user fee for %(portal_name)s') % {'portal_name': CosinnusPortal.get_current().name}),
-                    'description': force_text(pgettext_lazy('Invoice PDF, important!', 'Electronic service')),
+                    'description': force_text(pgettext_lazy('Invoice PDF, important!', 'Electronic service - Ref-Nr. %(user_id)d') % {'user_id': invoice.user.id}),
                     'quantity': 1,
                     'unitName': 'Stück',
                     'unitPrice': {

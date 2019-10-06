@@ -57,6 +57,9 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
         return initial
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(PaymentView, self).dispatch(request, *args, **kwargs)
+        
         active_subscription = Subscription.get_active_for_user(self.request.user)
         if active_subscription:
             return redirect('wechange-payments:my-subscription')
@@ -87,6 +90,9 @@ class PaymentSuccessView(RequireLoggedInMixin, DetailView):
     template_name = 'wechange_payments/payment_success.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(PaymentSuccessView, self).dispatch(request, *args, **kwargs)
+        
         self.object = self.get_object()
         # must be owner of the payment
         if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
@@ -119,6 +125,9 @@ class PaymentProcessView(RequireLoggedInMixin, DetailView):
     template_name = 'wechange_payments/payment_process.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(PaymentProcessView, self).dispatch(request, *args, **kwargs)
+        
         self.object = self.get_object()
         # must be owner of the payment
         if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
@@ -163,8 +172,6 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
     """ Redirects to the payment view if the user has no active subscriptions
         and to the my subscription view if there is an active subscription. """
     
-    template_name = 'wechange_payments/welcome_page.html'
-    
     def get_redirect_url(self, *args, **kwargs):
         subscription = get_object_or_None(Subscription, user=self.request.user, state__in=[
             Subscription.STATE_1_CANCELLED_BUT_ACTIVE,
@@ -186,6 +193,9 @@ class MySubscriptionView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/my_subscription.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(MySubscriptionView, self).dispatch(request, *args, **kwargs)
+        
         current_subscription = Subscription.get_current_for_user(self.request.user)
         waiting_subscription = Subscription.get_waiting_for_user(self.request.user)
         
@@ -223,6 +233,9 @@ class PaymentInfosView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/payment_infos.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(PaymentInfosView, self).dispatch(request, *args, **kwargs)
+        
         self.current_subscription = Subscription.get_current_for_user(self.request.user)
         self.last_payment = None
         if self.current_subscription:
@@ -250,6 +263,9 @@ class PastSubscriptionsView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/past_subscriptions.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(PastSubscriptionsView, self).dispatch(request, *args, **kwargs)
+        
         self.past_subscriptions = Subscription.objects.filter(user=self.request.user, state=Subscription.STATE_0_TERMINATED)
         if not self.past_subscriptions:
             return redirect('wechange-payments:payment')
@@ -271,6 +287,9 @@ class InvoicesView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/invoices/invoice_list.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(InvoicesView, self).dispatch(request, *args, **kwargs)
+        
         self.invoices = Invoice.objects.filter(user=request.user)
         if self.invoices.count() == 0:
             return redirect('wechange-payments:overview')
@@ -295,6 +314,9 @@ class InvoiceDetailView(DetailView):
     template_name = 'wechange_payments/invoices/invoice_detail.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(InvoiceDetailView, self).dispatch(request, *args, **kwargs)
+        
         # must be owner of the invoice
         self.object = self.get_object()
         if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
@@ -327,6 +349,9 @@ class InvoiceDownloadView(DetailView):
     model = Invoice
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(InvoiceDownloadView, self).dispatch(request, *args, **kwargs)
+        
         # must be owner of the invoice
         self.object = self.get_object()
         if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
@@ -365,6 +390,9 @@ class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
     template_name = 'wechange_payments/cancel_subscription.html'
     
     def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(CancelSubscriptionView, self).dispatch(request, *args, **kwargs)
+        
         current_subscription = Subscription.get_active_for_user(self.request.user)
         if not current_subscription:
             return redirect('wechange-payments:overview')
