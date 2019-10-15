@@ -31,7 +31,7 @@
 							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
 							{% trans "(INF5) Cancelled" context "subscription status" %}.
 							{% trans "Expires" %}: 
-							<span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span>
+							{{ subscription.next_due_date|localize }}
 						{% endif %}
 					</td>
 				</tr>
@@ -44,7 +44,6 @@
 					<td>{% trans "(INF7) Next Payment scheduled" %}</td>
 					<td>
 						{{ subscription.next_due_date|localize }}
-						(<i><span class="moment-data-date" data-date="{{ subscription.next_due_date|date:'c' }}"></span></i>)
 					</td>
 				</tr>
 				{% endif %}
@@ -117,7 +116,6 @@
 					<td>{% trans "(INF12) Date" %}</td>
 					<td>
 						{{ last_payment.completed_at|localize }}
-						(<i><span class="moment-data-date" data-date="{{ last_payment.completed_at|date:'c' }}"></span></i>)
 					</td>
 				</tr>
 			</table>

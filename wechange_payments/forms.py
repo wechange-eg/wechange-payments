@@ -30,7 +30,8 @@ class PaymentsForm(forms.Form):
     postal_code = forms.IntegerField()
     country = CountryField().formfield()
     
-    tos_accept = forms.BooleanField(required=True)
+    tos_check = forms.BooleanField(required=True)
+    privacy_policy_check = forms.BooleanField(required=True)
     
     # payment-specific-fields
     iban = forms.CharField()

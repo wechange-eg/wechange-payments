@@ -199,15 +199,7 @@
 		        	
 		        	<div class="large-space"></div>
 		        	
-		            <p class="inline-list transparent">
-				        <span class="cursor-pointer-input inline-list-input">
-				            {% render_field form.tos_accept %}
-				        </span>
-				        <span class="cursor-pointer-input" onclick="$('#{{ form.tos_accept.id_for_label }}').prop('checked', !($('#{{ form.tos_accept.id_for_label }}').prop('checked'))).trigger('change');">
-				            {% trans "(PF15) I accept the TOS and privacy policy and electronic processing of my data " %}
-				            *
-				        </span>
-				    </p>
+			        {% include 'cosinnus/registration/extra_signup_fields.html' with show_plain_form=True %}
 				    
 				    <hr/>
 				    

@@ -28,7 +28,7 @@
 				{% trans "(TS4) (explanation) No payments have been made yet. Your subscription will be cancelled." %}
 			{% elif current_subscription.state == 2 %}
 				{% trans "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until" %}:
-				<span class="moment-data-date" data-date="{{ current_subscription.next_due_date|date:'c' }}"></span>
+				{{ current_subscription.next_due_date|localize }}
 			{% endif %}
 		</p>
 		

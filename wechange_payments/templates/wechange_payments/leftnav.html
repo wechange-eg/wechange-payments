@@ -24,6 +24,12 @@
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-history" label=label show_required=True href=payment_url  %}
 {% endif %}
 
+{% if current_subscription and current_subscription.state == 2 %}
+	{% url "wechange-payments:cancel-subscription" as cancel_url %}
+	{% trans "(MS6) Cancel your Subscription" as label %}
+	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-minus-circle" label=label show_required=True href=cancel_url  %}
+{% endif %}
+
 <hr class="invisible"/>
 
 {% if COSINNUS_CURRENT_PORTAL.support_email %}

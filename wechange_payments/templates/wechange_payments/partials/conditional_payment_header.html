@@ -5,7 +5,7 @@
 	<h2>{% trans "(PF10) Your subscription will end soon!" %}</h2>
 	<p>
 		{% trans "(PF11) Your subscription will end on" %}
-		(<span class="moment-data-date" data-date="{{ current_subscription.next_due_date|date:'c' }}"></span>)
+		{{ current_subscription.next_due_date|localize }}
 	</p>
 	<p>
 		{% trans "(PF12) We're sorry to see you go! To continue subscribing, simply create a new subscription! Don't worry, we will start charging you only when your current subscription runs out!" %}

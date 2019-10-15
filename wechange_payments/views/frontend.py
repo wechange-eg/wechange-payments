@@ -52,7 +52,8 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
             'bic': 'BELADEBEXXX',
             'account_holder': 'Hans Mueller',
             'country': 'DE',
-            'tos_accept': True,
+            'tos_check': True,
+            'privacy_policy_check': True,
         }
         return initial
     
