@@ -1,7 +1,8 @@
 $(function() {
 	
 	var update_slider = function (event, ui) {
-	      
+		// cap at real allowed value
+		ui.value = Math.max(PAYMENTS_MINIMUM_PAYMENT_AMOUNT, Math.min(ui.value, PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT));
 		// set the values on slide
 		$(".payment-slider #value").val(ui.value);
 		
@@ -30,6 +31,8 @@ $(function() {
 			$('.payment-slider .high-amount').show();
 		}
 		
+		$('.payment-slider .max-amount-label').text(Math.max(ui.value, PAYMENTS_MAXIMUM_PAYMENT_AMOUNT));
+		
 		// toggle disabled status from submit buttons if they have class .enabled-on-change and the amount changed
 		if (!ui.initial) {
 			var $submitButton = $('.payment-slider').closest('form').find('button[type=submit].enabled-on-change');
@@ -53,7 +56,7 @@ $(function() {
     $('.slider-container #value').on('change keyup', function(){
     	$slider.slider('value', this.value);
     	$slider.slider('option', 'slide')(null, { value: this.value })
-    }).on('focus', function(){
+    }).on('click', function(){
     	this.select();
     });
     $('.amount-frame').on('click', function(){
@@ -62,7 +65,8 @@ $(function() {
     
     // on initial, trigger slide event to update visuals
     $slider.slider('option', 'slide')(null, { value: $slider.slider('value'), initial: true });
-    
+    // initially focus but deselect slider value
+    var textInput = $('.slider-container #value').focus();
     
 });
 

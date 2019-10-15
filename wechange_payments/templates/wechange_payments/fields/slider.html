@@ -6,19 +6,19 @@
                 
             <div class="">
             	<div class="value-frame">
-            		<div class="side-amount">
+            		<div class="side-amount min-amount-label">
             			{{ SETTINGS.PAYMENTS_MINIMUM_PAYMENT_AMOUNT|floatformat }} €
         			</div>
             		<div class="amount-container">
 	            		<div class="amount-frame" title="{% blocktrans with max_amount=SETTINGS.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT|intify %}You can contribute any amount up to {{ max_amount }} by entering it here. For larger contributions, please contact our support!{% endblocktrans %}">
 	                		<input id="value" type="number" name="{{ field_name }}" 
 	                		min="{{ SETTINGS.PAYMENTS_MINIMUM_PAYMENT_AMOUNT|floatformat }}" 
-	                		max="{% widthratio SETTINGS.PAYMENTS_MAXIMUM_PAYMENT_AMOUNT 1 5 %}"
+	                		max="{% widthratio SETTINGS.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT 1 5 %}"
 	                		pattern="^[0–9]$"></input>€
 	                		{% comment %} Allow 5x as much as the maximum slider amount to be entered in the number box {% endcomment %}
 	                	</div>
 	                </div>
-                	<div class="side-amount">
+                	<div class="side-amount max-amount-label">
                 		{{ SETTINGS.PAYMENTS_MAXIMUM_PAYMENT_AMOUNT|floatformat }} €
                 	</div>
                 </div>

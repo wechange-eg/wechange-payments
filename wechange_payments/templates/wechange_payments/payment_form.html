@@ -25,6 +25,10 @@
     <form method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
     		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
+        <div class="busy-animation">
+        	<i class="fas fa-spinner fa-spin"></i>
+        </div>
+        
         <!-- a box with semi transparent background -->
         <div class="v2-content">
 	        <div class="error-frame alert alert-danger alert-dismissable" style="display: none;">
@@ -43,7 +47,7 @@
 					            {% trans "(PF2) Learn more" %}
 					        </span>
 					    </a>
-		                <a class="rounded-button button-color-primary-inverted" href="#step2" role="tab" data-toggle="tab">
+		                <a class="rounded-button button-color-primary-inverted focus-slider-onclick" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 								{% trans "(PF3) Choose Contribution" context "payment step button" %}
 					        </span>
@@ -75,6 +79,11 @@
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         			
         			<div class="button-section clearfix">
+        				<a class="rounded-button button-color-secondary" href="#step1" role="tab" data-toggle="tab">
+					        <span class="rounded-button-inner">
+					            &lt; {% trans "(PF16) I changed my mind" context "payment step button" %}
+					        </span>
+					    </a>
 		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 								{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
@@ -209,7 +218,7 @@
 				    <hr/>
 				    
 					<div class="button-section clearfix">
-						<a class="rounded-button button-color-secondary" href="#step2" role="tab" data-toggle="tab">
+						<a class="rounded-button button-color-secondary focus-slider-onclick" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 					            &lt; {% trans "(PF8) Modify Contribution Amount" context "payment step button" %}
 					        </span>

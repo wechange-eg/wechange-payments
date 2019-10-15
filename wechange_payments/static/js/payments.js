@@ -89,4 +89,8 @@ window.PaymentForm = {
 
 $(function() {
 	window.PaymentForm.registerPaymentForm();
+	
+	$('.focus-slider-onclick').click(function(){
+		setTimeout(function(){$('.slider-container #value').focus()}, 200);
+	});
 });
