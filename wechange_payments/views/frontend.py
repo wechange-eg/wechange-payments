@@ -323,6 +323,10 @@ class InvoiceDetailView(DetailView):
         if not self.object.user == self.request.user and not check_user_superuser(self.request.user):
             raise PermissionDenied()
         
+        # immediately download a ready invoice instead of showing its detail page
+        if self.object.is_ready and self.object.file:
+            return redirect(reverse('wechange-payments:invoice-download', kwargs={'pk': self.object.pk}))
+        
         # for non-ready invoices, re-try API invoice creation in background if the retry delay is up
         if not self.object.is_ready:
             if now() > self.object.last_action_at + timedelta(minutes=settings.PAYMENTS_INVOICE_PROVIDER_RETRY_MINUTES):

@@ -186,7 +186,11 @@
 		        	<div class="row">
 		                <div class="col-sm-6 regular-space">
 							{% trans "Postal Code" as label %}
-							{% include 'cosinnus/fields/default_field.html' with field=form.postal_code label=label show_required=True%}
+							{% captureas postal_code_html %}
+								<input type="tel" name="{{ form.postal_code.html_name }}" value="{{ form.postal_code.value }}" autocomplete="off" required id="{{ form.postal_code.id_for_label }}" pattern="[0-9]*">
+							{% endcaptureas %}
+							{% include 'cosinnus/fields/default_field.html' with field=form.postal_code field_html=postal_code_html label=label show_required=True %}
+							
 		                </div>
 		                <div class="col-sm-6 regular-space">
 							{% trans "City" as label %}

@@ -40,11 +40,23 @@ window.PaymentForm = {
 			if (responseJSON && 'error' in responseJSON) {
 				error = responseJSON['error'];
 			}
+			$form.find('[name]').removeClass('missing');
 			if (responseJSON && 'missing_parameters' in responseJSON) {
 				$.each(responseJSON['missing_parameters'], function(index, name) {
 					$form.find('[name="' + name +'"]').addClass('missing');
 				});
-			} 
+			}
+			
+			// display error messages on fields
+			$form.find('.field-error-message').remove();
+			$form.find('[name]').removeClass('error');
+			if (responseJSON && 'field_errors' in responseJSON) {
+				$.each(responseJSON['field_errors'], function(name, errorMessage) {
+					$form.find('[name="' + name +'"]').addClass('error').after(
+						'<span class="field-error-message">' + errorMessage + '</span>'
+					);
+				});
+			}
 			// display error
 			$form.find('.error-frame').show().find('.error-message').text(error);
 			// re-enable form

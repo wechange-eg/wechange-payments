@@ -23,6 +23,7 @@ from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
 from wechange_payments import signals
+from wechange_payments.forms import PaymentsForm
 
 logger = logging.getLogger('wechange-payments')
 
@@ -49,6 +50,11 @@ def make_payment(request, on_success_func=None):
     payment_type = params.get('payment_type', None)
     error = 'Payment Type "%s" is not supported!' % payment_type 
     if payment_type in settings.PAYMENTS_ACCEPTED_PAYMENT_METHODS:
+        # check for valid form
+        form = PaymentsForm(request.POST)
+        if not form.is_valid():
+            return JsonResponse({'error': _('Please correct the errors in the highlighted fields!'), 'field_errors': form.errors}, status=500)
+        
         # check for complete parameter set
         missing_params = backend.check_missing_params(params, payment_type)
         if missing_params:
