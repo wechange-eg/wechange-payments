@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-06 18:37+0200\n"
+"POT-Creation-Date: 2019-10-16 16:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -297,6 +297,9 @@ msgstr ""
 msgid "(LN4) Past Subscriptions"
 msgstr ""
 
+msgid "(MS6) Cancel your Subscription"
+msgstr ""
+
 msgid "(LN7) If you have any questions about your subscription or encountered any problems, please send an email to"
 msgstr ""
 
@@ -329,7 +332,7 @@ msgid "(MS1) My Subscription"
 msgstr ""
 
 #, python-format
-msgid "(MS2) Your current contribution is %(amount)s euro"
+msgid "(MS2) Your current contribution is %(amount)s Euro"
 msgstr ""
 
 msgid "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'"
@@ -340,9 +343,6 @@ msgstr ""
 
 msgctxt "payment step button"
 msgid "(MS5) Modify Contribution Amount"
-msgstr ""
-
-msgid "(MS6) Cancel your Subscription"
 msgstr ""
 
 msgid "(PF10) Your subscription will end soon!"
@@ -372,6 +372,10 @@ msgstr ""
 
 msgctxt "payment step button"
 msgid "(PF3) Choose Contribution"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(PF16) I changed my mind"
 msgstr ""
 
 msgctxt "payment step button"
@@ -425,9 +429,6 @@ msgid "City"
 msgstr ""
 
 msgid "Country"
-msgstr ""
-
-msgid "(PF15) I accept the TOS and privacy policy and electronic processing of my data "
 msgstr ""
 
 msgctxt "payment step button"
@@ -577,6 +578,9 @@ msgid "(WC5) Choose amount"
 msgstr ""
 
 msgid "(WC6) Remind me later"
+msgstr ""
+
+msgid "Please correct the errors in the highlighted fields!"
 msgstr ""
 
 msgid "Please fill out all of the missing fields!"

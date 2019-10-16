@@ -33,7 +33,7 @@
 		    
 		    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
 		    
-		    <h2>{% blocktrans with amount=subscription.amount|intify %}(MS2) Your current contribution is {{ amount }} euro{% endblocktrans %}</h2>
+		    <h2>{% blocktrans with amount=subscription.amount|intify %}(MS2) Your current contribution is {{ amount }} Euro{% endblocktrans %}</h2>
 			<p>
 				{% trans "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" %}
 			</p>

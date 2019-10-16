@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-06 18:37+0200\n"
-"PO-Revision-Date: 2019-10-15 14:30+0100\n"
+"POT-Creation-Date: 2019-10-16 16:24+0200\n"
+"PO-Revision-Date: 2019-10-16 16:44+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -34,8 +34,6 @@ msgid "Freely chosen user fee for %(portal_name)s"
 msgstr "Frei gewählte Nutzungsgebühr für %(portal_name)s"
 
 #, python-format
-#| msgctxt "Invoice PDF, important!"
-#| msgid "Electronic service"
 msgctxt "Invoice PDF, important!"
 msgid "Electronic service - Ref-Nr. %(user_id)d"
 msgstr "Elektronische Dienstleistung - Ref-Nr. %(user_id)d"
@@ -68,10 +66,9 @@ msgstr ""
 msgid "Payment initiated but not completed by user yet"
 msgstr ""
 
-#, fuzzy
 #| msgid "Payment Type"
 msgid "Payment processing"
-msgstr "Zahlungsart"
+msgstr "Zahlung wird bearbeitet"
 
 msgid "Successfully paid"
 msgstr ""
@@ -139,7 +136,7 @@ msgid "Transaction Type"
 msgstr "Transaction Type"
 
 msgid "Payment Transaction Log"
-msgstr "Payment Transaction Log"
+msgstr "Zahlungstransaktions-Logs"
 
 msgid "Payment Transaction Logs"
 msgstr "Payment Transaction Logs"
@@ -255,7 +252,7 @@ msgid ""
 "active until"
 msgstr ""
 "(TS5) Es werden keine weiteren Abbuchungen mehr vorgenommen. Dein aktueller "
-"Zahlungsstatus bleibt bis zum Ablaufdatum erhalten:"
+"Zahlungsstatus bleibt bis zum Ablaufdatum erhalten"
 
 msgid "(TS6) Terminate Subscription"
 msgstr "(TS6) Zahlungen beenden"
@@ -307,7 +304,7 @@ msgid "Creating your invoice download is taking longer than expected."
 msgstr ""
 
 msgid "Please contact our support for assistance!"
-msgstr ""
+msgstr "Bitte kontaktiere unseren Support für Unterstützung!"
 
 msgid ""
 "Your invoice is still being prepared and will be ready for download shortly. "
@@ -330,16 +327,21 @@ msgstr "(LN3) Meine Rechnungen"
 msgid "(LN4) Past Subscriptions"
 msgstr ""
 
+msgid "(MS6) Cancel your Subscription"
+msgstr "(MS6) Zahlung einstellen"
+
 msgid ""
 "(LN7) If you have any questions about your subscription or encountered any "
 "problems, please send an email to"
 msgstr ""
+"(LN7) Falls du Fragen über unsere Beitragszahlungen hast, oder ein Problem "
+"aufgetreten ist, kontaktiere bitte unseren Support mit einer E-Mail an"
 
 msgid "(LN5) Contact support"
-msgstr ""
+msgstr "(LN5) Support kontaktieren"
 
 msgid "(LN6) Contact our Support"
-msgstr ""
+msgstr "(LN6) Kontaktiere unseren Support"
 
 #, python-format
 msgid ""
@@ -376,8 +378,9 @@ msgid "(MS1) My Subscription"
 msgstr "(MS1) Mein regelmäßiger monatlicher Beitrag "
 
 #, python-format
-msgid "(MS2) Your current contribution is %(amount)s euro"
-msgstr "(MS2) Dein momentaner Beitrag beträgt %(amount)s euro"
+#| msgid "(MS2) Your current contribution is %(amount)s euro"
+msgid "(MS2) Your current contribution is %(amount)s Euro"
+msgstr "(MS2) Dein momentaner Beitrag beträgt %(amount)s Euro"
 
 msgid ""
 "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'"
@@ -388,7 +391,7 @@ msgstr ""
 "du uns, WECHANGE stetig zu verbessern. Um die Plattform kostendeckend "
 "anbieten und weiterentwickeln zu können, brauchen wir von jedem Nutzer und "
 "jeder Nutzerin einen Beitrag von etwa 5 Euro pro Monat. Wenn du nur weniger "
-"oder gar nichts beitragen kannst, tragen andere dich mit. "
+"oder gar nichts beitragen kannst, tragen Andere dich mit. "
 
 msgid "(MS4) Learn more"
 msgstr "(MS4) Mehr erfahren"
@@ -396,9 +399,6 @@ msgstr "(MS4) Mehr erfahren"
 msgctxt "payment step button"
 msgid "(MS5) Modify Contribution Amount"
 msgstr "(MS5) Deine Zahlung anpassen"
-
-msgid "(MS6) Cancel your Subscription"
-msgstr "(MS6) Zahlung einstellen"
 
 msgid "(PF10) Your subscription will end soon!"
 msgstr "(PF10) Deine monatlichen Beitragszahlungen enden bald."
@@ -438,6 +438,10 @@ msgid "(PF3) Choose Contribution"
 msgstr "(PF3) Beitrag wählen"
 
 msgctxt "payment step button"
+msgid "(PF16) I changed my mind"
+msgstr "(PF16) Ich habe es mir anders überlegt"
+
+msgctxt "payment step button"
 msgid "(PF4) Set Contribution Amount"
 msgstr "(PF4) Höhe des Beitrags wählen"
 
@@ -451,7 +455,7 @@ msgid "Payment Info"
 msgstr "Zahlungsinformationen"
 
 msgid "Select Payment Method"
-msgstr ""
+msgstr "Zahlungsmethode auswählen"
 
 msgid "IBAN"
 msgstr "IBAN"
@@ -467,6 +471,8 @@ msgid ""
 "In the next step, you will be redirected to complete the payment process "
 "with the payment provider %(payment_provider)s."
 msgstr ""
+"Im nächsten Schritt wirst du weitergeleitet, um die Zahlung bei unserem "
+"Zahlungsdienstleister %(payment_provider)s abzuschließen."
 
 msgid "Billing Address"
 msgstr "Rechnungsadresse"
@@ -492,14 +498,9 @@ msgstr "Stadt"
 msgid "Country"
 msgstr "Land"
 
-msgid ""
-"(PF15) I accept the TOS and privacy policy and electronic processing of my "
-"data "
-msgstr "(PF15) Ich akzeptiere die AGBs und Datenschutzbestimmungen."
-
 msgctxt "payment step button"
 msgid "(PF8) Modify Contribution Amount"
-msgstr "(PF8) Gewählten Beitrag verändern"
+msgstr "(PF8) Gewählten Beitrag ändern"
 
 msgctxt "payment step button"
 msgid "(PF9) Confirm and pay"
@@ -543,8 +544,7 @@ msgid ""
 "current subscription and set up a new one!"
 msgstr ""
 "(INF8) Wenn du die Zahlungsart oder Rechnungsadresse ändern möchtest, klicke "
-"bitte auf \"Abbrechen\" und richte die Zahlung neu ein. Die nächste Zahlung "
-"wird erst nach Ablauf deines alten Beitrags ausgelöst."
+"bitte auf \"Abbrechen\" und richte die Zahlung neu ein."
 
 msgid "You will only be billed after the current subscription expires."
 msgstr ""
@@ -568,7 +568,6 @@ msgstr "(INF13) Für weitere Informationen sieh in deinen Rechnungen nach"
 msgid "(INF14) Invoices"
 msgstr "(INF14) Rechnungen"
 
-#| msgid "(PF1) Payments"
 msgid "(PRC1) Payment processing..."
 msgstr "(PF1) Zahlung wird bearbeitet..."
 
@@ -596,12 +595,13 @@ msgstr ""
 
 msgid "Please try again or contact our support for assistance!"
 msgstr ""
+"Bitte versuche es erneut oder kontaktiere unseren Support für Unterstützung!"
 
 msgid "(SC1) Payment Success"
-msgstr ""
+msgstr "(SC1) Zahlung erfolgreich"
 
 msgid "(SC2) Payments"
-msgstr ""
+msgstr "(SC2) Zahlungen"
 
 msgid ""
 "(SC3) Your payment was processed successfully, but your subscription could "
@@ -663,7 +663,7 @@ msgid "(POP6) Choose amount"
 msgstr "(POP6) Beitrag wählen"
 
 msgid "(WC1) Support us "
-msgstr ""
+msgstr "(WC1) Unterstütze uns"
 
 msgid "(WC2) Your Contribution"
 msgstr "(WC2) Dein Beitrag"
@@ -683,6 +683,9 @@ msgstr "(WC5) Beitrag festlegen"
 
 msgid "(WC6) Remind me later"
 msgstr "(WC6) Später erinnern"
+
+msgid "Please correct the errors in the highlighted fields!"
+msgstr "Bitte korrigiere die Fehler in den hervorgehobenen Feldern!"
 
 msgid "Please fill out all of the missing fields!"
 msgstr "Bitte fülle alle fehlenden Felder aus!"
@@ -762,9 +765,14 @@ msgid "There was an error with your payment."
 msgstr ""
 
 msgid "(MSG1) Your current Subscription was terminated."
-msgstr ""
+msgstr "(MSG1) Deine aktuelle Zahlung wurde eingestellt."
 
 msgid ""
 "(MSG2) There was an error terminating your subscription! Please contact the "
 "customer support!"
 msgstr ""
+
+#~ msgid ""
+#~ "(PF15) I accept the TOS and privacy policy and electronic processing of "
+#~ "my data "
+#~ msgstr "(PF15) Ich akzeptiere die AGBs und Datenschutzbestimmungen."

@@ -297,7 +297,7 @@ class BetterPaymentBackend(BaseBackend):
         if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
             obfuscated_iban = params['iban'][:2] + ('*' * (len(params['iban'])-6)) + params['iban'][-4:]
             extra_data.update({
-                'iban': obfuscated_iban,
+                'iban': obfuscated_iban.upper(),
                 'account_holder': params['account_holder'],
             })
 
