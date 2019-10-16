@@ -33,6 +33,11 @@
 		</p>
 		
 		<div class="button-section clearfix">
+			<a class="rounded-button button-color-secondary" href="{% url 'wechange-payments:overview' %}">
+		        <span class="rounded-button-inner">
+		            &lt; {% trans "(TS9) Back" context "payment step button" %}
+		        </span>
+		    </a>
             <a class="pull-right rounded-button button-color-secondary" data-toggle="modal" data-target="#cancel_confirm_modal">
 		        <span class="rounded-button-inner">
 					{% trans "(TS6) Terminate Subscription" %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 16:24+0200\n"
+"POT-Creation-Date: 2019-10-16 16:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,6 +229,10 @@ msgid "(TS4) (explanation) No payments have been made yet. Your subscription wil
 msgstr ""
 
 msgid "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(TS9) Back"
 msgstr ""
 
 msgid "(TS6) Terminate Subscription"

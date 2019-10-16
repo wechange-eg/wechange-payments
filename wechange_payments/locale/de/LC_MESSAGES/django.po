@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 16:24+0200\n"
-"PO-Revision-Date: 2019-10-16 16:44+0100\n"
+"POT-Creation-Date: 2019-10-16 16:59+0200\n"
+"PO-Revision-Date: 2019-10-16 17:02+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -66,7 +66,6 @@ msgstr ""
 msgid "Payment initiated but not completed by user yet"
 msgstr ""
 
-#| msgid "Payment Type"
 msgid "Payment processing"
 msgstr "Zahlung wird bearbeitet"
 
@@ -254,6 +253,10 @@ msgstr ""
 "(TS5) Es werden keine weiteren Abbuchungen mehr vorgenommen. Dein aktueller "
 "Zahlungsstatus bleibt bis zum Ablaufdatum erhalten"
 
+msgctxt "payment step button"
+msgid "(TS9) Back"
+msgstr "(TS9) Zurück"
+
 msgid "(TS6) Terminate Subscription"
 msgstr "(TS6) Zahlungen beenden"
 
@@ -378,7 +381,6 @@ msgid "(MS1) My Subscription"
 msgstr "(MS1) Mein regelmäßiger monatlicher Beitrag "
 
 #, python-format
-#| msgid "(MS2) Your current contribution is %(amount)s euro"
 msgid "(MS2) Your current contribution is %(amount)s Euro"
 msgstr "(MS2) Dein momentaner Beitrag beträgt %(amount)s Euro"
 
