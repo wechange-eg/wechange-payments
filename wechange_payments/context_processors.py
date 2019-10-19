@@ -9,7 +9,7 @@ from cosinnus.core.middleware.cosinnus_middleware import LOGIN_URLS
 from cosinnus.models.group import CosinnusPortal
 from wechange_payments.conf import settings
 from wechange_payments.models import Subscription,\
-    USERPROFILE_SETTING_POPUP_CLOSED, Invoice
+    USERPROFILE_SETTING_POPUP_CLOSED
 
 
 logger = logging.getLogger('wechange-payments')

@@ -61,11 +61,11 @@ def make_payment(request, on_success_func=None):
             return JsonResponse({'error': _('Please fill out all of the missing fields!'), 'missing_parameters': missing_params}, status=500)
         
         if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
-            payment, error = backend.make_sepa_payment(request, params, user=user)
+            payment, error = backend.make_sepa_payment(params, user=user)
         elif payment_type == PAYMENT_TYPE_CREDIT_CARD:
-            payment, error = backend.make_creditcard_payment(request, params, user=user)
+            payment, error = backend.make_creditcard_payment(params, user=user)
         elif payment_type == PAYMENT_TYPE_PAYPAL:
-            payment, error = backend.make_paypal_payment(request, params, user=user)
+            payment, error = backend.make_paypal_payment(params, user=user)
             
         if payment is not None and on_success_func is not None:
             return on_success_func(payment)
