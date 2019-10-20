@@ -6,6 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 from wechange_payments.backends import get_invoice_backend
 from wechange_payments.models import Payment, TransactionLog, Subscription, \
     Invoice
+from cosinnus.conf import settings
+from datetime import timedelta
+from wechange_payments.payment import process_due_subscription_payments
 
 
 class PaymentAdmin(admin.ModelAdmin):
@@ -61,7 +64,24 @@ class SubscriptionAdmin(admin.ModelAdmin):
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
     readonly_fields = ('state', 'amount',)
     raw_id_fields = ('user',)
-
+    
+    if getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):
+        actions = ['debug_timeshift_due_date', 'debug_process_subscriptions_now']
+    
+        def debug_timeshift_due_date(self, request, queryset):
+            for subscription in queryset:
+                subscription.next_due_date = subscription.next_due_date - timedelta(days=32)
+                subscription.save()
+            message = 'Shifted subscription due date back 32 days.'
+            self.message_user(request, message)
+        debug_timeshift_due_date.short_description = "DEBUG: Shift back due date 32 days"
+        
+        def debug_process_subscriptions_now(self, request, queryset):
+            process_due_subscription_payments()
+            message = 'Ran subscription processing!'
+            self.message_user(request, message)
+        debug_process_subscriptions_now.short_description = "DEBUG: Run subscription processing/expiry now!"
+        
 admin.site.register(Subscription, SubscriptionAdmin)
 
 
