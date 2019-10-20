@@ -11,25 +11,24 @@ from django.http.response import HttpResponseForbidden, HttpResponseNotFound, Fi
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.encoding import force_text
+from django.utils.formats import date_format
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 
 from cosinnus.core.signals import userprofile_ceated
+from cosinnus.models.group import CosinnusPortal
 from cosinnus.utils.permissions import check_user_superuser
 from cosinnus.utils.urls import get_non_cms_root_url, redirect_next_or
 from cosinnus.views.mixins.group import RequireLoggedInMixin
+from wechange_payments.backends import get_invoice_backend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
 from wechange_payments.forms import PaymentsForm
 from wechange_payments.models import Subscription, Payment, \
     USERPROFILE_SETTING_POPUP_CLOSED, Invoice
-from wechange_payments.payment import terminate_subscription
-from wechange_payments.backends import get_invoice_backend
-import mimetypes
-import urllib
-from cosinnus.models.group import CosinnusPortal
-from django.utils.formats import date_format
+from wechange_payments.payment import cancel_subscription as do_cancel_subscription
+
 
 logger = logging.getLogger('wechange-payments')
 
@@ -406,7 +405,7 @@ class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         """ Simply posting to this view will cancel the currently running subscription """
         try:
-            success = terminate_subscription(request.user)
+            success = do_cancel_subscription(request.user)
             if success:
                 messages.success(request, _('(MSG1) Your current Subscription was terminated.'))
                 return redirect('wechange-payments:overview')

@@ -260,8 +260,9 @@ class BetterPaymentBackend(BaseBackend):
             'last_name': reference_payment.last_name,
             'email': reference_payment.email,    
         }
+        payment_type = Payment.TYPE_MAP_REVERSE[reference_payment.type]
         payment, error = self._make_actual_payment(
-            Payment.TYPE_MAP_REVERSE[reference_payment.type], 
+            payment_type,
             order_id, 
             params,
             user=reference_payment.user, 
@@ -269,6 +270,12 @@ class BetterPaymentBackend(BaseBackend):
         )
         if error is not None:
             return None, error
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+            payment.status = Payment.STATUS_PAID
+            payment.completed_at = now()
+        else:
+            payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
+        
         try:
             payment.save()
         except Exception as e:
@@ -399,6 +406,7 @@ class BetterPaymentBackend(BaseBackend):
             amount=float(params['amount']),
             type=Payment.TYPE_MAP.get(payment_type),
             status=Payment.STATUS_STARTED,
+            is_reference_payment=(True if not original_transaction_id else False),
             
             address=params['address'],
             city=params['city'],

@@ -60,6 +60,8 @@ def process_due_subscription_payments():
         except Exception as e:
             logger.error('Payments: Exception during the call validate_state_and_cycle on a subscription! This is critical and needs to be fixed!', 
                          extra={'user': ending_sub.user, 'subscription': ending_sub, 'exception': e})
+            if settings.DEBUG:
+                raise
             
     # if an active subscription has its payment is due trigger a new payment on it
     for active_sub in Subscription.objects.filter(state=Subscription.STATE_2_ACTIVE):
@@ -103,11 +105,11 @@ def book_next_subscription_payment(subscription):
     return payment
 
 
-def terminate_subscription(user):
-    """ Ends the currently active or waiting subscription for a user """
+def cancel_subscription(user):
+    """ Cancels the currently active or waiting subscription for a user """
     subscription = Subscription.get_current_for_user(user)
     subscription.state = Subscription.STATE_1_CANCELLED_BUT_ACTIVE
-    subscription.terminated = now()
+    subscription.cancelled = now()
     subscription.save()
     # TODO: send email!
     return True

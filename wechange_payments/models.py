@@ -180,7 +180,8 @@ class Subscription(models.Model):
     last_payment = models.ForeignKey('wechange_payments.Payment', verbose_name=_('Last Payment'), 
         on_delete=models.PROTECT, related_name='+', null=False,
         help_text='The most recent payment made.')
-    terminated = models.DateTimeField(verbose_name=_('Terminated'), editable=False, blank=True, null=True)
+    cancelled = models.DateTimeField(verbose_name=_('Cancelled by User'), editable=False, blank=True, null=True)
+    terminated = models.DateTimeField(verbose_name=_('Finally terminated by System'), editable=False, blank=True, null=True)
     
     class Meta(object):
         ordering = ('created',)
@@ -213,10 +214,13 @@ class Subscription(models.Model):
             and whose next_due_date is in the past! 
             If an old subscription has been terminated, this will check if there
             is a new waiting subscription to be activated, and if so, activate it. """
-        if self.state == self.STATE_1_CANCELLED_BUT_ACTIVE and self.get_next_payment_date() <= now().date():
+        if self.state == self.STATE_1_CANCELLED_BUT_ACTIVE and self.next_due_date and \
+                self.next_due_date <= now().date():
             # terminate the subscription if the user cancelled it and it's past its next due_date
             self.state = self.STATE_0_TERMINATED
-            self.save(update_fields=['state'])
+            self.terminated = now()
+            self.save()
+            logger.warn('REMOVEME: Done ended old expired sub!')
             # after a termination, look if there is a waiting sub
             waiting_sub = get_object_or_None(Subscription, user=self.user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
             if waiting_sub:
@@ -226,7 +230,7 @@ class Subscription(models.Model):
                     waiting_sub.state = Subscription.STATE_2_ACTIVE
                     waiting_sub.next_due_date = self.next_due_date
                     waiting_sub.save()
-                    logger.warn('REMOVEME: Done ended old expired sub!')
+                    logger.warn('REMOVEME: Done activated a waiting sub after terminating an old expired sub!')
                 else:
                     logger.error('Payments: Critical sanity check fail: Tried to activate a waiting subscription for a user, but there was already an active subscription!. ', extra={'user': waiting_sub.user, 'subscription': waiting_sub})
     
