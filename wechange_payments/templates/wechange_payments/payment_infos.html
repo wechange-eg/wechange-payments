@@ -115,7 +115,13 @@
 				<tr>
 					<td>{% trans "(INF12) Date" %}</td>
 					<td>
-						{{ last_payment.completed_at|localize }}
+						{% if last_payment.status < 3 %}
+							{% blocktrans with date=last_payment.last_action_at|localize %}(INF15) Processing. Started at {{ date }}.{% endblocktrans %}
+						{% elif last_payment.status > 3 %}
+							{% blocktrans with date=last_payment.last_action_at|localize %}(INF16) Attempted at {{ date }}, but not completed.{% endblocktrans %}
+						{% else %}
+							{{ last_payment.completed_at|localize }}
+						{% endif %}
 					</td>
 				</tr>
 			</table>

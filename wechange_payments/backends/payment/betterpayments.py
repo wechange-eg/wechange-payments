@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
-from wechange_payments.backends.payment.base import BaseBackend
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
-    PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
-import urllib
+from copy import copy
 import hashlib
-from wechange_payments.models import TransactionLog, Payment
-
 import logging
+import urllib
+import uuid
+
+from annoying.functions import get_object_or_None
+from django.core.exceptions import PermissionDenied
+from django.urls.base import reverse
+from django.utils.timezone import now
+from django.utils.translation import ugettext_lazy as _
 import requests
 import six
-import uuid
-from django.urls.base import reverse
-from django.shortcuts import redirect
-from django.core.exceptions import PermissionDenied
+
 from cosinnus.models.group import CosinnusPortal
-from annoying.functions import get_object_or_None
-from django.utils.timezone import now
-from django.contrib import messages
-from copy import copy
-from wechange_payments.payment import create_subscription_for_payment
 from wechange_payments import signals
+from wechange_payments.backends.payment.base import BaseBackend
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
+    PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
+from wechange_payments.models import TransactionLog, Payment
+from wechange_payments.payment import create_subscription_for_payment
+
 
 logger = logging.getLogger('wechange-payments')
 
@@ -36,6 +37,8 @@ BETTERPAYMENT_SENSITIVE_POSTBACK_PARAMS = [
     'iban',
     'account_holder'
 ]
+
+ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED = _('You cannot make any additional payments at this time. Please contact our support!')
 
 def _strip_sensitive_data(params):
     """ Strips out sensitive data from a data dict that should not be saved in our DB """
@@ -165,7 +168,7 @@ class BetterPaymentBackend(BaseBackend):
         if result.get('error_code') != 0:
             extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
             logger.error('Payments: API Calling SEPA Mandate Creation returned an error!', extra=extra)
-            return 'Error: %s" (%d)' % (result.get('error_message'), result.get('error_code'))
+            return 'Error: "%s" (%d)' % (result.get('error_message'), result.get('error_code'))
         
         if result.get('error_code') == 0 and not transaction_id or not sepa_mandate_token:
             extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
@@ -174,36 +177,130 @@ class BetterPaymentBackend(BaseBackend):
         
         return (transaction_id, sepa_mandate_token)
     
-    
-    def _make_actual_payment(self, payment_type, order_id, request, params, user=None, original_transaction_id=None):
-        """ /rest/payment
-        
-            api_key:668651eb6e943eb3dc14
-            payment_type:dd  //https://dashboard.betterpayment.de/docs/?shell#payment-type
-            order_id:autogen_from_us_1
-            customer_id:our_user_id_1
-            //postback_url:our_postback_url
-            original_transaction_id:597d3a4f-7955-44ad-bdd3-f16d101ba843 <from the mandate-creation!>
-            checksum:<generate this>
+    def make_sepa_payment(self, params, user=None):
+        """
+            Make a SEPA payment. A mandate is created here, which has to be displayed
+            to the user. Return expects an error message or an object of base model
+            `wechange_payments.models.BasePayment` if successful.
+            Note: Never save any payment information in our DB!
             
-            amount:1.337
-            address:Straße
-            city:Berlin
-            postal_code:11111
-            country:DE // ISO 3166-1
-            first_name:Hans
-            last_name:Mueller
-            email:saschanarr@gmail.com
-            iban:de29742940937493240340
-            bic:BELADEBEXXX
-            account_holder:Hans Mueller
+            @param user: The user for which this payment should be made. Can potentially be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message)
+         """
+        if not self.user_pre_payment_safety_checks(user):
+            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+        
+        order_id = str(uuid.uuid4())
+        mandate_result = self._create_sepa_mandate(order_id)
+        if isinstance(mandate_result, six.string_types):
+            # contains error message, return
+            return None, mandate_result
+        transaction_id, sepa_mandate_token = mandate_result
+        
+        payment, error = self._make_actual_payment(PAYMENT_TYPE_DIRECT_DEBIT, order_id, params, user=user, original_transaction_id=transaction_id)
+        if error is not None:
+            return None, error
+        
+        payment.extra_data.update({
+            'sepa_mandate_token': sepa_mandate_token 
+        })
+        try:
+            if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+                payment.status = Payment.STATUS_PAID
+                payment.completed_at = now()
+            else:
+                payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
+            payment.save()
+        except Exception as e:
+            logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e})
+            
+        if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+            signals.successful_payment_made.send(sender=self, payment=payment)
+            self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+            
+        return payment, None
+    
+    def make_creditcard_payment(self, params, user=None):
+        """ Initiate a credit card payment. 
+            @param user: The user for which this payment should be made. Can potentially be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
+        if not self.user_pre_payment_safety_checks(user):
+            return 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+        return self._make_redirected_payment(params, PAYMENT_TYPE_CREDIT_CARD, user=user)
+    
+    def make_paypal_payment(self, params, user=None):
+        """ Initiate a paypal payment. 
+            @param user: The user for which this payment should be made. Can potentially be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
+        if not self.user_pre_payment_safety_checks(user):
+            return 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+        return self._make_redirected_payment(params, PAYMENT_TYPE_PAYPAL, user=user)
+    
+    def make_recurring_payment(self, reference_payment):
+        """ Executes a subsequent payment for a given reference payment. 
+            Used for monthly recurring payments. Returns the newly made `Payment` instance. 
+            @param user: The user for which this payment should be made. Can potentially be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @return: A tuple of (`Payment`, None) if successful, returning the *new* Payment,
+                or (None, Str-error-message) """
+        if not self.user_pre_payment_safety_checks(reference_payment.user):
+            return 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+        # collect params from reference payment
+        order_id = str(uuid.uuid4())
+        params = {
+            'amount': reference_payment.amount,
+            'address': reference_payment.address,
+            'city': reference_payment.city,
+            'postal_code': reference_payment.postal_code,
+            'country': str(reference_payment.country),
+            'first_name': reference_payment.first_name,
+            'last_name': reference_payment.last_name,
+            'email': reference_payment.email,    
+        }
+        payment_type = Payment.TYPE_MAP_REVERSE[reference_payment.type]
+        payment, error = self._make_actual_payment(
+            payment_type,
+            order_id, 
+            params,
+            user=reference_payment.user, 
+            original_transaction_id=reference_payment.vendor_transaction_id
+        )
+        if error is not None:
+            return None, error
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+            payment.status = Payment.STATUS_PAID
+            payment.completed_at = now()
+        else:
+            payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
+        
+        try:
+            payment.save()
+        except Exception as e:
+            logger.warning('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
+        return payment, None
+    
+    def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None):
+        """ Execute the actual payment-making API call to betterpayment.
+            At this point, all parameters are assumed to be existent and valid.
+            
+            Warning: This function does no further risk/safety checks!
+            Warning: The returned `Payment` instance is not yet saved!
+            Note: Never save any payment information in our DB!
+            
+            @param params: Expected Params can be found in `REQUIRED_PARAMS`.
+            @param original_transaction_id: supply the reference payment's vendor transaction id here.
+                if not None, means this is a recurring payment made from an existing payment. 
+            @return: A tuple of (*unsaved* `Payment`, None) if successful or (None, Str-error-message)
         """
         post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
-        
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
             'payment_type': payment_type,
             'order_id': order_id,
+            'recurring': 1,
             'postback_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-postback-endpoint'),
             
             'amount': params['amount'],
@@ -215,7 +312,7 @@ class BetterPaymentBackend(BaseBackend):
             'last_name': params['last_name'],
             'email': params['email'],
         }
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not original_transaction_id:
             data.update({
                 'iban': params['iban'],
                 'bic': params['bic'],
@@ -225,7 +322,7 @@ class BetterPaymentBackend(BaseBackend):
             data.update({
                 'original_transaction_id': original_transaction_id,
             })
-        if payment_type in REDIRECTING_PAYMENT_TYPES:
+        if payment_type in REDIRECTING_PAYMENT_TYPES and not original_transaction_id:
             data.update({
                 'success_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-success-endpoint'), 
                 'error_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-error-endpoint'),
@@ -241,8 +338,8 @@ class BetterPaymentBackend(BaseBackend):
         if not req.status_code == 200:
             extra = {'post_url': post_url, 'status':req.status_code, 'content': req._content}
             logger.error('Payments: BetterPayment Payment of type "%s" failed, request did not return status=200.' % payment_type, extra=extra)
-            return (None, 'Error: The payment provider could not be reached.')
-    
+            return (None, _('Error: "%s" (%d)') % (_('The payment provider could not be reached.'), -1))
+        
         result = req.json() # success!
         result['payment_type'] = payment_type
         TransactionLog.objects.create(
@@ -273,14 +370,14 @@ class BetterPaymentBackend(BaseBackend):
         """
         # result should always have an error code, which is 0 on success
         if not 'error_code' in result:
-            return (None, 'Error: %s (%d)' % (_('Unexpected response from payment provider.'), -1))
+            return (None, _('Error: "%s" (%d)') % (_('Unexpected response from payment provider.'), -2))
         
         if result.get('error_code') != 0:
             # ignore some errors for sentry warnings (126: invalid account info)
             if result.get('error_code') not in [126,]: 
                 extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
                 logger.warn('Payments: API Calling SEPA Payment returned an error!', extra=extra)
-            return (None, 'Error: %s (%d)' % (result.get('error_message'), result.get('error_code')))
+            return (None, _('Error: "%s" (%d)') % (result.get('error_message'), result.get('error_code')))
         
         extra_data = {}
         # handle client_action and action_data
@@ -294,7 +391,7 @@ class BetterPaymentBackend(BaseBackend):
             'status': result.get('status'), 
             'status_code': result.get('status_code'),
         })
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not original_transaction_id:
             obfuscated_iban = params['iban'][:2] + ('*' * (len(params['iban'])-6)) + params['iban'][-4:]
             extra_data.update({
                 'iban': obfuscated_iban.upper(),
@@ -309,6 +406,7 @@ class BetterPaymentBackend(BaseBackend):
             amount=float(params['amount']),
             type=Payment.TYPE_MAP.get(payment_type),
             status=Payment.STATUS_STARTED,
+            is_reference_payment=(True if not original_transaction_id else False),
             
             address=params['address'],
             city=params['city'],
@@ -323,57 +421,7 @@ class BetterPaymentBackend(BaseBackend):
         )
         return (payment, None)
     
-    def make_sepa_payment(self, request, params, user=None):
-        """
-            Make a SEPA payment. A mandate is created here, which has to be displayed
-            to the user. Return expects an error message or an object of base model
-            `wechange_payments.models.BasePayment` if successful.
-            Note: Never save any payment information in our DB!
-            
-            @param user: The user for which this payment should be made. Can be null.
-            @param params: Expected params are:
-                
-            @return: str error message or model of wechange_payments.models.BasePayment if successful
-         """
-        order_id = str(uuid.uuid4())
-        mandate_result = self._create_sepa_mandate(order_id)
-        if isinstance(mandate_result, six.string_types):
-            # contains error message, return
-            return None, mandate_result
-        transaction_id, sepa_mandate_token = mandate_result
-        
-        payment, error = self._make_actual_payment(PAYMENT_TYPE_DIRECT_DEBIT, order_id, request, params, user=user, original_transaction_id=transaction_id)
-        if error is not None:
-            return None, error
-        
-        payment.extra_data.update({
-            'sepa_mandate_token': sepa_mandate_token 
-        })
-        try:
-            if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
-                payment.status = Payment.STATUS_PAID
-                payment.completed_at = now()
-            else:
-                payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
-            payment.save()
-        except Exception as e:
-            logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e})
-            
-        if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
-            signals.successful_payment_made.send(sender=self, payment=payment)
-            self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
-            
-        return payment, None
-    
-    def make_creditcard_payment(self, request, params, user=None):
-        """ Initiate a credit card payment. """
-        return self._make_redirected_payment(request, params, PAYMENT_TYPE_CREDIT_CARD, user=user)
-    
-    def make_paypal_payment(self, request, params, user=None):
-        """ Initiate a paypal payment. """
-        return self._make_redirected_payment(request, params, PAYMENT_TYPE_PAYPAL, user=user)
-        
-    def _make_redirected_payment(self, request, params, payment_type, user=None):
+    def _make_redirected_payment(self, params, payment_type, user=None):
         """ 
             Initiate a payment where the user gets redirected to an external site for
             a part of the payment process.
@@ -381,13 +429,12 @@ class BetterPaymentBackend(BaseBackend):
             `wechange_payments.models.BasePayment` if successful.
             Note: Never save any payment information in our DB!
             
-            @param user: The user for which this payment should be made. Can be null.
-            @param params: Expected params are:
-                
-            @return: str error message or model of wechange_payments.models.BasePayment if successful
+            @param user: The user for which this payment should be made. Can potentially be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message)
         """
         order_id = str(uuid.uuid4())
-        payment, error = self._make_actual_payment(payment_type, order_id, request, params, user=user)
+        payment, error = self._make_actual_payment(payment_type, order_id, params, user=user)
         if error is not None:
             return None, error
         try:
@@ -395,7 +442,7 @@ class BetterPaymentBackend(BaseBackend):
         except Exception as e:
             logger.warning('Payments: Payment object could not be saved for a transaction of type "%s"!' % payment_type, extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
         return payment, None
-        
+            
     def handle_success_redirect(self, request, params):
         """ The user gets navigated here after completing a transaction on a popup/external payment provider.
             @return: The targetted Payment if the redirect was valid and active, False if it was an expired or inactive session. 

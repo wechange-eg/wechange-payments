@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.backends.payment.base import DummyBackend
-from wechange_payments.backends.payment.betterpayments import BetterPaymentBackend
 from wechange_payments.utils.utils import resolve_class
 
 BACKEND = None

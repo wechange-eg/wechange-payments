@@ -1,25 +1,19 @@
 # -*- coding: utf-8 -*-
 
-import datetime
-import hashlib
 import logging
-from os import path
-from uuid import uuid4
 
 from annoying.functions import get_object_or_None
 from dateutil import relativedelta
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.db import models
-from django.utils.encoding import force_text
+from django.urls.base import reverse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 
-from cosinnus.utils.files import get_cosinnus_media_file_folder
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL
 from wechange_payments.utils.utils import _get_invoice_filename
-from django.urls.base import reverse
 
 
 logger = logging.getLogger('wechange-payments')
@@ -42,6 +36,11 @@ class Payment(models.Model):
         PAYMENT_TYPE_DIRECT_DEBIT: TYPE_SEPA,
         PAYMENT_TYPE_CREDIT_CARD: TYPE_CC,
         PAYMENT_TYPE_PAYPAL: TYPE_PAYPAL,
+    }
+    TYPE_MAP_REVERSE = {
+        TYPE_SEPA: PAYMENT_TYPE_DIRECT_DEBIT,
+        TYPE_CC: PAYMENT_TYPE_CREDIT_CARD,
+        TYPE_PAYPAL: PAYMENT_TYPE_PAYPAL,
     }
     
     STATUS_NOT_STARTED = 0
@@ -181,7 +180,8 @@ class Subscription(models.Model):
     last_payment = models.ForeignKey('wechange_payments.Payment', verbose_name=_('Last Payment'), 
         on_delete=models.PROTECT, related_name='+', null=False,
         help_text='The most recent payment made.')
-    terminated = models.DateTimeField(verbose_name=_('Terminated'), editable=False, blank=True, null=True)
+    cancelled = models.DateTimeField(verbose_name=_('Cancelled by User'), editable=False, blank=True, null=True)
+    terminated = models.DateTimeField(verbose_name=_('Finally terminated by System'), editable=False, blank=True, null=True)
     
     class Meta(object):
         ordering = ('created',)
@@ -214,10 +214,13 @@ class Subscription(models.Model):
             and whose next_due_date is in the past! 
             If an old subscription has been terminated, this will check if there
             is a new waiting subscription to be activated, and if so, activate it. """
-        if self.state == self.STATE_1_CANCELLED_BUT_ACTIVE and self.get_next_payment_date() <= now().date():
+        if self.state == self.STATE_1_CANCELLED_BUT_ACTIVE and self.next_due_date and \
+                self.next_due_date <= now().date():
             # terminate the subscription if the user cancelled it and it's past its next due_date
             self.state = self.STATE_0_TERMINATED
-            self.save(update_fields=['state'])
+            self.terminated = now()
+            self.save()
+            logger.warn('REMOVEME: Done ended old expired sub!')
             # after a termination, look if there is a waiting sub
             waiting_sub = get_object_or_None(Subscription, user=self.user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
             if waiting_sub:
@@ -227,9 +230,9 @@ class Subscription(models.Model):
                     waiting_sub.state = Subscription.STATE_2_ACTIVE
                     waiting_sub.next_due_date = self.next_due_date
                     waiting_sub.save()
+                    logger.warn('REMOVEME: Done activated a waiting sub after terminating an old expired sub!')
                 else:
                     logger.error('Payments: Critical sanity check fail: Tried to activate a waiting subscription for a user, but there was already an active subscription!. ', extra={'user': waiting_sub.user, 'subscription': waiting_sub})
-        
     
     def check_payment_due(self):
         """ Returns true if the subscription is active and `next_due_date` is in the past or today. """
@@ -240,35 +243,20 @@ class Subscription(models.Model):
     def get_next_payment_date(self):
         """ Returns a Date of the next due payment date """
         if self.state == self.STATE_2_ACTIVE:
-            self.next_due_date
+            return self.next_due_date
         return None
     
     def set_next_due_date(self, last_target_date):
         """ Sets the `next_due_date` based on the date of the last target date.
             This will set the due date to the target date's next month, with the day of month of the reference payment,
             or the last day of month if it is a shorter month.
-            Called after a recurring payment has been successfully made. """
+            Should be called after a recurring payment has been successfully made. """
         next_month_date = last_target_date + relativedelta.relativedelta(months=1)
         try:
             next_month_date.replace(day=self.reference_payment.completed_at.day)
         except:
             pass
         self.next_due_date = next_month_date
-    
-    def book_next_payment(self):
-        """ Will create and book a new payment (using the reference payment as target) 
-            for the current `amount` of money.
-            Afterwards, will set the next due date for this subscription. """
-        if not self.user.is_active:
-            logger.warn('Payments: Prevented making a new continuous booking for a user that is inactive!', extra={'user': self.user, 'subscription': self})
-            return
-        raise Exception('NYI: book_next_payment')
-        payment = None # todo: book a new payment
-        payment.subscription = self
-        self.set_next_due_date(self.next_due_date)
-        self.last_payment = payment
-        self.save()
-        logger.info('Payments: Advanced the due_date of a subscription and saved it after a payment was made. ', extra={'user': self.user, 'subscription': self})
 
 
 class Invoice(models.Model):

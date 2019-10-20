@@ -1,14 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
-    PAYMENT_TYPE_PAYPAL, PAYMENT_TYPE_CREDIT_CARD
+from datetime import timedelta
+import logging
+
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Sum
+from django.template.loader import render_to_string
+from django.utils.timezone import now
+
+from wechange_payments import signals
+from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
+    PAYMENT_TYPE_PAYPAL, PAYMENT_TYPE_CREDIT_CARD
 from wechange_payments.models import Payment
 from wechange_payments.utils.utils import resolve_class
-from django.template.loader import render_to_string
-from wechange_payments import signals
 
-import logging
+
 logger = logging.getLogger('wechange-payments')
 
 class BaseBackend(object):
@@ -104,6 +110,46 @@ class BaseBackend(object):
                 missing_params.append(param)
         return missing_params
     
+    def user_pre_payment_safety_checks(self, user):
+        """ Executes a series of hardcoded safety checks to verify that the a payment
+            may be executed for a user. Meant as a second independent check to make 
+            sure that no irregularly frequent or too-high amounts will be processed
+            from a user.
+            This function *must* be called before making any actual payments!
+            
+            @return: True if a payment may be made, False otherwise 
+            """
+        # --------- Pre-Payment Safety checks ----------
+        # 0. Currently not accepting user-less payments
+        if not user:
+            logger.warn('Payments: user_pre_payment_safety_checks was prevented because a userless payment was attempted.')
+            return False
+        # 1. User is active
+        if not user.is_active:
+            logger.warn('Payments: user_pre_payment_safety_checks was prevented for an inactive user.', 
+                extra={'user': user})
+            return False
+        
+        if settings.DEBUG:
+            return True
+        
+        # 2. No existing successful payment in the last 7 days
+        seven_days = now() - timedelta(days=7)
+        paid_payments = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=seven_days)
+        if paid_payments.count() > 0:
+            logger.warn('Payments: user_pre_payment_safety_checks was prevented because of an existing successful Payment for this user in the last 7 days.', 
+                extra={'user': user})
+            return False
+        # 3. No payments for this user over the hardcapped payment amount in the last 28 days
+        twenty_eight_days = now() - timedelta(days=28)
+        paid_payments_month = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=twenty_eight_days)
+        payment_sum = paid_payments_month.aggregate(Sum('amount')).get('amount__sum', 0.00)
+        if payment_sum > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT:
+            logger.warn('Payments: user_pre_payment_safety_checks was prevented because the sum of Payment amounts for this user in the last 28 days exceeds the maximum hardcap payment amount.', 
+                extra={'user': user, 'payment_sum': payment_sum})
+            return False
+        return True
+    
     def send_payment_status_payment_email(self, email, payment, payment_type):
         """ Sends a success/error email out to the user, depending on the status of the given payment. """
         try:
@@ -129,7 +175,7 @@ class BaseBackend(object):
             if settings.DEBUG:
                 raise
         
-    def make_sepa_payment(self, request, params, user=None):
+    def make_sepa_payment(self, params, user=None):
         """
             Make a SEPA payment. A mandate is created here, which has to be displayed
             to the user. Return expects an error message or an object of base model
@@ -146,7 +192,7 @@ class BaseBackend(object):
          """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
-    def make_creditcard_payment(self, request, params, user=None):
+    def make_creditcard_payment(self, params, user=None):
         """
             Initiate a credit card payment. 
             Return expects an error message or an object of base model
@@ -163,7 +209,7 @@ class BaseBackend(object):
          """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
-    def make_paypal_payment(self, request, params, user=None):
+    def make_paypal_payment(self, params, user=None):
         """
             Initiate a paypal payment.  
             Return expects an error message or an object of base model
@@ -178,6 +224,21 @@ class BaseBackend(object):
                         str error message if error or None
                     )
          """
+        raise NotImplemented('Use a proper payment provider backend for this function!')
+    
+    def make_recurring_payment(self, reference_payment):
+        """
+            Executes a subsequent payment for a given reference payment. 
+            Used for monthly recurring payments. Returns the newly made `Payment` instance. 
+            
+            @param user: The user for which this payment should be made. Can be null.
+            @param params: Expected params can be found in `REQUIRED_PARAMS`
+                
+            @return: tuple (
+                        model of wechange_payments.models.BasePayment if successful or None,
+                        str error message if error or None
+                    )
+        """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
     def handle_success_redirect(self, request, params):
@@ -204,7 +265,7 @@ class DummyBackend(BaseBackend):
     def handle_postback(self, params):
         pass
     
-    def make_sepa_payment(self, request, params, user=None):
+    def make_sepa_payment(self, params, user=None):
         return (
             Payment(
                 user=user,
