@@ -130,7 +130,7 @@ class BaseBackend(object):
                 extra={'user': user})
             return False
         
-        if settings.DEBUG:
+        if getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):
             return True
         
         # 2. No existing successful payment in the last 7 days

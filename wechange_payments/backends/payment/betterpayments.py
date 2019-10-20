@@ -227,7 +227,7 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(user):
-            return 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
         return self._make_redirected_payment(params, PAYMENT_TYPE_CREDIT_CARD, user=user)
     
     def make_paypal_payment(self, params, user=None):
@@ -236,7 +236,7 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(user):
-            return 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
         return self._make_redirected_payment(params, PAYMENT_TYPE_PAYPAL, user=user)
     
     def make_recurring_payment(self, reference_payment):
@@ -247,7 +247,7 @@ class BetterPaymentBackend(BaseBackend):
             @return: A tuple of (`Payment`, None) if successful, returning the *new* Payment,
                 or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(reference_payment.user):
-            return 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
         # collect params from reference payment
         order_id = str(uuid.uuid4())
         params = {
@@ -280,6 +280,11 @@ class BetterPaymentBackend(BaseBackend):
             payment.save()
         except Exception as e:
             logger.warning('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
+            
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+            signals.successful_payment_made.send(sender=self, payment=payment)
+            self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+            
         return payment, None
     
     def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None):
