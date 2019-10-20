@@ -52,6 +52,9 @@ def make_payment(request, on_success_func=None):
     if payment_type in settings.PAYMENTS_ACCEPTED_PAYMENT_METHODS:
         # check for valid form
         form = PaymentsForm(request.POST)
+        if not payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
+            for field_name in ['iban', 'bic', 'account_holder']:
+                form.fields[field_name].required = False
         if not form.is_valid():
             return JsonResponse({'error': _('Please correct the errors in the highlighted fields!'), 'field_errors': form.errors}, status=500)
         
