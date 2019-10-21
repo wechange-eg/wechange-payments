@@ -9,5 +9,7 @@ class WechangePaymentsAppConfig(AppConfig):
 
     def ready(self):
         # connect all signal listeners
-        import wechange_payments.hooks  # noqa
+        from cosinnus.conf import settings
+        if not getattr(settings, 'TESTING', False):
+            import wechange_payments.hooks  # noqa
 
