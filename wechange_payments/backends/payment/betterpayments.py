@@ -260,9 +260,8 @@ class BetterPaymentBackend(BaseBackend):
             'last_name': reference_payment.last_name,
             'email': reference_payment.email,    
         }
-        payment_type = Payment.TYPE_MAP_REVERSE[reference_payment.type]
         payment, error = self._make_actual_payment(
-            payment_type,
+            reference_payment.type,
             order_id, 
             params,
             user=reference_payment.user, 
@@ -270,7 +269,7 @@ class BetterPaymentBackend(BaseBackend):
         )
         if error is not None:
             return None, error
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+        if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             payment.status = Payment.STATUS_PAID
             payment.completed_at = now()
         else:
@@ -281,7 +280,7 @@ class BetterPaymentBackend(BaseBackend):
         except Exception as e:
             logger.warning('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
             
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+        if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             signals.successful_payment_made.send(sender=self, payment=payment)
             self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
             
@@ -409,7 +408,7 @@ class BetterPaymentBackend(BaseBackend):
             vendor_transaction_id=result.get('transaction_id'),
             internal_transaction_id=result.get('order_id'),
             amount=float(params['amount']),
-            type=Payment.TYPE_MAP.get(payment_type),
+            type=payment_type,
             status=Payment.STATUS_STARTED,
             is_reference_payment=(True if not original_transaction_id else False),
             

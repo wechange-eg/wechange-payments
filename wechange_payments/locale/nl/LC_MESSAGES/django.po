@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 16:59+0200\n"
+"POT-Creation-Date: 2019-10-21 16:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,19 +42,26 @@ msgctxt "Invoice PDF, important!"
 msgid "We charge you for our services as follows:"
 msgstr ""
 
+msgid "You cannot make any additional payments at this time. Please contact our support!"
+msgstr ""
+
+#, python-format
+msgid "Error: \"%s\" (%d)"
+msgstr ""
+
+msgid "The payment provider could not be reached."
+msgstr ""
+
 msgid "Unexpected response from payment provider."
+msgstr ""
+
+msgid "Direct Debit (SEPA)"
 msgstr ""
 
 msgid "Credit Card"
 msgstr ""
 
-msgid "Direct Debit"
-msgstr ""
-
 msgid "Paypal"
-msgstr ""
-
-msgid "SEPA"
 msgstr ""
 
 msgid "PayPal"
@@ -168,7 +175,10 @@ msgstr ""
 msgid "Last Payment"
 msgstr ""
 
-msgid "Terminated"
+msgid "Cancelled by User"
+msgstr ""
+
+msgid "Finally terminated by System"
 msgstr ""
 
 msgid "Subscription"
@@ -492,6 +502,14 @@ msgid "(INF10) Last Payment"
 msgstr ""
 
 msgid "(INF12) Date"
+msgstr ""
+
+#, python-format
+msgid "(INF15) Processing. Started at %(date)s."
+msgstr ""
+
+#, python-format
+msgid "(INF16) Attempted at %(date)s, but not completed."
 msgstr ""
 
 msgid "(INF13) For more information see your invoices"

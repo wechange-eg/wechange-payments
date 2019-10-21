@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-16 16:59+0200\n"
-"PO-Revision-Date: 2019-10-16 17:02+0100\n"
+"POT-Creation-Date: 2019-10-21 16:00+0200\n"
+"PO-Revision-Date: 2019-10-21 16:00+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -42,20 +42,36 @@ msgctxt "Invoice PDF, important!"
 msgid "We charge you for our services as follows:"
 msgstr "Unsere Leistungen stellen wir Ihnen wie folgt in Rechnung:"
 
+#, fuzzy
+#| msgid ""
+#| "An error occured, and you cannot change your subscription amount at this "
+#| "time. Please contact the support!"
+msgid ""
+"You cannot make any additional payments at this time. Please contact our "
+"support!"
+msgstr ""
+"Es ist ein Fehler aufgetreten und du kannst deinen Zahlungsbetrag aktuell "
+"nicht ändern. Bitte kontaktiere unseren Support!"
+
+#, python-format
+msgid "Error: \"%s\" (%d)"
+msgstr ""
+
+msgid "The payment provider could not be reached."
+msgstr ""
+
 msgid "Unexpected response from payment provider."
 msgstr ""
+
+#| msgid "Direct Debit"
+msgid "Direct Debit (SEPA)"
+msgstr "Bankeinzug (SEPA)"
 
 msgid "Credit Card"
 msgstr "Kreditkarte"
 
-msgid "Direct Debit"
-msgstr "Bankeinzug"
-
 msgid "Paypal"
 msgstr "Paypal"
-
-msgid "SEPA"
-msgstr "SEPA"
 
 msgid "PayPal"
 msgstr "PayPal"
@@ -173,8 +189,14 @@ msgstr "Betrag"
 msgid "Last Payment"
 msgstr "Letzte Zahlung"
 
-msgid "Terminated"
-msgstr "Beendet"
+#, fuzzy
+#| msgctxt "subscription status"
+#| msgid "(INF5) Cancelled"
+msgid "Cancelled by User"
+msgstr "(INF5) Abgebrochen"
+
+msgid "Finally terminated by System"
+msgstr ""
 
 msgid "Subscription"
 msgstr "Abo"
@@ -564,6 +586,14 @@ msgstr "(INF10) Letzte Zahlung"
 msgid "(INF12) Date"
 msgstr "(INF12) Datum"
 
+#, python-format
+msgid "(INF15) Processing. Started at %(date)s."
+msgstr ""
+
+#, python-format
+msgid "(INF16) Attempted at %(date)s, but not completed."
+msgstr ""
+
 msgid "(INF13) For more information see your invoices"
 msgstr "(INF13) Für weitere Informationen sieh in deinen Rechnungen nach"
 
@@ -773,6 +803,12 @@ msgid ""
 "(MSG2) There was an error terminating your subscription! Please contact the "
 "customer support!"
 msgstr ""
+
+#~ msgid "SEPA"
+#~ msgstr "SEPA"
+
+#~ msgid "Terminated"
+#~ msgstr "Beendet"
 
 #~ msgid ""
 #~ "(PF15) I accept the TOS and privacy policy and electronic processing of "

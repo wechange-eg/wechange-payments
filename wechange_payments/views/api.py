@@ -123,7 +123,7 @@ def make_subscription_payment(request):
         # use the regular payment method and create a subscription if it was successful
         def on_success_func(payment):
             try:
-                if payment.type == Payment.TYPE_SEPA and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
+                if payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
                     create_subscription_for_payment(payment)
                     redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
                 else:

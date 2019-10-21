@@ -9,8 +9,8 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_CREDIT_CARD,\
 
 
 PAYMENT_CHOICES = {
+    PAYMENT_TYPE_DIRECT_DEBIT: _('Direct Debit (SEPA)'),
     PAYMENT_TYPE_CREDIT_CARD: _('Credit Card'),
-    PAYMENT_TYPE_DIRECT_DEBIT: _('Direct Debit'),
     PAYMENT_TYPE_PAYPAL: _('Paypal'),
 }
 
