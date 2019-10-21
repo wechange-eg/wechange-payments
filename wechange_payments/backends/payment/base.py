@@ -32,7 +32,7 @@ class BaseBackend(object):
             'country', # DE // ISO 3166-1 code
             'first_name', # Hans
             'last_name', # Mueller
-            'email', # saschanarr@gmail.com
+            'email', # test@mail.com
             'iban', # de29742940937493240340
             'bic', # BELADEBEXXX
             'account_holder', # Hans Mueller
@@ -45,7 +45,7 @@ class BaseBackend(object):
             'country', # DE // ISO 3166-1 code
             'first_name', # Hans
             'last_name', # Mueller
-            'email', # saschanarr@gmail.com
+            'email', # test@mail.com
         ],
         PAYMENT_TYPE_PAYPAL: [
             'amount', # 1.337
@@ -55,7 +55,7 @@ class BaseBackend(object):
             'country', # DE // ISO 3166-1 code
             'first_name', # Hans
             'last_name', # Mueller
-            'email', # saschanarr@gmail.com
+            'email', # test@mail.com
         ],
     }
     

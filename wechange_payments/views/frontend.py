@@ -23,11 +23,12 @@ from cosinnus.utils.permissions import check_user_superuser
 from cosinnus.utils.urls import get_non_cms_root_url, redirect_next_or
 from cosinnus.views.mixins.group import RequireLoggedInMixin
 from wechange_payments.backends import get_invoice_backend
-from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT
+from wechange_payments.conf import settings
 from wechange_payments.forms import PaymentsForm
 from wechange_payments.models import Subscription, Payment, \
     USERPROFILE_SETTING_POPUP_CLOSED, Invoice
 from wechange_payments.payment import cancel_subscription as do_cancel_subscription
+from wechange_payments.tests.example_data import TEST_DATA_SEPA_PAYMENT_FORM
 
 
 logger = logging.getLogger('wechange-payments')
@@ -36,25 +37,6 @@ logger = logging.getLogger('wechange-payments')
 class PaymentView(RequireLoggedInMixin, TemplateView):
     
     template_name = 'wechange_payments/payment_form.html'
-    
-    def _get_testform_initial(self):
-        initial = {
-            'payment_type': PAYMENT_TYPE_DIRECT_DEBIT,
-            'amount': 2.0,
-            'address':'Straße 73',
-            'city': 'Berlin',
-            'postal_code': 11111,
-            'first_name': 'Hans',
-            'last_name': 'Mueller',
-            'email': 'saschanarr@gmail.com',
-            'iban': 'DE34100500000710217340',
-            'bic': 'BELADEBEXXX',
-            'account_holder': 'Hans Mueller',
-            'country': 'DE',
-            'tos_check': True,
-            'privacy_policy_check': True,
-        }
-        return initial
     
     def dispatch(self, request, *args, **kwargs):
         if not self.request.user.is_authenticated:
@@ -73,7 +55,7 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
         
         form = PaymentsForm()
         if settings.DEBUG:
-            form = PaymentsForm(initial=self._get_testform_initial())
+            form = PaymentsForm(initial=TEST_DATA_SEPA_PAYMENT_FORM)
             
         context.update({
             'form': form,
@@ -412,6 +394,8 @@ class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
         except Exception as e:
             logger.error('Critical: Could not cancel a subscription!', extra={'exc': force_text(e)})
             messages.error(request, _('(MSG2) There was an error terminating your subscription! Please contact the customer support!'))
+            if settings.DEBUG:
+                raise
         return redirect('wechange-payments:overview')
 
 cancel_subscription = CancelSubscriptionView.as_view()

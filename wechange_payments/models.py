@@ -144,6 +144,14 @@ class Subscription(models.Model):
         STATE_1_CANCELLED_BUT_ACTIVE,
     )
     
+    # if a subsription is in any of these states, no other subscription for the same user
+    # may exist. enforced at `Subscription.save()`
+    EXLUSIVE_STATE_MAP = {
+        STATE_1_CANCELLED_BUT_ACTIVE: ACTIVE_STATES,
+        STATE_2_ACTIVE: ACTIVE_STATES,
+        STATE_3_WATING_TO_BECOME_ACTIVE: STATE_3_WATING_TO_BECOME_ACTIVE,
+    }
+    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
         editable=False, related_name='subscriptions', on_delete=models.CASCADE, null=False)
     reference_payment = models.OneToOneField('wechange_payments.Payment', verbose_name=_('Reference Payment'), 
@@ -173,6 +181,10 @@ class Subscription(models.Model):
         ordering = ('created',)
         verbose_name = _('Subscription')
         verbose_name_plural = _('Subscription')
+        
+    def __init__(self, *args, **kwargs):
+        super(Subscription, self).__init__(*args, **kwargs)
+        self._old_state = self.state
         
     @classmethod
     def get_current_for_user(cls, user):
@@ -243,7 +255,32 @@ class Subscription(models.Model):
         except:
             pass
         self.next_due_date = next_month_date
-
+    
+    def save(self, *args, **kwargs):
+        """ Do sanity checks: 
+            - ensure Subscription.state only ever changes downwards
+            - ensure that no other Subscription for the same user exists that would have the same active state """
+        created = bool(self.pk is None)
+        # state must be lower if changed
+        if not created:
+            if self.state > self._old_state:
+                logger.error('Fatal: Sanity check failed for subscription: Tried to save a subscription with a state higher than it previously was!',
+                    extra={'user': self.user, 'subscription_pk': self.pk, 'state': self.state, 'prev_state': self._old_state}) 
+                ('Fatal: Sanity check failed for subscription: Tried to save a subscription with a state higher than it previously was!')
+        # no other subscription for the user with an exclusive state may exist
+        exclusive_states = Subscription.EXLUSIVE_STATE_MAP.get(self.state, [])
+        if exclusive_states:
+            exclusive_qs = Subscription.objects.filter(user=self.user, state__in=exclusive_states)
+            if self.pk is not None:
+                exclusive_qs = exclusive_qs.exclude(pk=self.pk)
+            if exclusive_qs.count() > 0:
+                logger.error('Fatal: Sanity check failed for subscription: \
+                    Tried to save a subscription when another subscription with an exclusive state exists for the same user!',
+                    extra={'user': self.user, 'subscription_pk': self.pk, 'state': self.state}) 
+                raise Exception('Fatal: Sanity check failed for subscription: \
+                    Tried to save a subscription when another subscription with an exclusive state exists for the same user!')
+        super(Subscription, self).save(*args, **kwargs)
+        
 
 class Invoice(models.Model):
     
