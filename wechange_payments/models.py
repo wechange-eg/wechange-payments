@@ -188,7 +188,7 @@ class Subscription(models.Model):
         
     @classmethod
     def get_current_for_user(cls, user):
-        """ Returns the currently active or waiting subscription for a user. """
+        """ Returns the currently active or canceled-but-active subscription for a user. """
         if not user.is_authenticated:
             return None
         return get_object_or_None(cls, user=user, state__in=Subscription.ACTIVE_STATES)
@@ -233,7 +233,9 @@ class Subscription(models.Model):
                     logger.error('Payments: Critical sanity check fail: Tried to activate a waiting subscription for a user, but there was already an active subscription!. ', extra={'user': waiting_sub.user, 'subscription': waiting_sub})
     
     def check_payment_due(self):
-        """ Returns true if the subscription is active and `next_due_date` is in the past or today. """
+        """ Returns true if the subscription is active and `next_due_date` is in the past or today.
+            Note: To check if a canceled subscription is due to be terminated, 
+                manually compare `self.next_due_date`! """
         if self.state == self.STATE_2_ACTIVE:
             return self.get_next_payment_date() <= now().date()
         return False
