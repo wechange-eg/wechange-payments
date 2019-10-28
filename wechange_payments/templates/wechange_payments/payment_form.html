@@ -214,6 +214,82 @@
 				</div>
 				
 				<div class="tab-pane" id="step4">
+				
+					<h2>{% trans "(PF18) Review and Confirm Payment" %}</h2>
+					
+					<div class="payment-summary payment-info-page">
+						<div class="large-space">
+							<table>
+								<tr>
+			    					<td>{% trans "Chosen Amount" %}</td>
+			    					<td><span data-summary-item="amount"></span> €</td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Debiting Period" %}</td>
+			    					<td>{% trans "Monthly" %}</td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Payment Type" %}</td>
+			    					<td>
+			    						{% captureas payment_type_html %}
+				    						<span data-summary-payment-type="dd">{% trans "Direct Debit (SEPA)" %}</span>
+											<span data-summary-payment-type="cc">{% trans "Credit Card" %}</span>
+											<span data-summary-payment-type="paypal">{% trans "Paypal" %}</span>
+			    						{% endcaptureas %}
+			    						{{ payment_type_html }}
+			    					</td>
+			    				</tr>
+			    				<tr data-summary-payment-type="dd">
+			    					<td>{% trans "Account Holder" %}</td>
+			    					<td><span data-summary-item="account_holder"></span></td>
+			    				</tr>
+				    			<tr data-summary-payment-type="dd">
+			    					<td>{% trans "IBAN" %}</td>
+			    					<td><span data-summary-item="iban"></span></td>
+			    				</tr>
+			    				<tr data-summary-payment-type="dd">
+			    					<td>{% trans "IBAN" %}</td>
+			    					<td><span data-summary-item="bic"></span></td>
+			    				</tr>
+				    		</table>
+							
+							<h4>{% trans "Billing Address" %}</h4>
+				    		<table>
+				    			<tr>
+			    					<td>{% trans "Name" %}</td>
+			    					<td><span data-summary-item="first_name"></span><span data-summary-item="last_name"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Address" %}</td>
+			    					<td><span data-summary-item="address"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Postal Code" %}</td>
+			    					<td><span data-summary-item="postal_code"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "City" %}</td>
+			    					<td><span data-summary-item="city"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Country" %}</td>
+			    					<td><span data-summary-item="country"></span></td>
+			    				</tr>
+				    		</table>
+						</div>
+					
+						<p>
+							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html %}(PF19) By clicking on "Confirm and pay" you grant Wechange eG permission to debit {{ amount }} Euro per month from you via {{ payment_method }}.{% endblocktrans %}
+							{% if current_subscription and current_subscription.next_due_date %}
+								{% blocktrans with date=current_subscription.next_due_date|localize %}(PF21) The next debit will be made on {{ date }}.{% endblocktrans %}
+							{% else %}
+								{% trans "(PF20) The next debit will be made immediately." %}
+							{% endif %}
+							{% trans "(PF22) You can adjust the amount of your monthly contribution or cancel payments at any time." %}
+						</p>
+						
+						{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(PF23) Thank you for supporting {{ portal_name }}!{% endblocktrans %}
+					</div>
 					
 					<div data-only-required-step="#step4">
 			        	{% include 'cosinnus/registration/extra_signup_fields.html' with show_plain_form=True %}

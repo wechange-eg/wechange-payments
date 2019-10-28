@@ -35,13 +35,15 @@ window.PaymentForm = {
     	
     	// step3: payment information: check if form is valid, and if not, trigger an early validation
     	$('.to-step4-button').on('click', function(){
-			var form = $('#payments-form');
-			if (form[0].checkValidity()) {
+			var $form = $('#payments-form');
+			if ($form[0].checkValidity()) {
+				// generate the payment summary
+				window.PaymentForm.generatePaymentSummary();
 				// go to step 4
 				$('.hidden-step-4-button').click();
 			} else {
 				// fake-trigger a submit to trigger the native validation popup
-				$('<input type="submit">').hide().appendTo(form).click().remove();
+				$('<input type="submit">').hide().appendTo($form).click().remove();
 			}
     	});
 	},
@@ -120,6 +122,31 @@ window.PaymentForm = {
 		}
 	},
 	
+	generatePaymentSummary: function (data) {
+		var $form = $('#payments-form');
+		var summaryContainer = $('.payment-summary');
+		var summary_fields = [
+			'amount',
+			'account_holder',
+			'iban',
+			'bic',
+			'first_name',
+			'last_name',
+			'address',
+			'postal_code',
+			'city',
+			'country',
+		];
+		// fill placeholders with data from the form
+		$.each(summary_fields, function(idx, fieldname) {
+			var value = $form.find('input[name="' + fieldname + '"],select[name="' + fieldname + '"]').val();
+			summaryContainer.find('[data-summary-item="' + fieldname + '"]').text(value);
+		});
+		// show payment type items based on chosen type
+		var payment_type = $form.find('select[name="payment_type"]').val();
+		summaryContainer.find('[data-summary-payment-type]').hide();
+		summaryContainer.find('[data-summary-payment-type="' + payment_type + '"]').show();
+	},
 }
 
 

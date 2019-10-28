@@ -57,7 +57,7 @@
     					<td>{% trans "Payment Type" %}</td>
     					<td>{{ payment.get_type_string }}</td>
     				</tr>
-	    			{% if payment.type == 0 %}
+	    			{% if payment.type == 'dd' %}
     				<tr>
     					<td>{% trans "Account Holder" %}</td>
     					<td>{{ payment.extra_data.account_holder }}</td>
