@@ -32,7 +32,7 @@ class BaseBackend(object):
             'country', # DE // ISO 3166-1 code
             'first_name', # Hans
             'last_name', # Mueller
-            'email', # saschanarr@gmail.com
+            'email', # test@mail.com
             'iban', # de29742940937493240340
             'bic', # BELADEBEXXX
             'account_holder', # Hans Mueller
@@ -45,7 +45,7 @@ class BaseBackend(object):
             'country', # DE // ISO 3166-1 code
             'first_name', # Hans
             'last_name', # Mueller
-            'email', # saschanarr@gmail.com
+            'email', # test@mail.com
         ],
         PAYMENT_TYPE_PAYPAL: [
             'amount', # 1.337
@@ -55,7 +55,7 @@ class BaseBackend(object):
             'country', # DE // ISO 3166-1 code
             'first_name', # Hans
             'last_name', # Mueller
-            'email', # saschanarr@gmail.com
+            'email', # test@mail.com
         ],
     }
     
@@ -130,22 +130,23 @@ class BaseBackend(object):
                 extra={'user': user})
             return False
         
+        # skip this safety measure for test servers
         if getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):
             return True
         
-        # 2. No existing successful payment in the last 7 days
-        seven_days = now() - timedelta(days=7)
+        # 2. No existing successful payment in the last 14 days
+        seven_days = now() - timedelta(days=14)
         paid_payments = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=seven_days)
         if paid_payments.count() > 0:
-            logger.warn('Payments: user_pre_payment_safety_checks was prevented because of an existing successful Payment for this user in the last 7 days.', 
+            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_payment_safety_checks` was prevented because of an existing successful Payment for this user in the last 7 days!', 
                 extra={'user': user})
             return False
-        # 3. No payments for this user over the hardcapped payment amount in the last 28 days
-        twenty_eight_days = now() - timedelta(days=28)
+        # 3. No payments for this user over the hardcapped payment amount in the last 27 days
+        twenty_eight_days = now() - timedelta(days=27)
         paid_payments_month = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=twenty_eight_days)
         payment_sum = paid_payments_month.aggregate(Sum('amount')).get('amount__sum', 0.00)
         if payment_sum > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT:
-            logger.warn('Payments: user_pre_payment_safety_checks was prevented because the sum of Payment amounts for this user in the last 28 days exceeds the maximum hardcap payment amount.', 
+            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_payment_safety_checks` was prevented because the sum of Payment amounts for this user in the last 28 days exceeds the maximum hardcap payment amount!', 
                 extra={'user': user, 'payment_sum': payment_sum})
             return False
         return True

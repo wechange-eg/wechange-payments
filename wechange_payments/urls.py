@@ -23,7 +23,7 @@ urlpatterns = [
     
     url(r'^welcome/contribute/$', frontend.welcome_page, name='welcome-page'),
     
-    url(r'^payments/api/payment/$', api.make_payment, name='api-make-payment'),
+    #url(r'^payments/api/payment/$', api.make_payment, name='api-make-payment'),
     url(r'^payments/api/subscription-payment/$', api.make_subscription_payment, name='api-make-subscription-payment'),
     url(r'^payments/api/subscription-change-amount/$', api.subscription_change_amount, name='api-subscription-change-amount'),
     url(r'^payments/api/success_endpoint/$', api.success_endpoint, name='api-success-endpoint'),

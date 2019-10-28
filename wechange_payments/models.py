@@ -144,6 +144,14 @@ class Subscription(models.Model):
         STATE_1_CANCELLED_BUT_ACTIVE,
     )
     
+    # if a subsription is in any of these states, no other subscription for the same user
+    # may exist. enforced at `Subscription.save()`
+    EXLUSIVE_STATE_MAP = {
+        STATE_1_CANCELLED_BUT_ACTIVE: ACTIVE_STATES,
+        STATE_2_ACTIVE: ACTIVE_STATES,
+        STATE_3_WATING_TO_BECOME_ACTIVE: STATE_3_WATING_TO_BECOME_ACTIVE,
+    }
+    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
         editable=False, related_name='subscriptions', on_delete=models.CASCADE, null=False)
     reference_payment = models.OneToOneField('wechange_payments.Payment', verbose_name=_('Reference Payment'), 
@@ -174,9 +182,13 @@ class Subscription(models.Model):
         verbose_name = _('Subscription')
         verbose_name_plural = _('Subscription')
         
+    def __init__(self, *args, **kwargs):
+        super(Subscription, self).__init__(*args, **kwargs)
+        self._old_state = self.state
+        
     @classmethod
     def get_current_for_user(cls, user):
-        """ Returns the currently active or waiting subscription for a user. """
+        """ Returns the currently active or canceled-but-active subscription for a user. """
         if not user.is_authenticated:
             return None
         return get_object_or_None(cls, user=user, state__in=Subscription.ACTIVE_STATES)
@@ -200,8 +212,7 @@ class Subscription(models.Model):
             and whose next_due_date is in the past! 
             If an old subscription has been terminated, this will check if there
             is a new waiting subscription to be activated, and if so, activate it. """
-        if self.state == self.STATE_1_CANCELLED_BUT_ACTIVE and self.next_due_date and \
-                self.next_due_date <= now().date():
+        if self.check_termination_due():
             # terminate the subscription if the user cancelled it and it's past its next due_date
             self.state = self.STATE_0_TERMINATED
             self.terminated = now()
@@ -221,7 +232,9 @@ class Subscription(models.Model):
                     logger.error('Payments: Critical sanity check fail: Tried to activate a waiting subscription for a user, but there was already an active subscription!. ', extra={'user': waiting_sub.user, 'subscription': waiting_sub})
     
     def check_payment_due(self):
-        """ Returns true if the subscription is active and `next_due_date` is in the past or today. """
+        """ Returns true if the subscription is active and `next_due_date` is in the past or today.
+            Note: To check if a canceled subscription is due to be terminated, 
+                use `self.check_termination_due()`! """
         if self.state == self.STATE_2_ACTIVE:
             return self.get_next_payment_date() <= now().date()
         return False
@@ -231,6 +244,11 @@ class Subscription(models.Model):
         if self.state == self.STATE_2_ACTIVE:
             return self.next_due_date
         return None
+    
+    def check_termination_due(self):
+        if self.state == self.STATE_1_CANCELLED_BUT_ACTIVE:
+            return self.next_due_date <= now().date()
+        return False 
     
     def set_next_due_date(self, last_target_date):
         """ Sets the `next_due_date` based on the date of the last target date.
@@ -243,7 +261,32 @@ class Subscription(models.Model):
         except:
             pass
         self.next_due_date = next_month_date
-
+    
+    def save(self, *args, **kwargs):
+        """ Do sanity checks: 
+            - ensure Subscription.state only ever changes downwards
+            - ensure that no other Subscription for the same user exists that would have the same active state """
+        created = bool(self.pk is None)
+        # state must be lower if changed
+        if not created:
+            if self.state > self._old_state:
+                logger.error('Fatal: Sanity check failed for subscription: Tried to save a subscription with a state higher than it previously was!',
+                    extra={'user': self.user, 'subscription_pk': self.pk, 'state': self.state, 'prev_state': self._old_state}) 
+                ('Fatal: Sanity check failed for subscription: Tried to save a subscription with a state higher than it previously was!')
+        # no other subscription for the user with an exclusive state may exist
+        exclusive_states = Subscription.EXLUSIVE_STATE_MAP.get(self.state, [])
+        if exclusive_states:
+            exclusive_qs = Subscription.objects.filter(user=self.user, state__in=exclusive_states)
+            if self.pk is not None:
+                exclusive_qs = exclusive_qs.exclude(pk=self.pk)
+            if exclusive_qs.count() > 0:
+                logger.error('Fatal: Sanity check failed for subscription: \
+                    Tried to save a subscription when another subscription with an exclusive state exists for the same user!',
+                    extra={'user': self.user, 'subscription_pk': self.pk, 'state': self.state}) 
+                raise Exception('Fatal: Sanity check failed for subscription: \
+                    Tried to save a subscription when another subscription with an exclusive state exists for the same user!')
+        super(Subscription, self).save(*args, **kwargs)
+        
 
 class Invoice(models.Model):
     
