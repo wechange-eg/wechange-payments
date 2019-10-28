@@ -53,9 +53,15 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(PaymentView, self).get_context_data(*args, **kwargs)
         
-        form = PaymentsForm()
+        initial = {}
         if settings.DEBUG:
-            form = PaymentsForm(initial=TEST_DATA_SEPA_PAYMENT_FORM)
+            initial = TEST_DATA_SEPA_PAYMENT_FORM
+        if self.request.user.first_name:
+            initial['first_name'] = self.request.user.first_name
+        if self.request.user.last_name:
+            initial['last_name'] = self.request.user.last_name
+        initial['email'] = self.request.user.email
+        form = PaymentsForm(initial=initial)
             
         context.update({
             'form': form,

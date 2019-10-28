@@ -22,7 +22,7 @@
 {% block content %}
     
     {% comment %} The 'onkeydown' attribute prevents form sending on enter {% endcomment %}
-    <form method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
+    <form id="payments-form" method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
     		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
         <div class="busy-animation">
@@ -110,15 +110,10 @@
 					    </div>
 				    {% endif %}
 				
-					<h2>{% trans "(PF5)  Almost done!" %}</h2>
-					
-					<p>
+					<h2>
+						{% trans "(PF5)  Almost done!" %} 
 						{% trans "(PF6)  Please enter your account information below." %}
-					</p>
-					
-					<hr />
-					
-		            <h3>{% trans "Payment Info" %}</h3>
+					</h2>
 		            
 					{% trans "Payment Type" as label %}
 					{% captureas select_field_html %}
@@ -132,7 +127,7 @@
 			                {% endfor %}
                         </select>
 					{% endcaptureas %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label field_html=select_field_html show_required=True field_classes="conditional-select" %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label first=True field_html=select_field_html show_required=True field_classes="conditional-select" %}
 					
 					
 		            <div class="conditional-select-container" data-select-name="payment_type" data-select-value="dd">
@@ -201,17 +196,6 @@
 		        	{% trans "Country" as label %}
 					{% include 'cosinnus/fields/default_field.html' with field=form.country label=label show_required=True %}
 		        	
-		        	<div class="large-space"></div>
-		        	
-			        {% include 'cosinnus/registration/extra_signup_fields.html' with show_plain_form=True %}
-				    
-				    <hr/>
-				    
-					<p>
-						(PF7) TODO: Should we show the subscription amount again here as a confirmation for the user what they're actually paying when they click the next button??
-					</p>
-					
-				    <hr/>
 				    
 					<div class="button-section clearfix">
 						<a class="rounded-button button-color-secondary focus-slider-onclick" href="#step2" role="tab" data-toggle="tab">
@@ -219,9 +203,31 @@
 					            &lt; {% trans "(PF8) Modify Contribution Amount" context "payment step button" %}
 					        </span>
 					    </a>
+					    <a class="pull-right rounded-button button-color-primary-inverted  to-step4-button">
+					        <span class="rounded-button-inner">
+								{% trans "(PF17) Continue" context "payment step button" %}
+					        </span>
+					    </a>
+					    <a class="hidden-step-4-button" href="#step4" role="tab" data-toggle="tab" style="display: none;"></a>
+					
+					</div>
+				</div>
+				
+				<div class="tab-pane" id="step4">
+					
+					<div data-only-required-step="#step4">
+			        	{% include 'cosinnus/registration/extra_signup_fields.html' with show_plain_form=True %}
+				    </div>
+				    
+				    <div class="button-section clearfix">
+						<a class="rounded-button button-color-secondary focus-slider-onclick" href="#step3" role="tab" data-toggle="tab">
+					        <span class="rounded-button-inner">
+					            &lt; {% trans "(PF18) Edit payment information" context "payment step button" %}
+					        </span>
+					    </a>
 					    <button type="submit" class="pull-right rounded-button button-color-primary-inverted">
 					        <span class="rounded-button-inner">
-								{% trans "(PF9) Confirm and pay" context "payment step button" %}
+								{% trans "(PF9) Confirm and pay" context "payment step button (legally binding!)" %}
 					        </span>
 					    </button>		
 					
