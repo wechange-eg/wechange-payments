@@ -174,7 +174,7 @@ class PaymentsUnitTest(TestCase):
         # make sure our datetime-faking worked and both subs are due
         self.assertTrue(loyal_subscription.check_payment_due(), '32 days old Subscription is due for payment')
         self.assertFalse(disloyal_subscription.check_payment_due(), '32 days old cancelled Subscription is not due for payment')
-        self.assertLessEqual(disloyal_subscription.next_due_date, now().date(), '32 days old cancelled Subscription is due for termination')
+        self.assertTrue(disloyal_subscription.check_termination_due(), '32 days old cancelled Subscription is due for termination')
         
         # ------ run subscription processing ------
         time_before_subscription_processing = now()
@@ -208,6 +208,7 @@ class PaymentsUnitTest(TestCase):
         self.assertEqual(recurrent_payment.amount, loyal_subscription.amount, 'The amount for the monthly recurrent payment is the same as for its subscription')
         
         # a user with an active subscription should not be able to make another one
+        self.client.force_login(self.loyal_user)
         logger.warn('TODO: double-concurrent subscription making fail test!')
         
         # even if somehow the subscription date got wrongfully set back in time, 
