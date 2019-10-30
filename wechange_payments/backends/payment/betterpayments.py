@@ -265,7 +265,8 @@ class BetterPaymentBackend(BaseBackend):
             order_id, 
             params,
             user=reference_payment.user, 
-            original_transaction_id=reference_payment.vendor_transaction_id
+            original_transaction_id=reference_payment.vendor_transaction_id,
+            is_recurring=True,
         )
         if error is not None:
             return None, error
@@ -286,7 +287,7 @@ class BetterPaymentBackend(BaseBackend):
             
         return payment, None
     
-    def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None):
+    def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None, is_recurring=False):
         """ Execute the actual payment-making API call to betterpayment.
             At this point, all parameters are assumed to be existent and valid.
             
@@ -316,7 +317,7 @@ class BetterPaymentBackend(BaseBackend):
             'last_name': params['last_name'],
             'email': params['email'],
         }
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not original_transaction_id:
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not is_recurring:
             data.update({
                 'iban': params['iban'],
                 'bic': params['bic'],
@@ -326,7 +327,7 @@ class BetterPaymentBackend(BaseBackend):
             data.update({
                 'original_transaction_id': original_transaction_id,
             })
-        if payment_type in REDIRECTING_PAYMENT_TYPES and not original_transaction_id:
+        if payment_type in REDIRECTING_PAYMENT_TYPES and not is_recurring:
             data.update({
                 'success_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-success-endpoint'), 
                 'error_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-error-endpoint'),
@@ -395,7 +396,7 @@ class BetterPaymentBackend(BaseBackend):
             'status': result.get('status'), 
             'status_code': result.get('status_code'),
         })
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not original_transaction_id:
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not is_recurring:
             obfuscated_iban = params['iban'][:2] + ('*' * (len(params['iban'])-6)) + params['iban'][-4:]
             extra_data.update({
                 'iban': obfuscated_iban.upper(),
@@ -410,7 +411,7 @@ class BetterPaymentBackend(BaseBackend):
             amount=float(params['amount']),
             type=payment_type,
             status=Payment.STATUS_STARTED,
-            is_reference_payment=(True if not original_transaction_id else False),
+            is_reference_payment=(not is_recurring),
             
             address=params['address'],
             city=params['city'],
