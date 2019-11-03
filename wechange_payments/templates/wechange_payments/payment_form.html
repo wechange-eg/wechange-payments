@@ -22,7 +22,7 @@
 {% block content %}
     
     {% comment %} The 'onkeydown' attribute prevents form sending on enter {% endcomment %}
-    <form method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
+    <form id="payments-form" method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
     		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
         <div class="busy-animation">
@@ -37,8 +37,10 @@
 		    </div>
 		    
 		    <div class="tab-content">
-		    
-				<div class="tab-pane active" id="step1">
+		    	
+		    	{% comment %}  
+		    		Step1 disabled
+				<div class="tab-pane" id="step1">
 		        	{% include 'wechange_payments/partials/conditional_payment_header.html' %}
 					
 					<div class="button-section clearfix">
@@ -53,35 +55,39 @@
 					        </span>
 					    </a>
 					    
-					    {% if current_subscription and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
-					    <hr>
-					    <a href="{% url 'wechange-payments:debug-delete-subscription' %}">
-					    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE THE CANCELED SUBSCRIPTION WHICH IS STILL RUNNING
-					    </a>
-					    {% endif %}
 					    
 					</div>
 				</div>
+		    	{% endcomment %}
 				
-				<div class="tab-pane" id="step2">
+				<div class="tab-pane active" id="step2">
 		        	{% include 'wechange_payments/partials/conditional_payment_header.html' %}
-					
-					<div class="button-section clearfix">
-						<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
-					        <span class="rounded-button-inner">
-					            {% trans "(PF2) Learn more" %}
-					        </span>
-					    </a>
-					</div>
 					
 					<hr/>
 					
+					<h3>{% trans "(PF15) Choose your monthly Contribution" %}:</h3>
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         			
+        			<div class="large-space">
+        				<span>
+        					{% trans "(PF15a) Choose the amount you would like to contribute using the slider. You may also enter a higher amount by entering it manually." %}
+        					{% trans "(PF24) Contribution amount includes 19% VAT" %}
+        				</span>
+        			</div>
+        			
         			<div class="button-section clearfix">
+        				{% comment %}  
+        				Gone, because step1 disabled
         				<a class="rounded-button button-color-secondary" href="#step1" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 					            &lt; {% trans "(PF16) I changed my mind" context "payment step button" %}
+					        </span>
+					    </a>
+        				{% endcomment %}
+					    
+					    <a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
+					        <span class="rounded-button-inner">
+					            {% trans "(PF2) Learn more" %}
 					        </span>
 					    </a>
 		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" role="tab" data-toggle="tab">
@@ -89,6 +95,13 @@
 								{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
 					        </span>
 					    </a>
+					    
+					    {% if current_subscription and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
+						    <hr>
+						    <a href="{% url 'wechange-payments:debug-delete-subscription' %}">
+						    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE THE CANCELED SUBSCRIPTION WHICH IS STILL RUNNING
+						    </a>
+					    {% endif %}
 					</div>
 				</div>
 				
@@ -110,15 +123,9 @@
 					    </div>
 				    {% endif %}
 				
-					<h2>{% trans "(PF5)  Almost done!" %}</h2>
-					
-					<p>
-						{% trans "(PF6)  Please enter your account information below." %}
-					</p>
-					
-					<hr />
-					
-		            <h3>{% trans "Payment Info" %}</h3>
+					<h2>
+						{% trans "(PF5)  Almost done! Please enter your account information below." %}
+					</h2>
 		            
 					{% trans "Payment Type" as label %}
 					{% captureas select_field_html %}
@@ -132,7 +139,7 @@
 			                {% endfor %}
                         </select>
 					{% endcaptureas %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label field_html=select_field_html show_required=True field_classes="conditional-select" %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label first=True field_html=select_field_html show_required=True field_classes="conditional-select" %}
 					
 					
 		            <div class="conditional-select-container" data-select-name="payment_type" data-select-value="dd">
@@ -201,27 +208,118 @@
 		        	{% trans "Country" as label %}
 					{% include 'cosinnus/fields/default_field.html' with field=form.country label=label show_required=True %}
 		        	
-		        	<div class="large-space"></div>
-		        	
-			        {% include 'cosinnus/registration/extra_signup_fields.html' with show_plain_form=True %}
+		        	<hr class="invisible"/>
+		        	<div class="large-space">
+			        	{% trans "(PF18) No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment." context "payment step explanation" %}
+				    </div>
 				    
-				    <hr/>
-				    
-					<p>
-						(PF7) TODO: Should we show the subscription amount again here as a confirmation for the user what they're actually paying when they click the next button??
-					</p>
-					
-				    <hr/>
-				    
+				    <hr class="invisible"/>
 					<div class="button-section clearfix">
 						<a class="rounded-button button-color-secondary focus-slider-onclick" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 					            &lt; {% trans "(PF8) Modify Contribution Amount" context "payment step button" %}
 					        </span>
 					    </a>
+					    <a class="pull-right rounded-button button-color-primary-inverted  to-step4-button">
+					        <span class="rounded-button-inner">
+								{% trans "(PF17) Confirm data and continue" context "payment step button" %}
+					        </span>
+					    </a>
+					    <a class="hidden-step-4-button" href="#step4" role="tab" data-toggle="tab" style="display: none;"></a>
+					</div>
+				</div>
+				
+				<div class="tab-pane" id="step4">
+				
+					<h2>{% trans "(PF19) Review and Confirm Payment" %}</h2>
+					
+					<div class="payment-summary payment-info-page">
+						<div class="large-space">
+							<table>
+								<tr>
+			    					<td>{% trans "Chosen Amount" %}</td>
+			    					<td><b><span data-summary-item="amount"></span> €</b></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Debiting Period" %}</td>
+			    					<td>{% trans "Monthly" %}</td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Payment Type" %}</td>
+			    					<td>
+			    						{% captureas payment_type_html %}
+				    						<span data-summary-payment-type="dd">{% trans "Direct Debit (SEPA)" %}</span>
+											<span data-summary-payment-type="cc">{% trans "Credit Card" %}</span>
+											<span data-summary-payment-type="paypal">{% trans "Paypal" %}</span>
+			    						{% endcaptureas %}
+			    						{{ payment_type_html }}
+			    					</td>
+			    				</tr>
+			    				<tr data-summary-payment-type="dd">
+			    					<td>{% trans "Account Holder" %}</td>
+			    					<td><span data-summary-item="account_holder"></span></td>
+			    				</tr>
+				    			<tr data-summary-payment-type="dd">
+			    					<td>{% trans "IBAN" %}</td>
+			    					<td><span data-summary-item="iban"></span></td>
+			    				</tr>
+			    				<tr data-summary-payment-type="dd">
+			    					<td>{% trans "BIC" %}</td>
+			    					<td><span data-summary-item="bic"></span></td>
+			    				</tr>
+				    		</table>
+							
+							<h4>{% trans "Billing Address" %}</h4>
+				    		<table>
+				    			<tr>
+			    					<td>{% trans "Name" %}</td>
+			    					<td><span data-summary-item="first_name"></span> <span data-summary-item="last_name"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Address" %}</td>
+			    					<td><span data-summary-item="address"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Postal Code" %}</td>
+			    					<td><span data-summary-item="postal_code"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "City" %}</td>
+			    					<td><span data-summary-item="city"></span></td>
+			    				</tr>
+			    				<tr>
+			    					<td>{% trans "Country" %}</td>
+			    					<td><span data-summary-item="country"></span></td>
+			    				</tr>
+				    		</table>
+						</div>
+					
+						<p>
+							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html %}(PF7) By clicking on "Confirm and pay" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
+							{% if current_subscription and current_subscription.next_due_date %}
+								{% blocktrans with date=current_subscription.next_due_date|localize %}(PF21) The next debit will be made on {{ date }}.{% endblocktrans %}
+							{% else %}
+								{% trans "(PF20) The next debit will be made immediately." %}
+							{% endif %}
+							{% trans "(PF22) You can adjust the amount of your monthly contribution or cancel payments at any time." %}
+						</p>
+						
+						{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(PF23) Thank you for supporting {{ portal_name }}!{% endblocktrans %}
+					</div>
+					
+					<div data-only-required-step="#step4">
+			        	{% include 'cosinnus/registration/extra_signup_fields.html' with show_plain_form=True %}
+				    </div>
+				    
+				    <div class="button-section clearfix">
+						<a class="rounded-button button-color-secondary focus-slider-onclick" href="#step3" role="tab" data-toggle="tab">
+					        <span class="rounded-button-inner">
+					            &lt; {% trans "(PF25) Change payment information" context "payment step button" %}
+					        </span>
+					    </a>
 					    <button type="submit" class="pull-right rounded-button button-color-primary-inverted">
 					        <span class="rounded-button-inner">
-								{% trans "(PF9) Confirm and pay" context "payment step button" %}
+								{% trans "(PF9) Confirm and pay" context "payment step button (legally binding!)" %}
 					        </span>
 					    </button>		
 					

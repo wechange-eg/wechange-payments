@@ -7,15 +7,20 @@
 		{% trans "(POP2) Dear WECHANGE-Community," %}
 	</p>
 	<p>
-		{% trans "(POP3) solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. " %}
+		{% trans "(POP3) solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. " as pop_text %}
+		{{ pop_text|linebreaksbr }}
 	</p>
 	<hr class="invisible" />
+	{% comment %}  
+	Inspirational quote is out for now	
+	
 	<p>
 		<b>{% trans "(POP4a) 'inspirational quote'" %}</b>
 		<br/>
 		{% trans "(POP4b) quote credit" %}</b>
 		
 	</p>
+	{% endcomment %}
 {% endcaptureas %}
 
 {% captureas buttons %}

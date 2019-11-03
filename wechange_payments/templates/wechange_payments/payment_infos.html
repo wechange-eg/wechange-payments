@@ -16,7 +16,7 @@
     
     <!-- a box with semi transparent background -->
     <div class="v2-content white-content payment-info-page">
-		<h2>{% trans "(INF1) Payment Information" %}</h2>
+		<h2>{% trans "(INF17) Your Contribution" %}</h2>
     	<div class="large-space">
     		<table>
 				<tr>
@@ -25,8 +25,8 @@
 						{% if subscription.state == 3 %}
 							{% trans "(INF3) Will become active after your last subscription expires." context "subscription status" %}
 						{% elif subscription.state == 2 %}
-							{% trans "(INF4) Active" context "subscription status" %}
-							({% trans "since" %} {{ subscription.created.date|localize }})
+							{% trans "(INF4) Active since" context "subscription status" %}
+							{{ subscription.created.date|localize }}
 						{% elif subscription.state == 1 %}
 							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
 							{% trans "(INF5) Cancelled" context "subscription status" %}.
@@ -36,20 +36,56 @@
 					</td>
 				</tr>
 				<tr>
-					<td>{% trans "(INF6) Current Subscription Amount" %}</td>
-					<td>{{ subscription.amount|intify }} €</td>
+					<td>{% trans "(INF10) Last Payment" %}</td>
+					<td>
+						{% if last_payment.status < 3 %}
+							{% blocktrans with date=last_payment.last_action_at.date|localize %}(INF15) Processing. Started at {{ date }}.{% endblocktrans %}
+						{% elif last_payment.status > 3 %}
+							{% blocktrans with date=last_payment.last_action_at.date|localize %}(INF16) Attempted at {{ date }}, but not completed.{% endblocktrans %}
+						{% else %}
+							{{ last_payment.completed_at.date|localize }}
+						{% endif %}
+					</td>
 				</tr>
-				{% if subscription.state >= 2 %}
 				<tr>
-					<td>{% trans "(INF7) Next Payment scheduled" %}</td>
+					<td>{% trans "(INF11) Amount" %}</td>
+					<td>{{ last_payment.amount|intify }} €</td>
+				</tr>
+			</table>
+		</div>
+		<p>
+			{% trans "(INF13) For more information see your invoice overview" %}:
+			<a href="{% url "wechange-payments:invoices" %}">
+	            {% trans "(INF14) Show Invoice overview" %}
+		    </a>
+		</p>
+		
+		{% if subscription.state >= 2 %}
+		<div class="large-space">
+    		<table>
+				<tr>
+					<td>{% trans "(INF7) Next payment scheduled" %}</td>
 					<td>
 						{{ subscription.next_due_date|localize }}
 					</td>
 				</tr>
-				{% endif %}
+				<tr>
+					<td>{% trans "(INF6) Current monthly contribution" %}</td>
+					<td>
+						<span>{{ subscription.amount|intify }} €</span>
+						<a href="{% url "wechange-payments:payment" %}" style="margin-left: 12px;">
+					            ({% trans "(INF8.1) Adjust contribution amount" %})
+					    </a>
+					</td>
+				</tr>
 			</table>
-    		
 		</div>
+		{% endif %}
+		
+		<hr class=""></hr>
+		<hr class="invisible"></hr>
+		
+		<h2>{% trans "(INF1) Your Payment Information" %}</h2>
     	<div class="large-space">
     		{% with payment=subscription.reference_payment %}
     			<table>
@@ -57,7 +93,7 @@
     					<td>{% trans "Payment Type" %}</td>
     					<td>{{ payment.get_type_string }}</td>
     				</tr>
-	    			{% if payment.type == 0 %}
+	    			{% if payment.type == 'dd' %}
     				<tr>
     					<td>{% trans "Account Holder" %}</td>
     					<td>{{ payment.extra_data.account_holder }}</td>
@@ -94,42 +130,74 @@
 	    		</table>
     		{% endwith %}
     	</div>
+    	
     	<div>
-			{% trans "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
-			{% trans "You will only be billed after the current subscription expires." %} 
-			{% if subscription.state == 1 %}
-				<a href="{% url "wechange-payments:payment" %}">{% trans "Set up a new Subscription" %}</a>
-			{% else %}
-				<a href="{% url "wechange-payments:cancel-subscription" %}">{% trans "(INF9) Cancel your Subscription" %}</a>
-			{% endif %}
+    		{% captureas content %}
+		        <p>
+		        	{% trans "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
+		        </p>
+		        <p>
+					{% trans "You will only be billed after the current subscription expires." %} 
+		        </p>
+			{% endcaptureas %}
+			{% captureas custom_button_html %}
+				<button type="button" class="submit-btn-x btn btn-emphasized" href="{% if subscription.state == 1 %}{% url "wechange-payments:payment" %}{% else %}{% url "wechange-payments:cancel-subscription" %}{% endif %}">
+                    <ul class="media-list">
+                        <li class="media">
+                            <a class="pull-left" href="#">
+                                <i class="fa fa-check"></i>
+                            </a>
+                            <div class="media-body">
+                                {% trans "OK" %}
+                            </div>
+                        </li>
+                    </ul>
+                </button>
+                <button type="button" class="btn btn-emphasized" data-dismiss="modal">
+                    <ul class="media-list">
+                        <li class="media">
+                            <a class="pull-left" href="#">
+                                <i class="fa fa-times"></i>
+                            </a>
+                            <div class="media-body">
+                                {% trans "Cancel" %}
+                            </div>
+                        </li>
+                    </ul>
+                </button>
+			{% endcaptureas %}
+            {% trans "(INF1.1) Change payment information" as title %}
+		    {% include "cosinnus/modal_box.html" with id="changePaymentInfoModal" label=content title=title title_icon="fa-credit-card" hide_submit_button=True custom_button_html=custom_button_html %}
+		    
+			<a class="rounded-button button-color-secondary" href="#" data-toggle="modal" data-target="#changePaymentInfoModal">
+		        <span class="rounded-button-inner">
+		            {% trans "(INF1.1) Change payment information" %}
+		        </span>
+		    </a>
 		</div>
-		<hr/>
 		
-		<h3>{% trans "(INF10) Last Payment" %}</h3>
-    	<div class="large-space">
-    		<table>
-				<tr>
-					<td>{% trans "(INF11) Amount" %}</td>
-					<td>{{ last_payment.amount|intify }} €</td>
-				</tr>
-				<tr>
-					<td>{% trans "(INF12) Date" %}</td>
-					<td>
-						{% if last_payment.status < 3 %}
-							{% blocktrans with date=last_payment.last_action_at|localize %}(INF15) Processing. Started at {{ date }}.{% endblocktrans %}
-						{% elif last_payment.status > 3 %}
-							{% blocktrans with date=last_payment.last_action_at|localize %}(INF16) Attempted at {{ date }}, but not completed.{% endblocktrans %}
-						{% else %}
-							{{ last_payment.completed_at|localize }}
-						{% endif %}
-					</td>
-				</tr>
-			</table>
-		</div>
+
+    	{% comment %}  
+    		"Back to PORTAL" and "print as pdf" section, todo later! 
+    	
+    	<hr/>
     	<div>
-    		{% trans "(INF13) For more information see your invoices" %}: 
-    		<a href="{% url "wechange-payments:invoices" %}">{% trans "(INF14) Invoices" %}</a>
+    		<a href="{% get_non_cms_root_url %}" class="rounded-button button-color-primary-inverted">
+		        <span class="rounded-button-inner">
+                    {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(SC8) Back to {{ portal_name }}{% endblocktrans %}
+                    TODO: raus!
+		        </span>
+		    </a>
+		    <a class="pull-right rounded-button button-color-secondary" href="{% url "wechange-payments:payment" %}">
+		        <span class="rounded-button-inner">
+		            {% trans "(INF19) Print this page or save as PDF" %} (TODO!)
+		            TODO: als icon
+		        </span>
+		    </a>
     	</div>
+    	{% endcomment %}
+    	
+    	
     	
     </div>
         

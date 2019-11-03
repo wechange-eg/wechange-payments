@@ -1,7 +1,7 @@
 {% load i18n cosinnus_tags payments_tags %}
 
 {% url 'wechange-payments:overview' as payment_url %}
-{% trans "(LN1) My Contribution" as label %}
+{% trans "(LN1) Your Contribution" as label %}
 {% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-eur" label=label show_required=True href=payment_url  %}
 
 {% comment %} `current_subscription` comes from the context processor {% endcomment %}
@@ -13,7 +13,7 @@
 
 {% if user|has_invoices %}
 	{% url 'wechange-payments:invoices' as payment_url %}
-	{% trans "(LN3) My Invoices" as label %}
+	{% trans "(LN3) Your Invoices" as label %}
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-file-text" label=label show_required=True href=payment_url  %}
 {% endif %}
 

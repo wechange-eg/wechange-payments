@@ -10,6 +10,7 @@ from wechange_payments.views import api, frontend
 urlpatterns = [
     url(r'^account/subscription/$', frontend.overview, name='overview'),
     url(r'^account/subscription/payment/$', frontend.payment, name='payment'),
+    url(r'^account/subscription/payment/update/$', frontend.payment_update, name='payment-update'),
     url(r'^account/subscription/payment/(?P<pk>\d+)/process/$', frontend.payment_process, name='payment-process'),
     url(r'^account/subscription/payment/(?P<pk>\d+)/success/$', frontend.payment_success, name='payment-success'),
     url(r'^account/subscription/payment/infos/$', frontend.payment_infos, name='payment-infos'),

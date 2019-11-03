@@ -27,26 +27,33 @@
 			{% if current_subscription.state == 3 %}
 				{% trans "(TS4) (explanation) No payments have been made yet. Your subscription will be cancelled." %}
 			{% elif current_subscription.state == 2 %}
-				{% trans "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until" %}:
-				{{ current_subscription.next_due_date|localize }}
+				{% blocktrans with date=current_subscription.next_due_date|localize %}(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until {{ date }}.{% endblocktrans %}
 			{% endif %}
 		</p>
 		
 		<div class="button-section clearfix">
-			<a class="rounded-button button-color-secondary" href="{% url 'wechange-payments:overview' %}">
-		        <span class="rounded-button-inner">
-		            &lt; {% trans "(TS9) Back" context "payment step button" %}
-		        </span>
-		    </a>
             <a class="pull-right rounded-button button-color-secondary" data-toggle="modal" data-target="#cancel_confirm_modal">
 		        <span class="rounded-button-inner">
 					{% trans "(TS6) Terminate Subscription" %}
 		        </span>
 		    </a>
+		    <a href="{% url "wechange-payments:overview" %}" class="pull-left rounded-button button-color-tertiary">
+		        <span class="rounded-button-inner">
+            		{% trans "Cancel" %}
+		        </span>
+		    </a>
+		</div>
+		
+		<div class="button-section clearfix">
+            <a href="{% url "wechange-payments:payment-update" %}" class="pull-right rounded-button button-color-primary-inverted">
+		        <span class="rounded-button-inner">
+					{% trans "(INF1.1) Change payment information" %}
+		        </span>
+		    </a>
 		</div>
     	
-	    {% captureas label %}{% trans "(TS7) Confirm subscription canceling dialog text" %}{% endcaptureas %}
-	    {% captureas title %}{% trans "(TS8) Terminate Subscription" %}{% endcaptureas %}
+	    {% captureas label %}{% trans "(TS7) Confirm subscription canceling confirm-dialog header" %}{% endcaptureas %}
+	    {% captureas title %}{% trans "(TS8) Terminate Subscription canceling confirm-dialog text" %}{% endcaptureas %}
 	    {% include "cosinnus/modal_box.html" with id="cancel_confirm_modal" label=label title=title title_icon="fa-close" form_action="." %}
     </div>
     

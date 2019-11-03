@@ -33,7 +33,7 @@
 		    
 		    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
 		    
-		    <h2>{% blocktrans with amount=subscription.amount|intify %}(MS2) Your current contribution is {{ amount }} Euro{% endblocktrans %}</h2>
+		    <h2>{% blocktrans with amount=subscription.amount|intify %}(MS2) Your current contribution is {{ amount }} Euro per month{% endblocktrans %}</h2>
 			<p>
 				{% trans "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" %}
 			</p>
@@ -52,9 +52,18 @@
 						{% trans "(MS5) Modify Contribution Amount" context "payment step button" %}
 			        </span>
 			    </button>
-			    <a href="{% url "wechange-payments:cancel-subscription" %}" class="pull-left rounded-button button-color-tertiary">
+			    {% comment %}  
+			    	No cancelling here for now
+			    	
+				    <a href="{% url "wechange-payments:cancel-subscription" %}" class="pull-left rounded-button button-color-tertiary">
+				        <span class="rounded-button-inner">
+	                		{% trans "(MS6) Cancel your Subscription" %}
+				        </span>
+				    </a>
+			    {% endcomment %}
+			    <a href="{% url "wechange-payments:payment-update" %}" class="pull-left rounded-button button-color-secondary">
 			        <span class="rounded-button-inner">
-                		{% trans "(MS6) Cancel your Subscription" %}
+						{% trans "(TS9) Change payment information" %}
 			        </span>
 			    </a>
 			</div>

@@ -53,9 +53,15 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super(PaymentView, self).get_context_data(*args, **kwargs)
         
-        form = PaymentsForm()
+        initial = {}
         if settings.DEBUG:
-            form = PaymentsForm(initial=TEST_DATA_SEPA_PAYMENT_FORM)
+            initial = TEST_DATA_SEPA_PAYMENT_FORM
+        if self.request.user.first_name:
+            initial['first_name'] = self.request.user.first_name
+        if self.request.user.last_name:
+            initial['last_name'] = self.request.user.last_name
+        initial['email'] = self.request.user.email
+        form = PaymentsForm(initial=initial)
             
         context.update({
             'form': form,
@@ -64,6 +70,14 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
 
 payment = PaymentView.as_view()
 
+
+class PaymentUpdateView(PaymentView):
+    
+    def dispatch(self, request, *args, **kwargs):
+        messages.warning(request, "TODO: Achtung: Eigentlich sollte hier das Bezahlformular erscheinen, und eine neue Bezahlung direkt veranlasst werden können (die im Hintergrund das alte Abo kündigt). Das wird aber in den nächsten Tagen erst implementiert. Bis dahin muss man über 'Zahlungen einstellen' sein Abo erstmal beenden!")
+        return super(PaymentUpdateView, self).dispatch(request, *args, **kwargs)
+
+payment_update = PaymentUpdateView.as_view()
 
 class PaymentSuccessView(RequireLoggedInMixin, DetailView):
     """ This view shows the "thank-you" screen once the Payment+Subscription is complete. """

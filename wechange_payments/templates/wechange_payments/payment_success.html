@@ -44,7 +44,7 @@
 			{% trans "(SC6) Thank you text" %}
 		</p>
 		
-		{% if payment.type == 0 %}
+		{% if payment.type == 'dd' %}
 			<hr/>
 			<h3>{% trans "Your SEPA Mandate" %}</h3>
 			
@@ -55,9 +55,14 @@
 		
 		{% if not request.GET.subscription_error %}
 		    <div class="button-section clearfix">
+		    	<a href="{% get_non_cms_root_url %}" class="rounded-button button-color-primary-inverted">
+			        <span class="rounded-button-inner">
+	                    {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(SC8) Back to {{ portal_name }}{% endblocktrans %}
+			        </span>
+			    </a>
 	            <a href="{% url "wechange-payments:payment-infos" %}" class="pull-right rounded-button button-color-primary-inverted">
 			        <span class="rounded-button-inner">
-	                    {% trans "(SC7) View your subscription" %}
+	                    {% trans "(SC7) Show payment summary" %}
 			        </span>
 			    </a>
 			</div>

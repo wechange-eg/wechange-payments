@@ -3,7 +3,7 @@ window.PaymentForm = {
 		// register submits 
 		$('body').on('submit', 'form', window.PaymentForm.handleFormSubmit);
 		
-		// make hidden fields not required
+		// make fields inside conditional-select-containers not required if they aren't selected
 		var makeRequired = function(name, value){
     		$('.conditional-select-container[data-select-name="' + name + '"] input').each(function(){
     			this.removeAttribute("required");
@@ -12,13 +12,39 @@ window.PaymentForm = {
     			this.setAttribute("required", "true");
     		});
     	};
-		// onchange trigger
+		// onchange trigger for conditional-select
     	$('.conditional-select select').on('change', function() {
     		makeRequired(this.name, this.value);
 		});
-    	// initial state
+    	// initial state for conditional-select
     	$('.conditional-select select').each(function(){
     		makeRequired(this.name, this.value);
+    	});
+    	
+    	// step-specific triggers
+    	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    		// every step: make fields with inside containers with "data-only-required-step" only required if we're on that step
+		    var step = $(e.target).attr("href") // activated tab
+		    $('[data-only-required-step] input').each(function(){
+    			this.removeAttribute("required");
+    		});
+    		$('[data-only-required-step="' + step + '"] input').each(function(){
+    			this.setAttribute("required", "true");
+    		});
+    	});
+    	
+    	// step3: payment information: check if form is valid, and if not, trigger an early validation
+    	$('.to-step4-button').on('click', function(){
+			var $form = $('#payments-form');
+			if ($form[0].checkValidity()) {
+				// generate the payment summary
+				window.PaymentForm.generatePaymentSummary();
+				// go to step 4
+				$('.hidden-step-4-button').click();
+			} else {
+				// fake-trigger a submit to trigger the native validation popup
+				$('<input type="submit">').hide().appendTo($form).click().remove();
+			}
     	});
 	},
 	
@@ -96,6 +122,31 @@ window.PaymentForm = {
 		}
 	},
 	
+	generatePaymentSummary: function (data) {
+		var $form = $('#payments-form');
+		var summaryContainer = $('.payment-summary');
+		var summary_fields = [
+			'amount',
+			'account_holder',
+			'iban',
+			'bic',
+			'first_name',
+			'last_name',
+			'address',
+			'postal_code',
+			'city',
+			'country',
+		];
+		// fill placeholders with data from the form
+		$.each(summary_fields, function(idx, fieldname) {
+			var value = $form.find('input[name="' + fieldname + '"],select[name="' + fieldname + '"]').val();
+			summaryContainer.find('[data-summary-item="' + fieldname + '"]').text(value);
+		});
+		// show payment type items based on chosen type
+		var payment_type = $form.find('select[name="payment_type"]').val();
+		summaryContainer.find('[data-summary-payment-type]').hide();
+		summaryContainer.find('[data-summary-payment-type="' + payment_type + '"]').show();
+	},
 }
 
 

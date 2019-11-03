@@ -168,7 +168,7 @@ class BetterPaymentBackend(BaseBackend):
         if result.get('error_code') != 0:
             extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
             logger.error('Payments: API Calling SEPA Mandate Creation returned an error!', extra=extra)
-            return 'Error: "%s" (%d)' % (result.get('error_message'), result.get('error_code'))
+            return _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': result.get('error_message'), 'error_code': result.get('error_code')}
         
         if result.get('error_code') == 0 and not transaction_id or not sepa_mandate_token:
             extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
@@ -189,7 +189,7 @@ class BetterPaymentBackend(BaseBackend):
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message)
          """
         if not self.user_pre_payment_safety_checks(user):
-            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
         
         order_id = str(uuid.uuid4())
         mandate_result = self._create_sepa_mandate(order_id)
@@ -227,7 +227,7 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(user):
-            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+            return None, ('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
         return self._make_redirected_payment(params, PAYMENT_TYPE_CREDIT_CARD, user=user)
     
     def make_paypal_payment(self, params, user=None):
@@ -236,7 +236,7 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(user):
-            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+            return None, ('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
         return self._make_redirected_payment(params, PAYMENT_TYPE_PAYPAL, user=user)
     
     def make_recurring_payment(self, reference_payment):
@@ -247,7 +247,7 @@ class BetterPaymentBackend(BaseBackend):
             @return: A tuple of (`Payment`, None) if successful, returning the *new* Payment,
                 or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(reference_payment.user):
-            return None, 'Error: "%s" (%d)' % (ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, -6)
+            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
         # collect params from reference payment
         order_id = str(uuid.uuid4())
         params = {
@@ -265,7 +265,8 @@ class BetterPaymentBackend(BaseBackend):
             order_id, 
             params,
             user=reference_payment.user, 
-            original_transaction_id=reference_payment.vendor_transaction_id
+            original_transaction_id=reference_payment.vendor_transaction_id,
+            is_recurring=True,
         )
         if error is not None:
             return None, error
@@ -286,7 +287,7 @@ class BetterPaymentBackend(BaseBackend):
             
         return payment, None
     
-    def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None):
+    def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None, is_recurring=False):
         """ Execute the actual payment-making API call to betterpayment.
             At this point, all parameters are assumed to be existent and valid.
             
@@ -316,7 +317,7 @@ class BetterPaymentBackend(BaseBackend):
             'last_name': params['last_name'],
             'email': params['email'],
         }
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not original_transaction_id:
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not is_recurring:
             data.update({
                 'iban': params['iban'],
                 'bic': params['bic'],
@@ -326,7 +327,7 @@ class BetterPaymentBackend(BaseBackend):
             data.update({
                 'original_transaction_id': original_transaction_id,
             })
-        if payment_type in REDIRECTING_PAYMENT_TYPES and not original_transaction_id:
+        if payment_type in REDIRECTING_PAYMENT_TYPES and not is_recurring:
             data.update({
                 'success_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-success-endpoint'), 
                 'error_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-error-endpoint'),
@@ -342,7 +343,7 @@ class BetterPaymentBackend(BaseBackend):
         if not req.status_code == 200:
             extra = {'post_url': post_url, 'status':req.status_code, 'content': req._content}
             logger.error('Payments: BetterPayment Payment of type "%s" failed, request did not return status=200.' % payment_type, extra=extra)
-            return (None, _('Error: "%s" (%d)') % (_('The payment provider could not be reached.'), -1))
+            return (None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': _('The payment provider could not be reached.'), 'error_code': -1})
         
         result = req.json() # success!
         result['payment_type'] = payment_type
@@ -374,14 +375,14 @@ class BetterPaymentBackend(BaseBackend):
         """
         # result should always have an error code, which is 0 on success
         if not 'error_code' in result:
-            return (None, _('Error: "%s" (%d)') % (_('Unexpected response from payment provider.'), -2))
+            return (None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': _('Unexpected response from payment provider.'), 'error_code': -2})
         
         if result.get('error_code') != 0:
             # ignore some errors for sentry warnings (126: invalid account info)
             if result.get('error_code') not in [126,]: 
                 extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
                 logger.warn('Payments: API Calling SEPA Payment returned an error!', extra=extra)
-            return (None, _('Error: "%s" (%d)') % (result.get('error_message'), result.get('error_code')))
+            return (None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': result.get('error_message'), 'error_code': result.get('error_code')})
         
         extra_data = {}
         # handle client_action and action_data
@@ -395,7 +396,7 @@ class BetterPaymentBackend(BaseBackend):
             'status': result.get('status'), 
             'status_code': result.get('status_code'),
         })
-        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not original_transaction_id:
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT and not is_recurring:
             obfuscated_iban = params['iban'][:2] + ('*' * (len(params['iban'])-6)) + params['iban'][-4:]
             extra_data.update({
                 'iban': obfuscated_iban.upper(),
@@ -410,7 +411,7 @@ class BetterPaymentBackend(BaseBackend):
             amount=float(params['amount']),
             type=payment_type,
             status=Payment.STATUS_STARTED,
-            is_reference_payment=(True if not original_transaction_id else False),
+            is_reference_payment=(not is_recurring),
             
             address=params['address'],
             city=params['city'],

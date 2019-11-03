@@ -1,6 +1,6 @@
 @slider-main-color: #1db2b2;
 @slider-handle-color: #735991;
-@slider-background-color: #ccc;
+@slider-background-color: #aaaaaa;
 @frame-background-color: #fff;
 @amount-background-color: #f8f8f8;
 
@@ -29,15 +29,17 @@
 		.amount-container {
 	  		flex-grow: 2;
 			text-align: center;
-		
+			
 		  	.amount-frame {
 		  		display: inline-block;
 		  		border: 1px solid @slider-background-color;
 		  		background-color: @amount-background-color;
-				color: @slider-main-color;
-				padding: 0 10px 0 5px;	
+				padding: 0 5px 0 5px;	
+		  	}
+		  	.amount-frame, .amount-currency {
+		  		color: @slider-main-color;
 				font-size: 20px;
-				font-weight: bold;		
+				font-weight: bold;
 		  	}
 		}  		
   	}
