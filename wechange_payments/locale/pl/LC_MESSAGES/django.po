@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-21 16:00+0200\n"
+"POT-Creation-Date: 2019-11-03 13:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,7 +46,7 @@ msgid "You cannot make any additional payments at this time. Please contact our 
 msgstr ""
 
 #, python-format
-msgid "Error: \"%s\" (%d)"
+msgid "Error: \"%(error_message)s\" (%(error_code)d)"
 msgstr ""
 
 msgid "The payment provider could not be reached."
@@ -402,9 +402,6 @@ msgstr ""
 msgid "(PF6)  Please enter your account information below."
 msgstr ""
 
-msgid "Payment Info"
-msgstr ""
-
 msgid "Select Payment Method"
 msgstr ""
 
@@ -450,10 +447,54 @@ msgid "(PF8) Modify Contribution Amount"
 msgstr ""
 
 msgctxt "payment step button"
+msgid "(PF17) Continue"
+msgstr ""
+
+msgid "(PF18) Review and Confirm Payment"
+msgstr ""
+
+msgid "Chosen Amount"
+msgstr ""
+
+msgid "Debiting Period"
+msgstr ""
+
+msgid "Monthly"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+#, python-format
+msgid "(PF19) By clicking on \"Confirm and pay\" you grant Wechange eG permission to debit %(amount)s Euro per month from you via %(payment_method)s."
+msgstr ""
+
+#, python-format
+msgid "(PF21) The next debit will be made on %(date)s."
+msgstr ""
+
+msgid "(PF20) The next debit will be made immediately."
+msgstr ""
+
+msgid "(PF22) You can adjust the amount of your monthly contribution or cancel payments at any time."
+msgstr ""
+
+#, python-format
+msgid "(PF23) Thank you for supporting %(portal_name)s!"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(PF18) Edit payment information"
+msgstr ""
+
+msgctxt "payment step button (legally binding!)"
 msgid "(PF9) Confirm and pay"
 msgstr ""
 
 msgid "(INF1) Payment Information"
+msgstr ""
+
+msgid "(INF17) Your Contribution"
 msgstr ""
 
 msgid "(INF2) Subscription Status"
@@ -477,31 +518,7 @@ msgstr ""
 msgid "Expires"
 msgstr ""
 
-msgid "(INF6) Current Subscription Amount"
-msgstr ""
-
-msgid "(INF7) Next Payment scheduled"
-msgstr ""
-
-msgid "Name"
-msgstr ""
-
-msgid "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!"
-msgstr ""
-
-msgid "You will only be billed after the current subscription expires."
-msgstr ""
-
-msgid "Set up a new Subscription"
-msgstr ""
-
-msgid "(INF9) Cancel your Subscription"
-msgstr ""
-
 msgid "(INF10) Last Payment"
-msgstr ""
-
-msgid "(INF12) Date"
 msgstr ""
 
 #, python-format
@@ -512,10 +529,37 @@ msgstr ""
 msgid "(INF16) Attempted at %(date)s, but not completed."
 msgstr ""
 
-msgid "(INF13) For more information see your invoices"
+msgid "(INF13) For more information see your invoice overview"
 msgstr ""
 
-msgid "(INF14) Invoices"
+msgid "(INF14) Show Invoice overview"
+msgstr ""
+
+msgid "(INF7) Next payment scheduled"
+msgstr ""
+
+msgid "(INF6) Current monthly contribution"
+msgstr ""
+
+msgid "(INF8.1) Change contribution amount"
+msgstr ""
+
+msgid "(INF1) Your Payment Information"
+msgstr ""
+
+msgid "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!"
+msgstr ""
+
+msgid "You will only be billed after the current subscription expires."
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "(INF1.1) Change payment information"
 msgstr ""
 
 msgid "(PRC1) Payment processing..."
@@ -560,7 +604,11 @@ msgstr ""
 msgid "Your SEPA Mandate"
 msgstr ""
 
-msgid "(SC7) View your subscription"
+#, python-format
+msgid "(SC8) Back to %(portal_name)s"
+msgstr ""
+
+msgid "(SC7) Show payment summary"
 msgstr ""
 
 msgid "(POP1) wechange is becoming even fairer"
