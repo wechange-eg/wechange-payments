@@ -27,8 +27,7 @@
 			{% if current_subscription.state == 3 %}
 				{% trans "(TS4) (explanation) No payments have been made yet. Your subscription will be cancelled." %}
 			{% elif current_subscription.state == 2 %}
-				{% trans "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until" %}:
-				{{ current_subscription.next_due_date|localize }}
+				{% blocktrans with date=current_subscription.next_due_date|localize %}(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until {{ date }}.{% endblocktrans %}
 			{% endif %}
 		</p>
 		
@@ -46,9 +45,9 @@
 		</div>
 		
 		<div class="button-section clearfix">
-            <a href="{% url "wechange-payments:payment-update" %}" class="pull-right rounded-button button-color-secondary">
+            <a href="{% url "wechange-payments:payment-update" %}" class="pull-right rounded-button button-color-primary-inverted">
 		        <span class="rounded-button-inner">
-					{% trans "(TS9) Change payment information" %}
+					{% trans "(INF1.1) Change payment information" %}
 		        </span>
 		    </a>
 		</div>

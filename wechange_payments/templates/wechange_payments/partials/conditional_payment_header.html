@@ -4,16 +4,18 @@
 	{% comment %} Case for a still running, canceled subscription {% endcomment %}
 	<h2>{% trans "(PF10) Your subscription will end soon!" %}</h2>
 	<p>
-		{% trans "(PF11) Your subscription will end on" %}
+		{% trans "(PF11) Your paid contribution is valid until" %}
 		{{ current_subscription.next_due_date|localize }}
 	</p>
 	<p>
-		{% trans "(PF12) We're sorry to see you go! To continue subscribing, simply create a new subscription! Don't worry, we will start charging you only when your current subscription runs out!" %}
+		{% trans "(PF12) We're sorry to see you go! To continue subscribing, simply create a new subscription! Don't worry, we will start charging you only when your current subscription runs out!" as desc_text %}
+		{{ desc_text|linebreaksbr }}
 	</p>
 {% else %}
 	{% comment %} Case for no subscription {% endcomment %}
 	<h2>{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(PF13) You are using {{ portal_name }} free of charge.{% endblocktrans %}</h2>
 	<p>
-		{% trans "(PF14) Final description text for First Payment Step box" %}
+		{% trans "(PF14) Final description text for First Payment Step box" as desc_text %}
+		{{ desc_text|linebreaksbr }}
 	</p>
 {% endif %}

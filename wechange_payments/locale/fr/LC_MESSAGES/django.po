@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-03 13:51+0100\n"
+"POT-Creation-Date: 2019-11-03 18:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -238,20 +238,23 @@ msgstr ""
 msgid "(TS4) (explanation) No payments have been made yet. Your subscription will be cancelled."
 msgstr ""
 
-msgid "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until"
-msgstr ""
-
-msgctxt "payment step button"
-msgid "(TS9) Back"
+#, python-format
+msgid "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until %(date)s."
 msgstr ""
 
 msgid "(TS6) Terminate Subscription"
 msgstr ""
 
-msgid "(TS7) Confirm subscription canceling dialog text"
+msgid "Cancel"
 msgstr ""
 
-msgid "(TS8) Terminate Subscription"
+msgid "(INF1.1) Change payment information"
+msgstr ""
+
+msgid "(TS7) Confirm subscription canceling confirm-dialog header"
+msgstr ""
+
+msgid "(TS8) Terminate Subscription canceling confirm-dialog text"
 msgstr ""
 
 #, python-format
@@ -265,6 +268,9 @@ msgid "(SLD2) Medium amount text"
 msgstr ""
 
 msgid "(SLD3) High amount text"
+msgstr ""
+
+msgid "(SLD4) Very high amount text"
 msgstr ""
 
 #, python-format
@@ -299,13 +305,13 @@ msgstr ""
 msgid "Invoice for %(amount)s€ from %(date)s"
 msgstr ""
 
-msgid "(LN1) My Contribution"
+msgid "(LN1) Your Contribution"
 msgstr ""
 
 msgid "(LN2) Payment Information"
 msgstr ""
 
-msgid "(LN3) My Invoices"
+msgid "(LN3) Your Invoices"
 msgstr ""
 
 msgid "(LN4) Past Subscriptions"
@@ -346,7 +352,7 @@ msgid "(MS1) My Subscription"
 msgstr ""
 
 #, python-format
-msgid "(MS2) Your current contribution is %(amount)s Euro"
+msgid "(MS2) Your current contribution is %(amount)s Euro per month"
 msgstr ""
 
 msgid "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'"
@@ -359,10 +365,13 @@ msgctxt "payment step button"
 msgid "(MS5) Modify Contribution Amount"
 msgstr ""
 
+msgid "(TS9) Change payment information"
+msgstr ""
+
 msgid "(PF10) Your subscription will end soon!"
 msgstr ""
 
-msgid "(PF11) Your subscription will end on"
+msgid "(PF11) Your paid contribution is valid until"
 msgstr ""
 
 msgid "(PF12) We're sorry to see you go! To continue subscribing, simply create a new subscription! Don't worry, we will start charging you only when your current subscription runs out!"
@@ -381,25 +390,24 @@ msgstr ""
 msgid "(PF1) Payments"
 msgstr ""
 
+msgid "(PF15) Your monthly Contribution"
+msgstr ""
+
+msgid "(PF15a) Choose the amount you would like to contribute using the slider. You may also enter a higher amount by entering it manually."
+msgstr ""
+
+#, python-format
+msgid "(PF24) Contribution amount includes 19%% VAT"
+msgstr ""
+
 msgid "(PF2) Learn more"
-msgstr ""
-
-msgctxt "payment step button"
-msgid "(PF3) Choose Contribution"
-msgstr ""
-
-msgctxt "payment step button"
-msgid "(PF16) I changed my mind"
 msgstr ""
 
 msgctxt "payment step button"
 msgid "(PF4) Set Contribution Amount"
 msgstr ""
 
-msgid "(PF5)  Almost done!"
-msgstr ""
-
-msgid "(PF6)  Please enter your account information below."
+msgid "(PF5)  Almost done! Please enter your account information below."
 msgstr ""
 
 msgid "Select Payment Method"
@@ -442,15 +450,19 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+msgctxt "payment step explanation"
+msgid "(PF18) No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment."
+msgstr ""
+
 msgctxt "payment step button"
 msgid "(PF8) Modify Contribution Amount"
 msgstr ""
 
 msgctxt "payment step button"
-msgid "(PF17) Continue"
+msgid "(PF17) Confirm data and continue"
 msgstr ""
 
-msgid "(PF18) Review and Confirm Payment"
+msgid "(PF19) Review and Confirm Payment"
 msgstr ""
 
 msgid "Chosen Amount"
@@ -466,7 +478,7 @@ msgid "Name"
 msgstr ""
 
 #, python-format
-msgid "(PF19) By clicking on \"Confirm and pay\" you grant Wechange eG permission to debit %(amount)s Euro per month from you via %(payment_method)s."
+msgid "(PF7) By clicking on \"Confirm and pay\" you grant Wechange eG permission to debit %(amount)s Euro per month (incl. 19%% VAT) from you via %(payment_method)s."
 msgstr ""
 
 #, python-format
@@ -484,7 +496,7 @@ msgid "(PF23) Thank you for supporting %(portal_name)s!"
 msgstr ""
 
 msgctxt "payment step button"
-msgid "(PF18) Edit payment information"
+msgid "(PF25) Change payment information"
 msgstr ""
 
 msgctxt "payment step button (legally binding!)"
@@ -505,10 +517,7 @@ msgid "(INF3) Will become active after your last subscription expires."
 msgstr ""
 
 msgctxt "subscription status"
-msgid "(INF4) Active"
-msgstr ""
-
-msgid "since"
+msgid "(INF4) Active since"
 msgstr ""
 
 msgctxt "subscription status"
@@ -541,7 +550,7 @@ msgstr ""
 msgid "(INF6) Current monthly contribution"
 msgstr ""
 
-msgid "(INF8.1) Change contribution amount"
+msgid "(INF8.1) Adjust contribution amount"
 msgstr ""
 
 msgid "(INF1) Your Payment Information"
@@ -554,12 +563,6 @@ msgid "You will only be billed after the current subscription expires."
 msgstr ""
 
 msgid "OK"
-msgstr ""
-
-msgid "Cancel"
-msgstr ""
-
-msgid "(INF1.1) Change payment information"
 msgstr ""
 
 msgid "(PRC1) Payment processing..."
@@ -618,12 +621,6 @@ msgid "(POP2) Dear WECHANGE-Community,"
 msgstr ""
 
 msgid "(POP3) solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. "
-msgstr ""
-
-msgid "(POP4a) 'inspirational quote'"
-msgstr ""
-
-msgid "(POP4b) quote credit"
 msgstr ""
 
 msgid "(POP5) Learn more"

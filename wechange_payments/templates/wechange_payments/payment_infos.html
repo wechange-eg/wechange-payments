@@ -25,8 +25,8 @@
 						{% if subscription.state == 3 %}
 							{% trans "(INF3) Will become active after your last subscription expires." context "subscription status" %}
 						{% elif subscription.state == 2 %}
-							{% trans "(INF4) Active" context "subscription status" %}
-							({% trans "since" %} {{ subscription.created.date|localize }})
+							{% trans "(INF4) Active since" context "subscription status" %}
+							{{ subscription.created.date|localize }}
 						{% elif subscription.state == 1 %}
 							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
 							{% trans "(INF5) Cancelled" context "subscription status" %}.
@@ -39,11 +39,11 @@
 					<td>{% trans "(INF10) Last Payment" %}</td>
 					<td>
 						{% if last_payment.status < 3 %}
-							{% blocktrans with date=last_payment.last_action_at|localize %}(INF15) Processing. Started at {{ date }}.{% endblocktrans %}
+							{% blocktrans with date=last_payment.last_action_at.date|localize %}(INF15) Processing. Started at {{ date }}.{% endblocktrans %}
 						{% elif last_payment.status > 3 %}
-							{% blocktrans with date=last_payment.last_action_at|localize %}(INF16) Attempted at {{ date }}, but not completed.{% endblocktrans %}
+							{% blocktrans with date=last_payment.last_action_at.date|localize %}(INF16) Attempted at {{ date }}, but not completed.{% endblocktrans %}
 						{% else %}
-							{{ last_payment.completed_at|localize }}
+							{{ last_payment.completed_at.date|localize }}
 						{% endif %}
 					</td>
 				</tr>
@@ -74,7 +74,7 @@
 					<td>
 						<span>{{ subscription.amount|intify }} €</span>
 						<a href="{% url "wechange-payments:payment" %}" style="margin-left: 12px;">
-					            ({% trans "(INF8.1) Change contribution amount" %})
+					            ({% trans "(INF8.1) Adjust contribution amount" %})
 					    </a>
 					</td>
 				</tr>

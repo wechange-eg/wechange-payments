@@ -27,11 +27,13 @@ $(function() {
 			$('.payment-slider .low-amount').show();
 		} else if (ui.value < 10) {
 			$('.payment-slider .medium-amount').show();
-		} else {
+		} else if (ui.value < 15) {
 			$('.payment-slider .high-amount').show();
+		} else {
+			$('.payment-slider .very-high-amount').show();
 		}
 		
-		$('.payment-slider .max-amount-label').text(Math.max(ui.value, PAYMENTS_MAXIMUM_PAYMENT_AMOUNT));
+		$('.payment-slider .max-amount-label').text(Math.max(ui.value, PAYMENTS_MAXIMUM_PAYMENT_AMOUNT) + ' €');
 		
 		// toggle disabled status from submit buttons if they have class .enabled-on-change and the amount changed
 		if (!ui.initial) {
