@@ -65,7 +65,7 @@
 					
 					<hr/>
 					
-					<h3>{% trans "(PF15) Your monthly Contribution" %}:</h3>
+					<h3>{% trans "(PF15) Choose your monthly Contribution" %}:</h3>
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         			
         			<div class="large-space">
@@ -264,7 +264,7 @@
 			    					<td><span data-summary-item="iban"></span></td>
 			    				</tr>
 			    				<tr data-summary-payment-type="dd">
-			    					<td>{% trans "IBAN" %}</td>
+			    					<td>{% trans "BIC" %}</td>
 			    					<td><span data-summary-item="bic"></span></td>
 			    				</tr>
 				    		</table>
@@ -273,7 +273,7 @@
 				    		<table>
 				    			<tr>
 			    					<td>{% trans "Name" %}</td>
-			    					<td><span data-summary-item="first_name"></span><span data-summary-item="last_name"></span></td>
+			    					<td><span data-summary-item="first_name"></span> <span data-summary-item="last_name"></span></td>
 			    				</tr>
 			    				<tr>
 			    					<td>{% trans "Address" %}</td>
