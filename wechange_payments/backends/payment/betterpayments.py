@@ -18,8 +18,9 @@ from wechange_payments import signals
 from wechange_payments.backends.payment.base import BaseBackend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
-from wechange_payments.models import TransactionLog, Payment
+from wechange_payments.models import TransactionLog, Payment, Subscription
 from wechange_payments.payment import create_subscription_for_payment
+from wechange_payments.utils.utils import send_admin_mail_notification
 
 
 logger = logging.getLogger('wechange-payments')
@@ -257,6 +258,10 @@ class BetterPaymentBackend(BaseBackend):
                 or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(reference_payment.user):
             return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
+        # additional check: reference payment must be coming from an active subscription!
+        if not reference_payment.subscription or not reference_payment.subscription.state == Subscription.STATE_2_ACTIVE:
+            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -7}
+        
         # collect params from reference payment
         order_id = str(uuid.uuid4())
         params = {
@@ -570,10 +575,20 @@ class BetterPaymentBackend(BaseBackend):
                     self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
                 elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
                     # TODO: add refund logic, cancel subscription probably?
-                    logger.error('NYI: Received a postback for a refund, but refunding logic not yet implemented!', extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    extra = {'betterpayment_status_code': str(status), 'internal_transaction_id': str(payment.internal_transaction_id), 'vendor_transaction_id': str(payment.vendor_transaction_id)}
+                    content = ('We received a Refund or Chargeback for a payment in the WECHANGE Geschäftsmodell.\n' +\
+                        '\n' +\
+                        'Since we have no automatic handling of this, we will need to manually handle this. This includes setting the user subscription to TERMINATED, and also putting the chargeback into our Billing System!\n' +\
+                        '\n' +\
+                        'Payment Details:\n' +\
+                        'betterpayment_status_code: %(betterpayment_status_code)s\n' +\
+                        'internal_transaction_id: %(internal_transaction_id)s\n' +\
+                        'vendor_transaction_id: %(vendor_transaction_id)s\n') % extra 
+                    send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', content)
+                    logger.critical('NYI: Received a postback for a refund, but refunding logic not yet implemented! (A mail was also sent!', extra=extra)
                 else:
                     # we do not know what to do with this status
-                    logger.error('NYI: Received postback with a status we cannot handle (Status: %d)!' % status, extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    logger.critical('NYI: Received postback with a status we cannot handle (Status: %d)!' % status, extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
             except Exception as e:
                 logger.error('Payments: Error during postback processing! Postbacked data was saved, but payment status could not be updated!', extra={'params': params, 'exception': e})
             

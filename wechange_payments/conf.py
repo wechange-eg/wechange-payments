@@ -36,7 +36,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     """ Payment Source Infos """
     
-    PAYMENT_RECIPIENT_NAME = None # 'WECHANGE eG'
+    PAYMENT_RECIPIENT_NAME = 'Die WECHANGE Genossenschaft'
     SEPA_CREDITOR_ID = None # 
     
     """ Payment Form settings """
@@ -46,7 +46,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the displayed slider max amount
     MAXIMUM_PAYMENT_AMOUNT = 20.0
     # the displayed slider default amount
-    DEFAULT_PAYMENT_AMOUNT = 5.0
+    DEFAULT_PAYMENT_AMOUNT = 10.0
     
     # the lowest allowed amount for a payment transaction
     MINIMUM_ALLOWED_PAYMENT_AMOUNT = 1.0 

@@ -2,13 +2,13 @@
 
 {% if subscription and subscription.state == 1 %}
 	{% comment %} Case for a still running, canceled subscription {% endcomment %}
-	<h2>{% trans "(PF10) Your subscription will end soon!" %}</h2>
+	<h2>{% trans "(PF10) Your monthly Contributions will end soon!" %}</h2>
 	<p>
 		{% trans "(PF11) Your paid contribution is valid until" %}
 		{{ subscription.next_due_date|localize }}
 	</p>
 	<p>
-		{% trans "(PF12) We're sorry to see you go! To continue subscribing, simply create a new subscription! Don't worry, we will start charging you only when your current subscription runs out!" as desc_text %}
+		{% trans "(PF12) We're sorry to see you go! To continue contributing, simply create a new Contribution! Don't worry, we will start charging you only when your current Contribution runs out!" as desc_text %}
 		{{ desc_text|linebreaksbr }}
 	</p>
 {% elif subscription %}

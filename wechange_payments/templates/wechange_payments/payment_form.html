@@ -100,6 +100,8 @@
 					
 					{% if displayed_subscription and displayed_subscription.state != 1 %}
 						<h3>{% trans "(PF15a) Confirm your monthly Contribution" %}:</h3>
+					{% elif displayed_subscription and displayed_subscription.state == 1 %}
+						<h3>{% trans "(PF15b) Choose your new monthly Contribution" %}:</h3>
 					{% else %}
 						<h3>{% trans "(PF15) Choose your monthly Contribution" %}:</h3>
 					{% endif %}
@@ -108,7 +110,7 @@
         			
         			<div class="large-space">
         				<span>
-        					{% trans "(PF15a) Choose the amount you would like to contribute using the slider. You may also choose a higher amount by entering it manually." %}
+        					{% trans "(PF26) Choose the amount you would like to contribute using the slider. You may also choose a higher amount by entering it manually." %}
         					{% trans "(PF24) Contribution amount includes 19% VAT" %}
         				</span>
         			</div>
@@ -130,7 +132,11 @@
 					    </a>
 		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-								{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
+					        	{% if displayed_subscription and displayed_subscription.state != 1 %}
+					        		{% trans "(PF4a) Confirm Contribution Amount" context "payment step button" %}
+					        	{% else %}
+									{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
+								{% endif %}
 					        </span>
 					    </a>
 					    
@@ -338,7 +344,8 @@
 					
 						<p>
 							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html %}(PF7) By clicking on "Confirm and pay" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
-							<br/>
+							{% trans "(PF7a) This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT. The VAT is shown on the invoice." %}
+							<br/><br/>
 							{% if displayed_subscription and displayed_subscription.next_due_date %}
 								{% blocktrans with date=displayed_subscription.next_due_date|localize %}(PF21) The next debit will be made on {{ date }}.{% endblocktrans %}
 							{% else %}

@@ -1,12 +1,13 @@
-{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token payment_recipient_name=SETTINGS.PAYMENTS_PAYMENT_RECIPIENT_NAME sepa_creditor=SETTINGS.PAYMENTS_SEPA_CREDITOR_ID %}Thank you!
-
+{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token payment_recipient_name=SETTINGS.PAYMENTS_PAYMENT_RECIPIENT_NAME sepa_creditor=SETTINGS.PAYMENTS_SEPA_CREDITOR_ID %}
 You have successfully made a SEPA payment.
 
 Amount: {{ amount }}€
 SEPA-Mandate-ID: {{ sepa_mandate }}
 Creditor-ID: {{ sepa_creditor }}
 
-Thank you for supporting us!
+The contribution will be debited from your account within the next few days. Subsequent payments will be made monthly. Please make sure you have sufficient funds to avoid return debit fees. 
+
+Thank you for your Support!
 
 {{ payment_recipient_name }}
 

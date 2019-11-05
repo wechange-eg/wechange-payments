@@ -20,22 +20,26 @@
 {% comment %} Only shown in the "MySubscriptionView" {% endcomment %}
 {% if 0 and past_subscriptions %}
 	{% url 'wechange-payments:past-subscriptions' as payment_url %}
-	{% trans "(LN4) Past Subscriptions" as label %}
+	{% trans "(LN4) Past Contributions" as label %}
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-history" label=label show_required=True href=payment_url  %}
 {% endif %}
 
+{% comment %}  
+No cancelling here for now
+
 {% if current_subscription and current_subscription.state == 2 %}
 	{% url "wechange-payments:cancel-subscription" as cancel_url %}
-	{% trans "(MS6) Cancel your Subscription" as label %}
+	{% trans "(MS6) Cancel your Contribution" as label %}
 	{% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-minus-circle" label=label show_required=True href=cancel_url  %}
 {% endif %}
+{% endcomment %}
 
 <hr class="invisible"/>
 
 {% if COSINNUS_CURRENT_PORTAL.support_email %}
 	{% captureas content %}
         <p>
-            {% trans "(LN7) If you have any questions about your subscription or encountered any problems, please send an email to" %}:
+            {% trans "(LN7) If you have any questions about your Contribution or encountered any problems, please send an email to" %}:
         </p>
         <p>
 			<a href="mailto:{{ COSINNUS_CURRENT_PORTAL.support_email }}">{{ COSINNUS_CURRENT_PORTAL.support_email }}</a>

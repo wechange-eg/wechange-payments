@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-03 18:57+0100\n"
+"POT-Creation-Date: 2019-11-05 19:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,6 +79,9 @@ msgstr ""
 msgid "Successfully paid"
 msgstr ""
 
+msgid "Pre-authorized for payment, but not yet paid"
+msgstr ""
+
 msgid "Failed"
 msgstr ""
 
@@ -107,6 +110,9 @@ msgid "Payment Status"
 msgstr ""
 
 msgid "Is reference payment"
+msgstr ""
+
+msgid "Is postponed payment"
 msgstr ""
 
 msgid "Has been revoked"
@@ -152,6 +158,9 @@ msgid "Active"
 msgstr ""
 
 msgid "Waiting, becoming active at next payment due date"
+msgstr ""
+
+msgid "Suspended, because of payment errors"
 msgstr ""
 
 msgid "User"
@@ -223,38 +232,36 @@ msgstr ""
 msgid "(BS2) Payments"
 msgstr ""
 
-msgid "(TS1) Terminate your subscription"
-msgstr ""
-
-msgid "(TS1) Terminate your Subscription"
+msgid "(TS1) Cancel your monthly Contribution"
 msgstr ""
 
 msgid "(TS2) sorry and think-about-it-again-please text"
 msgstr ""
 
-msgid "(TS3) What happens when you cancel your subscription"
+msgid "(TS3) What happens when you cancel your monthly Contribution"
 msgstr ""
 
-msgid "(TS4) (explanation) No payments have been made yet. Your subscription will be cancelled."
+msgid "(TS4) (explanation) No payments have been made yet. Your monthly Contribution will be cancelled."
 msgstr ""
 
 #, python-format
-msgid "(TS5) (explanation) Your subscription will be terminated and no future payments will be made. Your currently paid subscription status will remain active until %(date)s."
+msgid "(TS5) (explanation) Your monthly Contribution will be terminated and no future payments will be made. Your currently paid Contribution status will remain active until %(date)s."
 msgstr ""
 
-msgid "(TS6) Terminate Subscription"
+msgid "(TS6) Cancel your Contribution"
 msgstr ""
 
 msgid "Cancel"
 msgstr ""
 
-msgid "(INF1.1) Change payment information"
+msgctxt "payment step button"
+msgid "(MS5) Modify Contribution Amount"
 msgstr ""
 
-msgid "(TS7) Confirm subscription canceling confirm-dialog header"
+msgid "(TS7) Confirm Contribution canceling confirm-dialog header"
 msgstr ""
 
-msgid "(TS8) Terminate Subscription canceling confirm-dialog text"
+msgid "(TS8) Confirm Contribution canceling confirm-dialog text"
 msgstr ""
 
 #, python-format
@@ -277,13 +284,13 @@ msgstr ""
 msgid "Invoice from %(date)s"
 msgstr ""
 
-msgid "My Invoices"
+msgid "Your Invoices"
 msgstr ""
 
 msgid "Payment Purpose"
 msgstr ""
 
-msgid "Subscription Payment (monthly, recurring)"
+msgid "Monthly Contribution Payment (recurring)"
 msgstr ""
 
 msgid "(INF11) Amount"
@@ -314,13 +321,10 @@ msgstr ""
 msgid "(LN3) Your Invoices"
 msgstr ""
 
-msgid "(LN4) Past Subscriptions"
+msgid "(LN4) Past Contributions"
 msgstr ""
 
-msgid "(MS6) Cancel your Subscription"
-msgstr ""
-
-msgid "(LN7) If you have any questions about your subscription or encountered any problems, please send an email to"
+msgid "(LN7) If you have any questions about your Contribution or encountered any problems, please send an email to"
 msgstr ""
 
 msgid "(LN5) Contact support"
@@ -331,7 +335,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Thank you!\n"
 "\n"
 "You have successfully made a SEPA payment.\n"
 "\n"
@@ -339,7 +342,9 @@ msgid ""
 "SEPA-Mandate-ID: %(sepa_mandate)s\n"
 "Creditor-ID: %(sepa_creditor)s\n"
 "\n"
-"Thank you for supporting us!\n"
+"The contribution will be debited from your account within the next few days. Subsequent payments will be made monthly. Please make sure you have sufficient funds to avoid return debit fees. \n"
+"\n"
+"Thank you for your Support!\n"
 "\n"
 "%(payment_recipient_name)s\n"
 "\n"
@@ -348,11 +353,11 @@ msgstr ""
 msgid "You have successfully made a SEPA payment!"
 msgstr ""
 
-msgid "(MS1) My Subscription"
+msgid "(MS1) Your Contribution"
 msgstr ""
 
 #, python-format
-msgid "(MS2) Your current contribution is %(amount)s Euro per month"
+msgid "(MS2) Your current Contribution is %(amount)s Euro per month"
 msgstr ""
 
 msgid "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'"
@@ -361,20 +366,39 @@ msgstr ""
 msgid "(MS4) Learn more"
 msgstr ""
 
-msgctxt "payment step button"
-msgid "(MS5) Modify Contribution Amount"
+msgid "(MS7) Change your monthly Contribution"
 msgstr ""
 
-msgid "(TS9) Change payment information"
+msgid "(MS8) If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually."
 msgstr ""
 
-msgid "(PF10) Your subscription will end soon!"
+#, python-format
+msgid "(PF24) Contribution amount includes 19%% VAT"
+msgstr ""
+
+msgid "(MS6) Cancel your Contribution"
+msgstr ""
+
+msgid "(PF10) Your monthly Contributions will end soon!"
 msgstr ""
 
 msgid "(PF11) Your paid contribution is valid until"
 msgstr ""
 
-msgid "(PF12) We're sorry to see you go! To continue subscribing, simply create a new subscription! Don't worry, we will start charging you only when your current subscription runs out!"
+msgid "(PF12) We're sorry to see you go! To continue contributing, simply create a new Contribution! Don't worry, we will start charging you only when your current Contribution runs out!"
+msgstr ""
+
+msgid "(PF10a) Update your payment information"
+msgstr ""
+
+#, python-format
+msgid "(PF11a) You can choose a new payment method or update your payment information here. The next payment will be made when your Contribution is due, on %(date)s."
+msgstr ""
+
+msgid "(PF11x) If you only want to change the amount you contribute each month using the same payment information, you can do this here"
+msgstr ""
+
+msgid "(PF1) Your Contribution"
 msgstr ""
 
 #, python-format
@@ -384,23 +408,29 @@ msgstr ""
 msgid "(PF14) Final description text for First Payment Step box"
 msgstr ""
 
-msgid "Past Subscriptions"
+msgid "Past Contributions"
 msgstr ""
 
-msgid "(PF1) Payments"
+msgid "(PF1a) Update payment information"
+msgstr ""
+
+msgid "(PF15a) Confirm your monthly Contribution"
+msgstr ""
+
+msgid "(PF15b) Choose your new monthly Contribution"
 msgstr ""
 
 msgid "(PF15) Choose your monthly Contribution"
 msgstr ""
 
-msgid "(PF15a) Choose the amount you would like to contribute using the slider. You may also enter a higher amount by entering it manually."
-msgstr ""
-
-#, python-format
-msgid "(PF24) Contribution amount includes 19%% VAT"
+msgid "(PF26) Choose the amount you would like to contribute using the slider. You may also choose a higher amount by entering it manually."
 msgstr ""
 
 msgid "(PF2) Learn more"
+msgstr ""
+
+msgctxt "payment step button"
+msgid "(PF4a) Confirm Contribution Amount"
 msgstr ""
 
 msgctxt "payment step button"
@@ -482,6 +512,10 @@ msgid "(PF7) By clicking on \"Confirm and pay\" you grant Wechange eG permission
 msgstr ""
 
 #, python-format
+msgid "(PF7a) This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19%% VAT. The VAT is shown on the invoice."
+msgstr ""
+
+#, python-format
 msgid "(PF21) The next debit will be made on %(date)s."
 msgstr ""
 
@@ -509,11 +543,28 @@ msgstr ""
 msgid "(INF17) Your Contribution"
 msgstr ""
 
-msgid "(INF2) Subscription Status"
+msgid "(INF10) Last Payment"
+msgstr ""
+
+#, python-format
+msgid "(INF15) Processing. Started at %(date)s."
+msgstr ""
+
+#, python-format
+msgid "(INF16) Attempted at %(date)s, but not completed."
+msgstr ""
+
+msgid "(INF13) All information about your past payments can be found in the invoice overview"
+msgstr ""
+
+msgid "(INF14) Show Invoice overview"
+msgstr ""
+
+msgid "(INF2) Contribution Status"
 msgstr ""
 
 msgctxt "subscription status"
-msgid "(INF3) Will become active after your last subscription expires."
+msgid "(INF3) Will become active after your last Contribution expires."
 msgstr ""
 
 msgctxt "subscription status"
@@ -527,42 +578,19 @@ msgstr ""
 msgid "Expires"
 msgstr ""
 
-msgid "(INF10) Last Payment"
-msgstr ""
-
-#, python-format
-msgid "(INF15) Processing. Started at %(date)s."
-msgstr ""
-
-#, python-format
-msgid "(INF16) Attempted at %(date)s, but not completed."
-msgstr ""
-
-msgid "(INF13) For more information see your invoice overview"
-msgstr ""
-
-msgid "(INF14) Show Invoice overview"
-msgstr ""
-
 msgid "(INF7) Next payment scheduled"
 msgstr ""
 
 msgid "(INF6) Current monthly contribution"
 msgstr ""
 
-msgid "(INF8.1) Adjust contribution amount"
+msgid "(INF8.1) Adjust contribution amount or cancel your Contribution"
 msgstr ""
 
 msgid "(INF1) Your Payment Information"
 msgstr ""
 
-msgid "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!"
-msgstr ""
-
-msgid "You will only be billed after the current subscription expires."
-msgstr ""
-
-msgid "OK"
+msgid "(TS9) Change payment information"
 msgstr ""
 
 msgid "(PRC1) Payment processing..."
@@ -592,7 +620,7 @@ msgstr ""
 msgid "(SC2) Payments"
 msgstr ""
 
-msgid "(SC3) Your payment was processed successfully, but your subscription could not be activated due to an internal server error."
+msgid "(SC3) Your payment was processed successfully, but your Contribution could not be activated due to an internal server error."
 msgstr ""
 
 msgid "(SC4) Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!"
@@ -659,7 +687,7 @@ msgstr ""
 msgid "You already have an active subscription and cannot start another one!"
 msgstr ""
 
-msgid "We can not create a new subscription for you at this point. Please contact our support! No payment has been made yet."
+msgid "You do not currently have an active subscription you could update!"
 msgstr ""
 
 msgid "You do not currently have a subscription!"

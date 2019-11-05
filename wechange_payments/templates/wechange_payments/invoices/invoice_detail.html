@@ -9,7 +9,7 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a href="{% url 'wechange-payments:invoices' %}">{% trans "My Invoices" %}</a></li>
+	<li><a href="{% url 'wechange-payments:invoices' %}">{% trans "Your Invoices" %}</a></li>
 	<li><a class="active" href="{{ object.get_absolute_url }}">{% blocktrans with date=object.created.date|localize %}Invoice from {{ date }}{% endblocktrans %}</a></li>
 {% endblock %}
 
@@ -23,7 +23,7 @@
     		<table>
 				<tr>
 					<td>{% trans "Payment Purpose" %}</td>
-					<td>{% trans "Subscription Payment (monthly, recurring)" %}</td>
+					<td>{% trans "Monthly Contribution Payment (recurring)" %}</td>
 				</tr>
 				<tr>
 					<td>{% trans "Payment Type" %}</td>
