@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from wechange_payments.conf import settings
+from django.db import transaction
 from django.utils.timezone import now
 
 import logging
@@ -14,22 +15,20 @@ def create_subscription_for_payment(payment):
     """ Creates the subscription object for a user after the initial payment 
         for the subscription has completed successfully. 
         
-        This handles all cancellations of current or waiting subscriptions, depending 
+        This handles all state changes of current or waiting subscriptions, depending 
         on the states of the existing subscriptions. All entry API functions are safely
         gate-kept, so we can assume here that this was well-checked for states.
-        I.e. if this call comes to pass, and the user has an active subscription, 
-        they must have called update_payment, so cancel the current subscription,
-        and create a new, postponed one.
+        I.e. if this call comes to pass, and the user may create a new subscription.
+        Should they have an active subscription, they must have called update_payment, 
+        so cancel the current subscription, and create a new, waiting one (in that
+        case the payment will have been made to be postponed).
     """
-        
-    # if the user has an existing active sub, we will not create a second subscription
-    # this case should never happen, as sanity checks on payments should prevent it!
-    # (cancelled active subs are ok!)
-    active_sub = Subscription.get_current_for_user(payment.user)
-    if active_sub and active_sub.state != Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
-        logger.error('Payments: CRITICAL! create_subscription_for_payment() was called after a payment, but there is already an active payment for this user! You need to take action and make sure the payment will result in a proper subscription, or refund the user!', 
-                        extra={'payment-id': payment.id, 'payment': payment, 'active-subscription-id': active_sub.id, 'active-subscription': active_sub, 'user': payment.user})
-        return
+    
+    user = payment.user
+    active_sub = Subscription.get_active_for_user(user)
+    waiting_sub = Subscription.get_waiting_for_user(user)
+    cancelled_sub = Subscription.get_canceled_for_user(user)
+    suspended_sub = Subscription.get_suspended_for_user(user)
     
     subscription = Subscription(
         user=payment.user,
@@ -37,41 +36,49 @@ def create_subscription_for_payment(payment):
         amount=payment.amount,
         last_payment=payment,
     )
-    # TODO cases: 
-    #     A: no subs at all: 
-    #            create new sub with state 2
-    #     B: active sub (state 2), none other: 
-    #            set active sub to state 1, create new with state 3
-    #     C: canceled sub (state 1), none other:
-    #            leave sub canceled, create new with state 3
-    #     D: canceled sub (state 1), waiting sub (state 3):
-    #            leave sub canceled, "delete" waiting sub
-    #            by setting to 0, create new sub with state 3
-    #     E: only waiting sub (state 3), no others:
-    #            delete waiting sub by setting it to 0, then case A
-    #     X: All other cases should not happen and need to be logged 
-    #        with a critical error, so we can check out the case manually!
     
-    
-    # if we have an active cancelled subscription, use its next due date as date for the new sub
-    if active_sub:
-        # important! set the waiting sub's due date correctly to that of the current one!
-        subscription.next_due_date = active_sub.next_due_date 
-        subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
-    else:
-        subscription.set_next_due_date(now().date())
-        subscription.state = Subscription.STATE_2_ACTIVE
-    
-    subscription.save()
-    
-    # todo: if we just instated a waiting sub during an active one, set the current
-    # active one's state to 1!
-    
-    payment.subscription = subscription
-    payment.save()
-    
-    logger.info('Payments: Successfully created a new subscription for a user.',
-                extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user})
+    # the numbers refer to the state-change cases in `Subscription`'s docstring!
+    with transaction.atomic():
+        # terminate any failed suspended subscriptions
+        suspended_sub.state = Subscription.STATE_0_TERMINATED
+        suspended_sub.terminated = now()
+        suspended_sub.save()
+        
+        if not active_sub and not waiting_sub and not cancelled_sub:
+            # 1. (new subscription)
+            subscription.set_next_due_date(now().date())
+            subscription.state = Subscription.STATE_2_ACTIVE
+        elif active_sub and not waiting_sub and not cancelled_sub: 
+            # 2. (updated payment infos, becomes active next due date)
+            subscription.next_due_date = active_sub.next_due_date 
+            subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
+            active_sub.state = Subscription.STATE_1_CANCELLED_BUT_ACTIVE
+            active_sub.cancelled = now()
+            active_sub.save()
+        elif not active_sub and not waiting_sub and cancelled_sub:
+            # 3. (canceled Subscriptions, created new subscription before next payment due)
+            subscription.next_due_date = cancelled_sub.next_due_date 
+            subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
+        elif not active_sub and waiting_sub:
+            # 4. and 5. (updated payment infos again, 
+            # or replaced a waiting subscription before it became active)
+            # this may mean there is currently a cancelled sub, but we leave that alone here
+            subscription.next_due_date = waiting_sub.next_due_date
+            subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
+            waiting_sub.state = Subscription.STATE_0_TERMINATED
+            waiting_sub.terminated = now()
+            waiting_sub.save()
+        else:
+            logger.critical('Payments: "Unreachable" case reached for subscription state situation for a user! Could not save the user\'s new subscription! This has to be checked out manually!.',
+                extra={'payment-id': payment.id, 'payment': payment, 'user': user})
+        
+        subscription.save()
+        
+        payment.subscription = subscription
+        payment.save()
+        
+        logger.info('Payments: Successfully created a new subscription for a user.',
+                    extra={'payment-id': payment.id, 'payment': payment, 'user': user})
 
     return subscription
 

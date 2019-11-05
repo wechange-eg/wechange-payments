@@ -310,6 +310,7 @@ class BetterPaymentBackend(BaseBackend):
         """
         if make_postponed:
             post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_CAPTURE_PAYMENT
+            logger.warn('REMOVEME: now doing CAPTURE payment')
         else:
             post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
         data = {
