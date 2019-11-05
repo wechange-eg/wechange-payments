@@ -26,6 +26,7 @@ logger = logging.getLogger('wechange-payments')
 
 
 BETTERPAYMENTS_API_ENDPOINT_PAYMENT = '/rest/payment'
+BETTERPAYMENTS_API_ENDPOINT_CAPTURE_PAYMENT = '/rest/capture'
 
 # a list of sensitive parameter keys that should be dropped from postback data and not saved in our DB
 BETTERPAYMENT_SENSITIVE_POSTBACK_PARAMS = [
@@ -177,7 +178,7 @@ class BetterPaymentBackend(BaseBackend):
         
         return (transaction_id, sepa_mandate_token)
     
-    def make_sepa_payment(self, params, user=None):
+    def make_sepa_payment(self, params, user=None, make_postponed=False):
         """
             Make a SEPA payment. A mandate is created here, which has to be displayed
             to the user. Return expects an error message or an object of base model
@@ -186,6 +187,7 @@ class BetterPaymentBackend(BaseBackend):
             
             @param user: The user for which this payment should be made. Can potentially be null.
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message)
          """
         if not self.user_pre_payment_safety_checks(user):
@@ -198,7 +200,7 @@ class BetterPaymentBackend(BaseBackend):
             return None, mandate_result
         transaction_id, sepa_mandate_token = mandate_result
         
-        payment, error = self._make_actual_payment(PAYMENT_TYPE_DIRECT_DEBIT, order_id, params, user=user, original_transaction_id=transaction_id)
+        payment, error = self._make_actual_payment(PAYMENT_TYPE_DIRECT_DEBIT, order_id, params, user=user, original_transaction_id=transaction_id, make_postponed=make_postponed)
         if error is not None:
             return None, error
         
@@ -207,8 +209,11 @@ class BetterPaymentBackend(BaseBackend):
         })
         try:
             if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
-                payment.status = Payment.STATUS_PAID
-                payment.completed_at = now()
+                if make_postponed:
+                    payment.status = Payment.STATUS_PREAUTHORIZED_UNPAID
+                else:
+                    payment.status = Payment.STATUS_PAID
+                    payment.completed_at = now()
             else:
                 payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
             payment.save()
@@ -221,23 +226,25 @@ class BetterPaymentBackend(BaseBackend):
             
         return payment, None
     
-    def make_creditcard_payment(self, params, user=None):
+    def make_creditcard_payment(self, params, user=None, make_postponed=False):
         """ Initiate a credit card payment. 
             @param user: The user for which this payment should be made. Can potentially be null.
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(user):
             return None, ('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
-        return self._make_redirected_payment(params, PAYMENT_TYPE_CREDIT_CARD, user=user)
+        return self._make_redirected_payment(params, PAYMENT_TYPE_CREDIT_CARD, user=user, make_postponed=make_postponed)
     
-    def make_paypal_payment(self, params, user=None):
+    def make_paypal_payment(self, params, user=None, make_postponed=False):
         """ Initiate a paypal payment. 
             @param user: The user for which this payment should be made. Can potentially be null.
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
         if not self.user_pre_payment_safety_checks(user):
             return None, ('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
-        return self._make_redirected_payment(params, PAYMENT_TYPE_PAYPAL, user=user)
+        return self._make_redirected_payment(params, PAYMENT_TYPE_PAYPAL, user=user, make_postponed=make_postponed)
     
     def make_recurring_payment(self, reference_payment):
         """ Executes a subsequent payment for a given reference payment. 
@@ -287,7 +294,7 @@ class BetterPaymentBackend(BaseBackend):
             
         return payment, None
     
-    def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None, is_recurring=False):
+    def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None, is_recurring=False, make_postponed=False):
         """ Execute the actual payment-making API call to betterpayment.
             At this point, all parameters are assumed to be existent and valid.
             
@@ -298,9 +305,13 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected Params can be found in `REQUIRED_PARAMS`.
             @param original_transaction_id: supply the reference payment's vendor transaction id here.
                 if not None, means this is a recurring payment made from an existing payment. 
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (*unsaved* `Payment`, None) if successful or (None, Str-error-message)
         """
-        post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
+        if make_postponed:
+            post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_CAPTURE_PAYMENT
+        else:
+            post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
             'payment_type': payment_type,
@@ -412,6 +423,7 @@ class BetterPaymentBackend(BaseBackend):
             type=payment_type,
             status=Payment.STATUS_STARTED,
             is_reference_payment=(not is_recurring),
+            is_postponed_payment=make_postponed,
             
             address=params['address'],
             city=params['city'],
@@ -426,7 +438,7 @@ class BetterPaymentBackend(BaseBackend):
         )
         return (payment, None)
     
-    def _make_redirected_payment(self, params, payment_type, user=None):
+    def _make_redirected_payment(self, params, payment_type, user=None, make_postponed=False):
         """ 
             Initiate a payment where the user gets redirected to an external site for
             a part of the payment process.
@@ -436,10 +448,11 @@ class BetterPaymentBackend(BaseBackend):
             
             @param user: The user for which this payment should be made. Can potentially be null.
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message)
         """
         order_id = str(uuid.uuid4())
-        payment, error = self._make_actual_payment(payment_type, order_id, params, user=user)
+        payment, error = self._make_actual_payment(payment_type, order_id, params, user=user, make_postponed=make_postponed)
         if error is not None:
             return None, error
         try:
@@ -513,14 +526,29 @@ class BetterPaymentBackend(BaseBackend):
                 if status in [self.BETTERPAYMENT_STATUS_STARTED, self.BETTERPAYMENT_STATUS_PENDING]:
                     # case 'started', 'pending': no further action required, we are waiting for the transaction to complete
                     return
+                elif status == self.BETTERPAYMENT_STATUS_SUCCESS and payment.status == Payment.STATUS_PAID:
+                    # got a postback on an already paid Payment, so we do not do anything
+                    logger.info('Received a postback for a successful payment, but the payment\'s status was already PAID!', extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription
-                    payment.status = Payment.STATUS_PAID
-                    payment.completed_at = now()
+                    # depending on `is_postponed_payment` and the payment.status, switch states here to preauthorized or paid!
+                    create_new_subscription = True
+                    if payment.is_postponed_payment and \
+                            payment.status in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
+                        payment.status = Payment.STATUS_PREAUTHORIZED_UNPAID
+                    elif payment.is_postponed_payment and payment.status == Payment.STATUS_PREAUTHORIZED_UNPAID:
+                        payment.status = Payment.STATUS_PAID
+                        payment.completed_at = now()
+                        # we do not change our subscription here because one should already have been created
+                        # at the time of pre-authorization for this payment
+                        create_new_subscription = False
+                    else:
+                        payment.status = Payment.STATUS_PAID
+                        payment.completed_at = now()
                     payment.save()
                     signals.successful_payment_made.send(sender=self, payment=payment)
                     # IMPORTANT: if this is a recurring payment for a running subscription, don't start a subscription!
-                    if payment.is_reference_payment:
+                    if payment.is_reference_payment and create_new_subscription:
                         create_subscription_for_payment(payment)
                     self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
                 elif status == self.BETTERPAYMENT_STATUS_CANCELED:

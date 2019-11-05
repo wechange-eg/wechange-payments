@@ -176,7 +176,7 @@ class BaseBackend(object):
             if settings.DEBUG:
                 raise
         
-    def make_sepa_payment(self, params, user=None):
+    def make_sepa_payment(self, params, user=None, make_postponed=False):
         """
             Make a SEPA payment. A mandate is created here, which has to be displayed
             to the user. Return expects an error message or an object of base model
@@ -185,6 +185,7 @@ class BaseBackend(object):
             
             @param user: The user for which this payment should be made. Can be null.
             @param params: Expected params can be found in `REQUIRED_PARAMS`
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
                 
             @return: tuple (
                         model of wechange_payments.models.BasePayment if successful or None,
@@ -193,7 +194,7 @@ class BaseBackend(object):
          """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
-    def make_creditcard_payment(self, params, user=None):
+    def make_creditcard_payment(self, params, user=None, make_postponed=False):
         """
             Initiate a credit card payment. 
             Return expects an error message or an object of base model
@@ -202,6 +203,7 @@ class BaseBackend(object):
             
             @param user: The user for which this payment should be made. Can be null.
             @param params: Expected params can be found in `REQUIRED_PARAMS`
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
                 
             @return: tuple (
                         model of wechange_payments.models.BasePayment if successful or None,
@@ -210,7 +212,7 @@ class BaseBackend(object):
          """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
-    def make_paypal_payment(self, params, user=None):
+    def make_paypal_payment(self, params, user=None, make_postponed=False):
         """
             Initiate a paypal payment.  
             Return expects an error message or an object of base model
@@ -219,6 +221,7 @@ class BaseBackend(object):
             
             @param user: The user for which this payment should be made. Can be null.
             @param params: Expected params can be found in `REQUIRED_PARAMS`
+            @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
                 
             @return: tuple (
                         model of wechange_payments.models.BasePayment if successful or None,
@@ -227,14 +230,25 @@ class BaseBackend(object):
          """
         raise NotImplemented('Use a proper payment provider backend for this function!')
     
+    def cash_in_postponed_payment(self, postponed_payment):
+        """ Cashes in a pre-authorized payment made using `make_postponed=True`, by making an API call
+            using a reference to that pre-authorized payment. 
+            
+            @param postponed_payment: The pre-authorized payment which a cash-in call can be made to.
+            @return: tuple (
+                        model of wechange_payments.models.BasePayment if successful or None,
+                        str error message if error or None
+                    )
+        """
+        raise NotImplemented('Use a proper payment provider backend for this function!')
+    
     def make_recurring_payment(self, reference_payment):
         """
             Executes a subsequent payment for a given reference payment. 
             Used for monthly recurring payments. Returns the newly made `Payment` instance. 
             
-            @param user: The user for which this payment should be made. Can be null.
-            @param params: Expected params can be found in `REQUIRED_PARAMS`
-                
+            @param reference_payment: The initial reference payment which can be referred to to make
+                follow-up payments on.
             @return: tuple (
                         model of wechange_payments.models.BasePayment if successful or None,
                         str error message if error or None

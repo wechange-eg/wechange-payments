@@ -25,6 +25,11 @@
     <form id="payments-form" method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
     		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
+        {% comment %} Flag for updating payments {% endcomment %}
+        {% if update_payment %}
+			<input type="hidden" name="update_payment" value="{{ update_payment }}" />
+        {% endif %}
+        
         <div class="busy-animation">
         	<i class="fas fa-spinner fa-spin"></i>
         </div>

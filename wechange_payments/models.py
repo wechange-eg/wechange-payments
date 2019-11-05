@@ -22,6 +22,15 @@ USERPROFILE_SETTING_POPUP_CLOSED = 'payment_popup_closed_date'
 
 
 class Payment(models.Model):
+    """ 
+        Payment model.
+        
+        State `STATUS_PREAUTHORIZED_UNPAID` is a special state, where a future payment
+            has been authorized and saved at the payment proveider, and only needs a special
+            API call to confirm and "cash in" the payment. 
+            This is used for postponed subscriptions, that are created while a current 
+            subscription is still running.
+    """
     
     TYPE_CHOICES = (
         (PAYMENT_TYPE_DIRECT_DEBIT, _('Direct Debit (SEPA)')),
@@ -33,6 +42,7 @@ class Payment(models.Model):
     STATUS_STARTED = 1
     STATUS_COMPLETED_BUT_UNCONFIRMED = 2
     STATUS_PAID = 3
+    STATUS_PREAUTHORIZED_UNPAID = 301
     STATUS_FAILED = 101
     STATUS_RETRACTED = 102
     STATUS_CANCELED = 103
@@ -42,6 +52,7 @@ class Payment(models.Model):
         (STATUS_STARTED, _('Payment initiated but not completed by user yet')),
         (STATUS_COMPLETED_BUT_UNCONFIRMED, _('Payment processing')),
         (STATUS_PAID, _('Successfully paid')),
+        (STATUS_PREAUTHORIZED_UNPAID, _('Pre-authorized for payment, but not yet paid')),
         (STATUS_FAILED, _('Failed')),
         (STATUS_RETRACTED, _('Retracted')),
         (STATUS_CANCELED, _('Canceled')),
@@ -66,6 +77,8 @@ class Payment(models.Model):
     
     is_reference_payment = models.BooleanField(verbose_name=_('Is reference payment'), default=True, editable=False, 
         help_text='Is this the reference (first) payment in a series or a subscription payment derived from a reference payment?') 
+    is_postponed_payment = models.BooleanField(verbose_name=_('Is postponed payment'), default=False, editable=False, 
+        help_text='Is this a postponed payment, that gets pre-authorized first, and then cashed-in at some later point?') 
     revoked = models.BooleanField(verbose_name=_('Has been revoked'), default=False)
     
     # billing address details, can be saved for some payment methods, but not necessary
@@ -199,7 +212,14 @@ class Subscription(models.Model):
         if not user.is_authenticated:
             return None
         return get_object_or_None(cls, user=user, state=Subscription.STATE_2_ACTIVE)
-
+    
+    @classmethod
+    def get_canceled_for_user(cls, user):
+        """ Returns the currently canceled-but-active subscription for a user. """
+        if not user.is_authenticated:
+            return None
+        return get_object_or_None(cls, user=user, state=Subscription.STATE_1_CANCELLED_BUT_ACTIVE)
+    
     @classmethod
     def get_waiting_for_user(cls, user):
         """ Returns the currently waiting subscription for a user. """
@@ -218,6 +238,8 @@ class Subscription(models.Model):
             self.terminated = now()
             self.save()
             logger.warn('REMOVEME: Done ended old expired sub!')
+            
+            TODO: das hier raus und in payments.py rein!
             # after a termination, look if there is a waiting sub
             waiting_sub = get_object_or_None(Subscription, user=self.user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
             if waiting_sub:
