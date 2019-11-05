@@ -24,62 +24,69 @@ def create_subscription_for_payment(payment):
         case the payment will have been made to be postponed).
     """
     
-    user = payment.user
-    active_sub = Subscription.get_active_for_user(user)
-    waiting_sub = Subscription.get_waiting_for_user(user)
-    cancelled_sub = Subscription.get_canceled_for_user(user)
-    suspended_sub = Subscription.get_suspended_for_user(user)
-    
-    subscription = Subscription(
-        user=payment.user,
-        reference_payment=payment,
-        amount=payment.amount,
-        last_payment=payment,
-    )
-    
-    # the numbers refer to the state-change cases in `Subscription`'s docstring!
-    with transaction.atomic():
-        # terminate any failed suspended subscriptions
-        suspended_sub.state = Subscription.STATE_0_TERMINATED
-        suspended_sub.terminated = now()
-        suspended_sub.save()
+    try:
+        user = payment.user
+        active_sub = Subscription.get_active_for_user(user)
+        waiting_sub = Subscription.get_waiting_for_user(user)
+        cancelled_sub = Subscription.get_canceled_for_user(user)
+        suspended_sub = Subscription.get_suspended_for_user(user)
         
-        if not active_sub and not waiting_sub and not cancelled_sub:
-            # 1. (new subscription)
-            subscription.set_next_due_date(now().date())
-            subscription.state = Subscription.STATE_2_ACTIVE
-        elif active_sub and not waiting_sub and not cancelled_sub: 
-            # 2. (updated payment infos, becomes active next due date)
-            subscription.next_due_date = active_sub.next_due_date 
-            subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
-            active_sub.state = Subscription.STATE_1_CANCELLED_BUT_ACTIVE
-            active_sub.cancelled = now()
-            active_sub.save()
-        elif not active_sub and not waiting_sub and cancelled_sub:
-            # 3. (canceled Subscriptions, created new subscription before next payment due)
-            subscription.next_due_date = cancelled_sub.next_due_date 
-            subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
-        elif not active_sub and waiting_sub:
-            # 4. and 5. (updated payment infos again, 
-            # or replaced a waiting subscription before it became active)
-            # this may mean there is currently a cancelled sub, but we leave that alone here
-            subscription.next_due_date = waiting_sub.next_due_date
-            subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
-            waiting_sub.state = Subscription.STATE_0_TERMINATED
-            waiting_sub.terminated = now()
-            waiting_sub.save()
-        else:
-            logger.critical('Payments: "Unreachable" case reached for subscription state situation for a user! Could not save the user\'s new subscription! This has to be checked out manually!.',
-                extra={'payment-id': payment.id, 'payment': payment, 'user': user})
+        subscription = Subscription(
+            user=payment.user,
+            reference_payment=payment,
+            amount=payment.amount,
+            last_payment=payment,
+        )
         
-        subscription.save()
-        
-        payment.subscription = subscription
-        payment.save()
-        
-        logger.info('Payments: Successfully created a new subscription for a user.',
+        # the numbers refer to the state-change cases in `Subscription`'s docstring!
+        with transaction.atomic():
+            
+            # terminate any failed suspended subscriptions
+            if suspended_sub:
+                suspended_sub.state = Subscription.STATE_0_TERMINATED
+                suspended_sub.terminated = now()
+                suspended_sub.save()
+            
+            if not active_sub and not waiting_sub and not cancelled_sub:
+                # 1. (new subscription)
+                subscription.set_next_due_date(now().date())
+                subscription.state = Subscription.STATE_2_ACTIVE
+            elif active_sub and not waiting_sub and not cancelled_sub: 
+                # 2. (updated payment infos, becomes active next due date)
+                subscription.next_due_date = active_sub.next_due_date 
+                subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
+                active_sub.state = Subscription.STATE_1_CANCELLED_BUT_ACTIVE
+                active_sub.cancelled = now()
+                active_sub.save()
+            elif not active_sub and not waiting_sub and cancelled_sub:
+                # 3. (canceled Subscriptions, created new subscription before next payment due)
+                subscription.next_due_date = cancelled_sub.next_due_date 
+                subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
+            elif not active_sub and waiting_sub:
+                # 4. and 5. (updated payment infos again, 
+                # or replaced a waiting subscription before it became active)
+                # this may mean there is currently a cancelled sub, but we leave that alone here
+                subscription.next_due_date = waiting_sub.next_due_date
+                subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
+                waiting_sub.state = Subscription.STATE_0_TERMINATED
+                waiting_sub.terminated = now()
+                waiting_sub.save()
+            else:
+                logger.critical('Payments: "Unreachable" case reached for subscription state situation for a user! Could not save the user\'s new subscription! This has to be checked out manually!.',
                     extra={'payment-id': payment.id, 'payment': payment, 'user': user})
-
+            
+            subscription.save()
+            
+            payment.subscription = subscription
+            payment.save()
+            
+            logger.info('Payments: Successfully created a new subscription for a user.',
+                        extra={'payment-id': payment.id, 'payment': payment, 'user': user})
+    except Exception as e:
+        logger.error('Payments: Critical! A user made a successful payment, but there was an error while creating his subscription! Find out what happened, create a subscription for them, and contact them!',
+            extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user, 'exception': e})
+        raise
+    
     return subscription
 
 

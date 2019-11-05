@@ -26,7 +26,9 @@ logger = logging.getLogger('wechange-payments')
 
 
 BETTERPAYMENTS_API_ENDPOINT_PAYMENT = '/rest/payment'
+BETTERPAYMENTS_API_ENDPOINT_AUTHORIZE_PAYMENT = '/rest/authorize'
 BETTERPAYMENTS_API_ENDPOINT_CAPTURE_PAYMENT = '/rest/capture'
+
 
 # a list of sensitive parameter keys that should be dropped from postback data and not saved in our DB
 BETTERPAYMENT_SENSITIVE_POSTBACK_PARAMS = [
@@ -306,10 +308,14 @@ class BetterPaymentBackend(BaseBackend):
             @param original_transaction_id: supply the reference payment's vendor transaction id here.
                 if not None, means this is a recurring payment made from an existing payment. 
             @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
-            @return: A tuple of (*unsaved* `Payment`, None) if successful or (None, Str-error-message)
+            @return: A tuple of (Payment`, None) if successful or (None, Str-error-message)
         """
         if make_postponed:
-            post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_CAPTURE_PAYMENT
+            # TODO: Postponed payments are not yet possible!
+            if True:
+                return None, 'Achtung! Zahlungsdaten aktualisieren und weitere Beiträge während eines laufenden monatlichen Beitrags einrichten ist aktuell noch nicht möglich!'
+            
+            post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_AUTHORIZE_PAYMENT
             logger.warn('REMOVEME: now doing CAPTURE payment')
         else:
             post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
@@ -437,6 +443,7 @@ class BetterPaymentBackend(BaseBackend):
             backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__),
             extra_data=extra_data,
         )
+        payment.save()
         return (payment, None)
     
     def _make_redirected_payment(self, params, payment_type, user=None, make_postponed=False):

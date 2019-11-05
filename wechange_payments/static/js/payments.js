@@ -90,6 +90,8 @@ window.PaymentForm = {
 	        $form.find('input,textarea,select,button').removeAttr('disabled');
 	        // scroll up
 	        window.scrollTo(0, 0);
+	        // show step 3
+	        $('a[data-toggle="tab"][href="#step3"]').click();
 		});
     }, 
 	

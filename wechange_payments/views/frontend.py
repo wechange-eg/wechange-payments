@@ -67,9 +67,13 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
             initial['last_name'] = self.request.user.last_name
         initial['email'] = self.request.user.email
         form = PaymentsForm(initial=initial)
-            
+        
+        current_sub = Subscription.get_current_for_user(self.request.user)
+        waiting_sub = Subscription.get_waiting_for_user(self.request.user)
+        
         context.update({
             'form': form,
+            'displayed_subscription' : waiting_sub or current_sub or None,
         })
         return context
 
@@ -98,6 +102,7 @@ class PaymentUpdateView(PaymentView):
         context = super(PaymentUpdateView, self).get_context_data(*args, **kwargs)
         context.update({
             'update_payment': '1',
+            'is_update_form': True,
         })
         return context
         
@@ -450,10 +455,16 @@ def debug_delete_subscription(request):
     if subscription:
         subscription.state = Subscription.STATE_0_TERMINATED
         subscription.save()
+    waiting_subscription = Subscription.get_waiting_for_user(request.user)
+    if waiting_subscription:
+        waiting_subscription.state = Subscription.STATE_0_TERMINATED
+        waiting_subscription.save()
+        
     processing_payment = get_object_or_None(Payment, user=request.user, status=Payment.STATUS_COMPLETED_BUT_UNCONFIRMED)
     if processing_payment:
         processing_payment.status = Payment.STATUS_FAILED
         processing_payment.save()
+    messages.success(request, 'Test-server-shortcut: Your Contributions were removed!')
     return redirect('wechange-payments:overview')
 
 

@@ -123,7 +123,7 @@ def make_subscription_payment(request):
     # been activated yet, we make special postponed payment that 
     # only saves the account data with the payment provider, but does not actually 
     # transfer any money yet. money will be transfered with the next subscription due date
-    make_postponed = active_sub or cancelled_sub
+    make_postponed = bool(active_sub or cancelled_sub)
     # if for some reason, there is ONLY a waiting sub, we will delete that later
     
     params = request.POST.copy()
@@ -140,9 +140,8 @@ def make_subscription_payment(request):
                 data = {
                     'redirect_to': redirect_url
                 }
-            except Exception as e:
-                logger.error('Payments: Critical! A user made a successful payment, but there was an error while creating his subscription! Find out what happened, create a subscription for them, and contact them!',
-                     extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user, 'exception': e})
+            except:
+                # exception logging happens inside create_subscription_for_payment!
                 if settings.DEBUG:
                     raise
                 # redirect to the success view with errors this point, so the user doesn't just resubmit the form

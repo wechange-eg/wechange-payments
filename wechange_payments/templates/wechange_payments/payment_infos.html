@@ -132,7 +132,17 @@
     	</div>
     	
     	<div>
-    		{% captureas content %}
+    		<a href="{% url "wechange-payments:payment-update" %}" class="rounded-button button-color-secondary">
+		        <span class="rounded-button-inner">
+					{% trans "(TS9) Change payment information" %}
+		        </span>
+		    </a>
+		</div>
+		
+		{% comment %}  
+			Popup explaining payment information
+			
+			{% captureas content %}
 		        <p>
 		        	{% trans "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
 		        </p>
@@ -171,11 +181,11 @@
 		    
 			<a class="rounded-button button-color-secondary" href="#" data-toggle="modal" data-target="#changePaymentInfoModal">
 		        <span class="rounded-button-inner">
-		            {% trans "(INF1.1) Change payment information" %}
+		            {% trans "(INF1.1) Change payment informationx" %}
 		        </span>
 		    </a>
-		</div>
 		
+		{% endcomment %}
 
     	{% comment %}  
     		"Back to PORTAL" and "print as pdf" section, todo later! 

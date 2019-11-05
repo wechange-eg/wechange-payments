@@ -43,6 +43,15 @@
 
 			<hr/>
 			
+			<h3>{% trans "(MS7) Change your monthly Contribution" %}:</h3>
+			
+        	<div class="large-space">
+				<span>
+					{% trans "(PF15a) If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually." %}
+					{% trans "(PF24) Contribution amount includes 19% VAT" %}
+				</span>
+			</div>
+			
 			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         	
 			
