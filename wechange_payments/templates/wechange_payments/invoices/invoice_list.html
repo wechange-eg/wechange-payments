@@ -1,7 +1,7 @@
 {% extends "wechange_payments/base.html" %}
 {% load i18n %}
 
-{% block page_title %}{% trans "My Invoices" %}{% endblock %}
+{% block page_title %}{% trans "Your Invoices" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -9,7 +9,7 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:invoices' %}">{% trans "My Invoices" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:invoices' %}">{% trans "Your Invoices" %}</a></li>
 {% endblock %}
 
 {% block content %}

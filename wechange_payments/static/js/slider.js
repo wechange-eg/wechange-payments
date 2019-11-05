@@ -1,10 +1,25 @@
 $(function() {
 	
 	var update_slider = function (event, ui) {
+		var selectAll = false;
+		console.log(ui.value)
+		
+		// for invalid values, jump back to default value and select input box
+		if (!$.isNumeric(ui.value)) {
+			ui.value = PAYMENTS_SLIDER_INITIAL_PAYMENT_AMOUNT;
+			selectAll = true;
+		} else if (ui.value > PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT || ui.value < PAYMENTS_MINIMUM_PAYMENT_AMOUNT) {
+			selectAll = true;
+		}
 		// cap at real allowed value
 		ui.value = Math.max(PAYMENTS_MINIMUM_PAYMENT_AMOUNT, Math.min(ui.value, PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT));
 		// set the values on slide
 		$(".payment-slider #value").val(ui.value);
+		$('.payment-slider #slider').slider('value', ui.value)
+		
+		if (selectAll) {
+			$(".payment-slider #value").focus().select();
+		}
 		
 		// slide the background gradient
 		var color = $('.payment-slider #slider').css('color');

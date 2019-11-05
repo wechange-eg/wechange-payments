@@ -22,6 +22,15 @@ USERPROFILE_SETTING_POPUP_CLOSED = 'payment_popup_closed_date'
 
 
 class Payment(models.Model):
+    """ 
+        Payment model.
+        
+        State `STATUS_PREAUTHORIZED_UNPAID` is a special state, where a future payment
+            has been authorized and saved at the payment proveider, and only needs a special
+            API call to confirm and "cash in" the payment. 
+            This is used for postponed subscriptions, that are created while a current 
+            subscription is still running.
+    """
     
     TYPE_CHOICES = (
         (PAYMENT_TYPE_DIRECT_DEBIT, _('Direct Debit (SEPA)')),
@@ -33,6 +42,7 @@ class Payment(models.Model):
     STATUS_STARTED = 1
     STATUS_COMPLETED_BUT_UNCONFIRMED = 2
     STATUS_PAID = 3
+    STATUS_PREAUTHORIZED_UNPAID = 301
     STATUS_FAILED = 101
     STATUS_RETRACTED = 102
     STATUS_CANCELED = 103
@@ -42,6 +52,7 @@ class Payment(models.Model):
         (STATUS_STARTED, _('Payment initiated but not completed by user yet')),
         (STATUS_COMPLETED_BUT_UNCONFIRMED, _('Payment processing')),
         (STATUS_PAID, _('Successfully paid')),
+        (STATUS_PREAUTHORIZED_UNPAID, _('Pre-authorized for payment, but not yet paid')),
         (STATUS_FAILED, _('Failed')),
         (STATUS_RETRACTED, _('Retracted')),
         (STATUS_CANCELED, _('Canceled')),
@@ -66,6 +77,8 @@ class Payment(models.Model):
     
     is_reference_payment = models.BooleanField(verbose_name=_('Is reference payment'), default=True, editable=False, 
         help_text='Is this the reference (first) payment in a series or a subscription payment derived from a reference payment?') 
+    is_postponed_payment = models.BooleanField(verbose_name=_('Is postponed payment'), default=False, editable=False, 
+        help_text='Is this a postponed payment, that gets pre-authorized first, and then cashed-in at some later point?') 
     revoked = models.BooleanField(verbose_name=_('Has been revoked'), default=False)
     
     # billing address details, can be saved for some payment methods, but not necessary
@@ -113,6 +126,66 @@ class TransactionLog(models.Model):
 
 
 class Subscription(models.Model):
+    """
+        Subscription model. Has an initial reference payment which can be used
+        to book further payments from a provider.
+        The `state` of the subscription is extremely important, as it determines
+        if further payments can be made from it. 
+        The `next_due_date` determines if a further payment may be made at this time.
+        
+        States mostly exclusive, meaning if for a user, one subscription of that state
+        exists, no more for that users with the same state(s) can also exist.
+        This is enforced in the `save()` method.
+        The two "current" states 1 and 2 are mutually exclusive, and while there is
+        an active 2 subscription, there can never be a waiting (3) subscription!
+        Check `EXLUSIVE_STATE_MAP` to for a full list of exclusive states.
+        
+        ### State transition overview:
+        
+        A listing of all cases that can happen, where Subscriptions are created
+        or are transitioning states for one specific user.
+        * Sub is a newly created Subscription (after a successful payment)
+        * S<n> are existing Subscriptions with the state <n>.
+        * Cycle(<result>) is the daily call to `process_due_subscription_payments` to book
+            due subscription payments
+        * Pattern is: <precondition> + <addition> --> <result>
+        
+        1. <None> + Sub --> Sub becomes S2 
+                (new subscription)
+        2. S2 + Sub --> S2 becomes S1, Sub becomes S3 
+                (updated payment infos, becomes active next due date)
+        3. S1 + Sub --> Sub becomes S3 
+                (canceled Subscriptions, created new subscription before next payment due)
+        4. S1,S3 + Sub  --> S1 stays S1, S3 becomes S0, Sub becomes S3 
+                (updated payment infos again, or on a waiting subscription)
+        5. S3 + Sub --> S3 becomes S0, Sub becomes S3 
+                (only a waiting subscription, can happen if the payment provider is down 
+                for multiple days)
+        6. <None> + Cycle() --> no effect 
+                (user has no subscription)
+        7. S2 + Cycle(success) --> S2
+                (successfully booked a recurring payment for subscription)
+        8. S2 + Cycle(payment-failure) --> S2 becomes S99
+                (subscription is suspended because payment for subscription failed 
+                because of no-longer-correct payment infos) 
+        9. S1,S3 + Cycle(success) --> S1 becomes S0, S3 becomes S2
+                (cancelled subscription is terminated after running out, waiting 
+                subscription is cashed in and activated)
+        10. S1,S3 + Cycle(failure) --> S1 becomes S0, S3 becomes S99
+                (cancelled subscription is terminated after running out, waiting 
+                subscription is set to suspended because of failed payment)
+        11. S3 + Cycle(success) --> S3 becomes S2
+                (see 9.)
+        12. S3 + Cycle(failure) --> S3 becomes S99
+                (see 10.)
+        13. S1 + Cycle() --> S1 becomes S0
+                (cancelled subscription is terminated after running out, no further 
+                subscriptions are waiting to be activated)
+        
+        Note: All payments for Subscriptions that would become S3 are made as 
+            pre-authorized payments that will only be cashed in once the Cycle is being 
+            called and the waiting Subscription is due.
+    """
     
     # A cancelled subscription that no longer has any run-time left. There can be many of those.
     STATE_0_TERMINATED = 0
@@ -124,14 +197,21 @@ class Subscription(models.Model):
     # A new subscription waiting for next payment due date, but with another subscription with the state STATE_1_CANCELLED_BUT_ACTIVE.
     # There can only be one subscription with state 3 active at a time.
     STATE_3_WATING_TO_BECOME_ACTIVE = 3
+    # A special state that a subscription gets put in when its payments have been unsuccessful or redacted
+    # This will be kept and can be shown to the user as current subscription,
+    # but can be terminated by them, and it gets terminated immediately if a
+    # new subscription is made 
+    STATE_99_FAILED_PAYMENTS_SUSPENDED = 99
     
     # - A subscription can only ever go from higher number states to lower number states, never back up again!
+    #     (except for the special STATE_99_FAILED_PAYMENTS_SUSPENDED state)
     # - There should only ever be one subscription for each user in both states 1 and 2 combined
     STATES = (
         (STATE_0_TERMINATED, _('Terminated.')),
         (STATE_1_CANCELLED_BUT_ACTIVE, _('Cancelled, but still active')),
         (STATE_2_ACTIVE, _('Active')),
         (STATE_3_WATING_TO_BECOME_ACTIVE, _('Waiting, becoming active at next payment due date')),
+        (STATE_99_FAILED_PAYMENTS_SUSPENDED, _('Suspended, because of payment errors')),
     )
     
     ACTIVE_STATES = (
@@ -148,7 +228,9 @@ class Subscription(models.Model):
     # may exist. enforced at `Subscription.save()`
     EXLUSIVE_STATE_MAP = {
         STATE_1_CANCELLED_BUT_ACTIVE: ACTIVE_STATES,
-        STATE_2_ACTIVE: ACTIVE_STATES,
+        STATE_2_ACTIVE: (STATE_1_CANCELLED_BUT_ACTIVE,
+                         STATE_2_ACTIVE,
+                         STATE_3_WATING_TO_BECOME_ACTIVE),
         STATE_3_WATING_TO_BECOME_ACTIVE: STATE_3_WATING_TO_BECOME_ACTIVE,
     }
     
@@ -199,13 +281,27 @@ class Subscription(models.Model):
         if not user.is_authenticated:
             return None
         return get_object_or_None(cls, user=user, state=Subscription.STATE_2_ACTIVE)
-
+    
+    @classmethod
+    def get_canceled_for_user(cls, user):
+        """ Returns the currently canceled-but-active subscription for a user. """
+        if not user.is_authenticated:
+            return None
+        return get_object_or_None(cls, user=user, state=Subscription.STATE_1_CANCELLED_BUT_ACTIVE)
+    
     @classmethod
     def get_waiting_for_user(cls, user):
         """ Returns the currently waiting subscription for a user. """
         if not user.is_authenticated:
             return None
         return get_object_or_None(cls, user=user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
+    
+    @classmethod
+    def get_suspended_for_user(cls, user):
+        """ Returns the current suspended subscription for a user. """
+        if not user.is_authenticated:
+            return None
+        return get_object_or_None(cls, user=user, state=Subscription.STATE_99_FAILED_PAYMENTS_SUSPENDED)
     
     def validate_state_and_cycle(self):
         """ This will terminate this subscription if it has been cancelled, 
@@ -218,19 +314,7 @@ class Subscription(models.Model):
             self.terminated = now()
             self.save()
             logger.warn('REMOVEME: Done ended old expired sub!')
-            # after a termination, look if there is a waiting sub
-            waiting_sub = get_object_or_None(Subscription, user=self.user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
-            if waiting_sub:
-                # if there was a waiting sub, activate it and set it to the due date of the old one
-                # sanity check: there cannot be an active subscription if we want to activate this one!
-                if Subscription.get_current_for_user(waiting_sub.user) is None:
-                    waiting_sub.state = Subscription.STATE_2_ACTIVE
-                    waiting_sub.next_due_date = self.next_due_date
-                    waiting_sub.save()
-                    logger.warn('REMOVEME: Done activated a waiting sub after terminating an old expired sub!')
-                else:
-                    logger.error('Payments: Critical sanity check fail: Tried to activate a waiting subscription for a user, but there was already an active subscription!. ', extra={'user': waiting_sub.user, 'subscription': waiting_sub})
-    
+            
     def check_payment_due(self):
         """ Returns true if the subscription is active and `next_due_date` is in the past or today.
             Note: To check if a canceled subscription is due to be terminated, 

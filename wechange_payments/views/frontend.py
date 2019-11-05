@@ -42,9 +42,14 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
         if not self.request.user.is_authenticated:
             return super(PaymentView, self).dispatch(request, *args, **kwargs)
         
-        active_subscription = Subscription.get_active_for_user(self.request.user)
-        if active_subscription:
-            return redirect('wechange-payments:my-subscription')
+        allow_active_subscription = kwargs.get('allow_active_subscription', False)
+        if not allow_active_subscription:
+            active_subscription = Subscription.get_active_for_user(self.request.user)
+            if active_subscription:
+                return redirect('wechange-payments:my-subscription')
+        else:
+            kwargs.pop('allow_active_subscription')
+            
         processing_payment = get_object_or_None(Payment, user=request.user, status=Payment.STATUS_COMPLETED_BUT_UNCONFIRMED)
         if processing_payment:
             return redirect(reverse('wechange-payments:payment-process', kwargs={'pk': processing_payment.pk}))
@@ -62,9 +67,13 @@ class PaymentView(RequireLoggedInMixin, TemplateView):
             initial['last_name'] = self.request.user.last_name
         initial['email'] = self.request.user.email
         form = PaymentsForm(initial=initial)
-            
+        
+        current_sub = Subscription.get_current_for_user(self.request.user)
+        waiting_sub = Subscription.get_waiting_for_user(self.request.user)
+        
         context.update({
             'form': form,
+            'displayed_subscription' : waiting_sub or current_sub or None,
         })
         return context
 
@@ -72,12 +81,33 @@ payment = PaymentView.as_view()
 
 
 class PaymentUpdateView(PaymentView):
+    """ Same as the payment view, only that it allows "overwriting" the current
+        subscription. This means that on completion of the payment, the current subscription
+        is canceled, and a new postponed subscription with this payment as reference is created. """
     
     def dispatch(self, request, *args, **kwargs):
-        messages.warning(request, "TODO: Achtung: Eigentlich sollte hier das Bezahlformular erscheinen, und eine neue Bezahlung direkt veranlasst werden können (die im Hintergrund das alte Abo kündigt). Das wird aber in den nächsten Tagen erst implementiert. Bis dahin muss man über 'Zahlungen einstellen' sein Abo erstmal beenden!")
+        if not self.request.user.is_authenticated:
+            return super(PaymentView, self).dispatch(request, *args, **kwargs)
+        
+        # user needs an active or waiting subscription to access this view
+        active_subscription = Subscription.get_active_for_user(self.request.user)
+        waiting_subscription = Subscription.get_waiting_for_user(self.request.user)
+        if not active_subscription and not waiting_subscription:
+            return redirect('wechange-payments:overview')
+        
+        kwargs.update({'allow_active_subscription': True})
         return super(PaymentUpdateView, self).dispatch(request, *args, **kwargs)
-
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(PaymentUpdateView, self).get_context_data(*args, **kwargs)
+        context.update({
+            'update_payment': '1',
+            'is_update_form': True,
+        })
+        return context
+        
 payment_update = PaymentUpdateView.as_view()
+
 
 class PaymentSuccessView(RequireLoggedInMixin, DetailView):
     """ This view shows the "thank-you" screen once the Payment+Subscription is complete. """
@@ -425,10 +455,16 @@ def debug_delete_subscription(request):
     if subscription:
         subscription.state = Subscription.STATE_0_TERMINATED
         subscription.save()
+    waiting_subscription = Subscription.get_waiting_for_user(request.user)
+    if waiting_subscription:
+        waiting_subscription.state = Subscription.STATE_0_TERMINATED
+        waiting_subscription.save()
+        
     processing_payment = get_object_or_None(Payment, user=request.user, status=Payment.STATUS_COMPLETED_BUT_UNCONFIRMED)
     if processing_payment:
         processing_payment.status = Payment.STATUS_FAILED
         processing_payment.save()
+    messages.success(request, 'Test-server-shortcut: Your Contributions were removed!')
     return redirect('wechange-payments:overview')
 
 

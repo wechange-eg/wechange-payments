@@ -4,11 +4,21 @@
 {% block extrahead %}
 	{{ block.super }}
 	
-	{% include 'wechange_payments/partials/slider_dependencies.html' %}
+	{% if not displayed_subscription or displayed_subscription.state == 1 %}
+		{% include 'wechange_payments/partials/slider_dependencies.html' %}
+	{% else %}
+		{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=displayed_subscription.amount %}
+	{% endif %}		
 {% endblock %}
 
 
-{% block page_title %}{% trans "(PF1) Payments" %}{% endblock %}
+{% block page_title %}
+	{% if is_update_form %}
+		{% trans "(PF1a) Update payment information" %}
+	{% else %}
+		{% trans "(PF1) Your Contribution" %}
+	{% endif %}
+{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -16,7 +26,11 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "(PF1) Payments" %}</a></li>
+	{% if is_update_form %}
+		<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "(PF1a) Update payment information" %}</a></li>
+	{% else %}
+		<li><a class="active" href="{% url 'wechange-payments:payment-update' %}">{% trans "(PF1) Your Contribution" %}</a></li>
+	{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -25,16 +39,35 @@
     <form id="payments-form" method="POST" action="{% url "wechange-payments:api-make-subscription-payment" %}" 
     		class="payments-form cosinnus-form form-horizontal large-space" onkeydown="return event.key != 'Enter';">{% csrf_token %}
         
+        {% comment %} Flag for updating payments {% endcomment %}
+        {% if update_payment %}
+			<input type="hidden" name="update_payment" value="{{ update_payment }}" />
+        {% endif %}
+        
         <div class="busy-animation">
         	<i class="fas fa-spinner fa-spin"></i>
         </div>
         
         <!-- a box with semi transparent background -->
         <div class="v2-content">
-	        <div class="error-frame alert alert-danger alert-dismissable" style="display: none;">
-	            <i class="fa fa-exclamation-triangle fa-3x"></i>
-		        <p class="error-message"></p>
-		    </div>
+		    
+		    {% if SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %} 
+				{% if displayed_subscription %}
+			    	<div class="alert alert-warning alert-dismissable">
+			            <i class="fa fa-exclamation fa-3x"></i>
+			            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&#215;</button>
+				        <p style="">
+							Achtung! Zahlungsdaten aktualisieren und weitere Beiträge während eines laufenden monatlichen Beitrags einrichten ist aktuell noch nicht möglich!
+							<br/><br/>
+							Die Zahlung wird am Ende des Dialogs fehlschlagen! Um eine weitere Zahlung zu veranlassen, kann zu Testzwecken die aktuelle Beitragszahlung komplett entfernt werden, indem hier geklickt wird:
+							<br/><br/>
+							<a href="{% url 'wechange-payments:debug-delete-subscription' %}">
+						    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE ALL CURRENT, CANCELED, AND QUEUED SUBSCRIPTIONS
+						    </a>
+						</p>
+				    </div>
+			    {% endif %}
+		    {% endif %}
 		    
 		    <div class="tab-content">
 		    	
@@ -61,16 +94,23 @@
 		    	{% endcomment %}
 				
 				<div class="tab-pane active" id="step2">
-		        	{% include 'wechange_payments/partials/conditional_payment_header.html' %}
+		        	{% include 'wechange_payments/partials/conditional_payment_header.html' with subscription=displayed_subscription %}
 					
 					<hr/>
 					
-					<h3>{% trans "(PF15) Choose your monthly Contribution" %}:</h3>
+					{% if displayed_subscription and displayed_subscription.state != 1 %}
+						<h3>{% trans "(PF15a) Confirm your monthly Contribution" %}:</h3>
+					{% elif displayed_subscription and displayed_subscription.state == 1 %}
+						<h3>{% trans "(PF15b) Choose your new monthly Contribution" %}:</h3>
+					{% else %}
+						<h3>{% trans "(PF15) Choose your monthly Contribution" %}:</h3>
+					{% endif %}
+					
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         			
         			<div class="large-space">
         				<span>
-        					{% trans "(PF15a) Choose the amount you would like to contribute using the slider. You may also enter a higher amount by entering it manually." %}
+        					{% trans "(PF26) Choose the amount you would like to contribute using the slider. You may also choose a higher amount by entering it manually." %}
         					{% trans "(PF24) Contribution amount includes 19% VAT" %}
         				</span>
         			</div>
@@ -92,20 +132,28 @@
 					    </a>
 		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-								{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
+					        	{% if displayed_subscription and displayed_subscription.state != 1 %}
+					        		{% trans "(PF4a) Confirm Contribution Amount" context "payment step button" %}
+					        	{% else %}
+									{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
+								{% endif %}
 					        </span>
 					    </a>
 					    
-					    {% if current_subscription and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
+					    {% if displayed_subscription and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
 						    <hr>
 						    <a href="{% url 'wechange-payments:debug-delete-subscription' %}">
-						    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE THE CANCELED SUBSCRIPTION WHICH IS STILL RUNNING
+						    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE ALL CURRENT, CANCELED, AND QUEUED SUBSCRIPTIONS
 						    </a>
 					    {% endif %}
 					</div>
 				</div>
 				
 				<div class="tab-pane" id="step3">
+					<div class="error-frame alert alert-danger alert-dismissable" style="display: none;">
+			            <i class="fa fa-exclamation-triangle fa-3x"></i>
+				        <p class="error-message"></p>
+				    </div>
 					
 				    {% if SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %} 
 				    	<div class="alert alert-warning alert-dismissable">
@@ -296,8 +344,10 @@
 					
 						<p>
 							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html %}(PF7) By clicking on "Confirm and pay" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
-							{% if current_subscription and current_subscription.next_due_date %}
-								{% blocktrans with date=current_subscription.next_due_date|localize %}(PF21) The next debit will be made on {{ date }}.{% endblocktrans %}
+							{% trans "(PF7a) This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT. The VAT is shown on the invoice." %}
+							<br/><br/>
+							{% if displayed_subscription and displayed_subscription.next_due_date %}
+								{% blocktrans with date=displayed_subscription.next_due_date|localize %}(PF21) The next debit will be made on {{ date }}.{% endblocktrans %}
 							{% else %}
 								{% trans "(PF20) The next debit will be made immediately." %}
 							{% endif %}

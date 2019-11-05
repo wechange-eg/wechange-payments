@@ -9,6 +9,7 @@ from django.utils.encoding import force_text
 
 from cosinnus.utils.files import get_cosinnus_media_file_folder
 from wechange_payments.conf import settings
+from django.contrib.auth import get_user_model
 
 
 def resolve_class(path_to_class):
@@ -30,3 +31,13 @@ def _get_invoice_filename(instance, filename, folder_type='invoices', base_folde
     return path.join(filedir, newfilename)
 
 
+def send_admin_mail_notification(subject, content):
+    """ Sends a very simple mail to all admins """
+    from cosinnus.models.group import CosinnusPortal
+    from cosinnus.core.mail import send_mail_or_fail
+    
+    template = 'wechange_payments/utils/email_blank_template.html'
+    admins = get_user_model().objects.exclude(is_active=False).\
+                        filter(id__in=CosinnusPortal.get_current().admins)
+    for user in admins:
+        send_mail_or_fail(user.email, subject, template, {'content': content})

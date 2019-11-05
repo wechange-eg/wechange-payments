@@ -31,9 +31,15 @@ logger = logging.getLogger('wechange-payments')
 @csrf_exempt
 @never_cache
 @sensitive_post_parameters('iban', 'bic', 'account_holder')
-def make_payment(request, on_success_func=None):
+def make_payment(request, on_success_func=None, make_postponed=False):
     """ A non-user-based payment API function, that can be used for anonymous (or user-based),
-        one-time donations. """
+        one-time donations.
+        
+        @param on_success_func: The function that should be called on success, or None.
+            In case we use a payment method that uses a vendor-step, we will get a postback
+            for a success, so we don't need a success function here in that case.
+        @param make_postponed: If True, make a call that only authorizes the payment, but does
+            not yet process it. """
     
     if not request.method=='POST':
         return HttpResponseNotAllowed(['POST'])
@@ -64,11 +70,11 @@ def make_payment(request, on_success_func=None):
             return JsonResponse({'error': _('Please fill out all of the missing fields!'), 'missing_parameters': missing_params}, status=500)
         
         if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
-            payment, error = backend.make_sepa_payment(params, user=user)
+            payment, error = backend.make_sepa_payment(params, user=user, make_postponed=make_postponed)
         elif payment_type == PAYMENT_TYPE_CREDIT_CARD:
-            payment, error = backend.make_creditcard_payment(params, user=user)
+            payment, error = backend.make_creditcard_payment(params, user=user, make_postponed=make_postponed)
         elif payment_type == PAYMENT_TYPE_PAYPAL:
-            payment, error = backend.make_paypal_payment(params, user=user)
+            payment, error = backend.make_paypal_payment(params, user=user, make_postponed=make_postponed)
             
         if payment is not None and on_success_func is not None:
             return on_success_func(payment)
@@ -98,24 +104,27 @@ def make_subscription_payment(request):
     if not request.user.is_authenticated:
         return HttpResponseForbidden('You must be logged in to do that!')
     
-    # if the user has an existing active or waiting sub, deny this payment (cancelled active subs are ok!)
+    update_payment = request.POST.get('update_payment', '0')
+    update_payment = update_payment == '1'
+    
     active_sub = Subscription.get_active_for_user(request.user)
     waiting_sub = Subscription.get_waiting_for_user(request.user)
-    if active_sub or waiting_sub:
-        return JsonResponse({'error': _('You already have an active subscription and cannot start another one!')}, status=500)
+    cancelled_sub = Subscription.get_canceled_for_user(request.user)
     
-    # if the user has a cancelled, but still active sub, we make special payment that
+    # gatecheck: if the user has an existing active or waiting sub, and is not on the "update payment" page,
+    # deny this payment (cancelled active subs are ok!)
+    if not update_payment and (active_sub or waiting_sub):
+        return JsonResponse({'error': _('You already have an active subscription and cannot start another one!')}, status=500)
+    # gatecheck: if the user is calling an "update payment" call, and has no active or waiting subscription, deny that too
+    if update_payment and not (active_sub or waiting_sub):
+        return JsonResponse({'error': _('You do not currently have an active subscription you could update!')}, status=500)
+        
+    # if the user has an active, or a cancelled, but still active sub, or a waiting sub that has not 
+    # been activated yet, we make special postponed payment that 
     # only saves the account data with the payment provider, but does not actually 
     # transfer any money yet. money will be transfered with the next subscription due date
-    cancelled_sub = Subscription.get_current_for_user(request.user)
-    if cancelled_sub:
-        # sanity check that we are really dealing with a cancelled sub
-        if not cancelled_sub.state == Subscription.STATE_1_CANCELLED_BUT_ACTIVE:
-            logger.error('Critical: User seemed to have a cancelled sub, but sanity check on it failed when trying to make a waiting subscription!', 
-                         extra={'user': request.user.email})
-            return JsonResponse({'error': _('We can not create a new subscription for you at this point. Please contact our support! No payment has been made yet.')}, status=500)
-        # TODO: implement postponed subscription payment!
-        return JsonResponse({'error': 'NYI: Postponed subscription creation is not yet implemented!'}, status=500)
+    make_postponed = bool(active_sub or cancelled_sub)
+    # if for some reason, there is ONLY a waiting sub, we will delete that later
     
     params = request.POST.copy()
     payment_type = params.get('payment_type', None)
@@ -131,9 +140,8 @@ def make_subscription_payment(request):
                 data = {
                     'redirect_to': redirect_url
                 }
-            except Exception as e:
-                logger.error('Payments: Critical! A user made a successful payment, but there was an error while creating his subscription! Find out what happened, create a subscription for them, and contact them!',
-                     extra={'payment-id': payment.id, 'payment': payment, 'user': payment.user, 'exception': e})
+            except:
+                # exception logging happens inside create_subscription_for_payment!
                 if settings.DEBUG:
                     raise
                 # redirect to the success view with errors this point, so the user doesn't just resubmit the form
@@ -147,7 +155,7 @@ def make_subscription_payment(request):
         # use the regular payment method and redirect to a site the vendor provides
         on_success_func = None
         
-    return make_payment(request, on_success_func=on_success_func)
+    return make_payment(request, on_success_func=on_success_func, make_postponed=make_postponed)
 
 
 def subscription_change_amount(request):

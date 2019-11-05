@@ -20,22 +20,6 @@
     	<div class="large-space">
     		<table>
 				<tr>
-					<td>{% trans "(INF2) Subscription Status" %}</td>
-					<td>
-						{% if subscription.state == 3 %}
-							{% trans "(INF3) Will become active after your last subscription expires." context "subscription status" %}
-						{% elif subscription.state == 2 %}
-							{% trans "(INF4) Active since" context "subscription status" %}
-							{{ subscription.created.date|localize }}
-						{% elif subscription.state == 1 %}
-							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
-							{% trans "(INF5) Cancelled" context "subscription status" %}.
-							{% trans "Expires" %}: 
-							{{ subscription.next_due_date|localize }}
-						{% endif %}
-					</td>
-				</tr>
-				<tr>
 					<td>{% trans "(INF10) Last Payment" %}</td>
 					<td>
 						{% if last_payment.status < 3 %}
@@ -53,16 +37,37 @@
 				</tr>
 			</table>
 		</div>
-		<p>
-			{% trans "(INF13) For more information see your invoice overview" %}:
-			<a href="{% url "wechange-payments:invoices" %}">
-	            {% trans "(INF14) Show Invoice overview" %}
+		<div class="regular-space">
+			{% trans "(INF13) All information about your past payments can be found in the invoice overview" %}:
+		</div>
+		<div>
+    		<a href="{% url "wechange-payments:invoices" %}" class="rounded-button button-color-secondary">
+		        <span class="rounded-button-inner">
+					{% trans "(INF14) Show Invoice overview" %}
+		        </span>
 		    </a>
-		</p>
+		</div>
+		<hr class="invisible" />
 		
 		{% if subscription.state >= 2 %}
 		<div class="large-space">
     		<table>
+				<tr>
+					<td>{% trans "(INF2) Contribution Status" %}</td>
+					<td>
+						{% if subscription.state == 3 %}
+							{% trans "(INF3) Will become active after your last Contribution expires." context "subscription status" %}
+						{% elif subscription.state == 2 %}
+							{% trans "(INF4) Active since" context "subscription status" %}
+							{{ subscription.created.date|localize }}
+						{% elif subscription.state == 1 %}
+							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
+							{% trans "(INF5) Cancelled" context "subscription status" %}.
+							{% trans "Expires" %}: 
+							{{ subscription.next_due_date|localize }}
+						{% endif %}
+					</td>
+				</tr>
 				<tr>
 					<td>{% trans "(INF7) Next payment scheduled" %}</td>
 					<td>
@@ -73,13 +78,18 @@
 					<td>{% trans "(INF6) Current monthly contribution" %}</td>
 					<td>
 						<span>{{ subscription.amount|intify }} €</span>
-						<a href="{% url "wechange-payments:payment" %}" style="margin-left: 12px;">
-					            ({% trans "(INF8.1) Adjust contribution amount" %})
-					    </a>
 					</td>
 				</tr>
 			</table>
 		</div>
+		<div>
+    		<a href="{% url "wechange-payments:payment" %}" class="rounded-button button-color-secondary">
+		        <span class="rounded-button-inner">
+					{% trans "(INF8.1) Adjust contribution amount or cancel your Contribution" %}
+		        </span>
+		    </a>
+		</div>
+		
 		{% endif %}
 		
 		<hr class=""></hr>
@@ -117,7 +127,7 @@
     				</tr>
     				<tr>
     					<td>{% trans "Postal Code" %}</td>
-    					<td>{{ payment.postal_code }}</td>
+    					<td>{{ payment.postal_code|stringformat:"05d" }}</td>
     				</tr>
     				<tr>
     					<td>{% trans "City" %}</td>
@@ -131,13 +141,25 @@
     		{% endwith %}
     	</div>
     	
-    	<div>
-    		{% captureas content %}
+    	{% if subscription.state != 1 %}
+	    	<div>
+	    		<a href="{% url "wechange-payments:payment-update" %}" class="rounded-button button-color-secondary">
+			        <span class="rounded-button-inner">
+						{% trans "(TS9) Change payment information" %}
+			        </span>
+			    </a>
+			</div>
+		{% endif %}
+		
+		{% comment %}  
+			Popup explaining payment information
+			
+			{% captureas content %}
 		        <p>
-		        	{% trans "(INF8) To change your payment method or billing address, please cancel the current subscription and set up a new one!" %}
+		        	{% trans "(INF8) To change your payment method or billing address, please cancel the current Contribution and set up a new one!" %}
 		        </p>
 		        <p>
-					{% trans "You will only be billed after the current subscription expires." %} 
+					{% trans "You will only be billed after the current Contribution expires." %} 
 		        </p>
 			{% endcaptureas %}
 			{% captureas custom_button_html %}
@@ -171,11 +193,11 @@
 		    
 			<a class="rounded-button button-color-secondary" href="#" data-toggle="modal" data-target="#changePaymentInfoModal">
 		        <span class="rounded-button-inner">
-		            {% trans "(INF1.1) Change payment information" %}
+		            {% trans "(INF1.1) Change payment informationx" %}
 		        </span>
 		    </a>
-		</div>
 		
+		{% endcomment %}
 
     	{% comment %}  
     		"Back to PORTAL" and "print as pdf" section, todo later! 
