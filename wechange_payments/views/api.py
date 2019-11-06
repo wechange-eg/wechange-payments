@@ -12,7 +12,8 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
 
 import logging
 from wechange_payments.models import Subscription,\
-    USERPROFILE_SETTING_POPUP_CLOSED, Payment
+    USERPROFILE_SETTING_POPUP_CLOSED, Payment,\
+    USERPROFILE_SETTING_POPUP_CLOSED_TIMES
 from wechange_payments.payment import create_subscription_for_payment,\
     change_subscription_amount
 from django.shortcuts import redirect
@@ -253,6 +254,7 @@ def snooze_popup(request):
     try:
         profile = request.user.cosinnus_profile
         profile.settings[USERPROFILE_SETTING_POPUP_CLOSED] = now()
+        profile.settings[USERPROFILE_SETTING_POPUP_CLOSED_TIMES] = profile.settings.get(USERPROFILE_SETTING_POPUP_CLOSED_TIMES, 0) + 1
         profile.save(update_fields=['settings'])
     except Exception as e:
         logger.error('Error in `api.snooze_popup`: %s' % e, extra={'exception': e})

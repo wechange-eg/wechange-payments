@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-05 19:21+0100\n"
+"POT-Creation-Date: 2019-11-06 18:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -642,13 +642,31 @@ msgstr ""
 msgid "(SC7) Show payment summary"
 msgstr ""
 
-msgid "(POP1) wechange is becoming even fairer"
+msgid "(POP1-repeat) popup header"
 msgstr ""
 
-msgid "(POP2) Dear WECHANGE-Community,"
+msgid "(POP2-repeat) dear user,"
 msgstr ""
 
-msgid "(POP3) solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. "
+msgid "(POP3-repeat) popup body text "
+msgstr ""
+
+msgid "(POP1-newuser) popup header"
+msgstr ""
+
+msgid "(POP2-newuser) Dear WECHANGE-Community,"
+msgstr ""
+
+msgid "(POP3-newuser) popup body text"
+msgstr ""
+
+msgid "(POP1-release) popup header"
+msgstr ""
+
+msgid "(POP2-release) dear user,"
+msgstr ""
+
+msgid "(POP3-release) popup body text"
 msgstr ""
 
 msgid "(POP5) Learn more"

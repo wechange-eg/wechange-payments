@@ -56,7 +56,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     # how many days until the payment popup is shown again for non-subscribers, after clicking it away
     POPUP_SHOW_AGAIN_DAYS = 30
     # how many days after a new user registered to show the popup, instead of immediately
-    POPUP_DELAY_FOR_NEW_USERS_DAYS = 7
+    POPUP_DELAY_FOR_NEW_USERS_DAYS = 5
     # how many seconds till the "processing payment" page shows a "we're taking long..." message
     LATE_PAYMENT_PROCESS_MESSAGE_SECONDS = 30
     

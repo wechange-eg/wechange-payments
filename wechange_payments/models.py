@@ -19,6 +19,10 @@ from wechange_payments.utils.utils import _get_invoice_filename
 logger = logging.getLogger('wechange-payments')
 
 USERPROFILE_SETTING_POPUP_CLOSED = 'payment_popup_closed_date'
+USERPROFILE_SETTING_POPUP_CLOSED_TIMES = 'payment_popup_closed_times'
+# False or missing means "existing user"
+# True means newly registered user (after payments were introduced) who hasn't clicked away the popup ever
+USERPROFILE_SETTING_POPUP_USER_IS_NEW = 'payment_popup_user_registered_after_payments'
 
 
 class Payment(models.Model):

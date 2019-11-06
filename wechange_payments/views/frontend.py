@@ -26,7 +26,7 @@ from wechange_payments.backends import get_invoice_backend
 from wechange_payments.conf import settings
 from wechange_payments.forms import PaymentsForm
 from wechange_payments.models import Subscription, Payment, \
-    USERPROFILE_SETTING_POPUP_CLOSED, Invoice
+    USERPROFILE_SETTING_POPUP_CLOSED, Invoice, USERPROFILE_SETTING_POPUP_USER_IS_NEW
 from wechange_payments.payment import cancel_subscription as do_cancel_subscription
 from wechange_payments.tests.example_data import TEST_DATA_SEPA_PAYMENT_FORM
 
@@ -471,5 +471,8 @@ def debug_delete_subscription(request):
 @receiver(userprofile_ceated)
 def delay_payment_popup_for_new_user(sender, profile, **kwargs):
     """ Delays the user's payment popup window by some time after a fresh registration """
-    profile.settings[USERPROFILE_SETTING_POPUP_CLOSED] = now() + timedelta(days=settings.PAYMENTS_POPUP_DELAY_FOR_NEW_USERS_DAYS)
+    # setting it to now - PAYMENTS_POPUP_SHOW_AGAIN_DAYS would 
+    profile.settings[USERPROFILE_SETTING_POPUP_CLOSED] = (now() - timedelta(days=settings.PAYMENTS_POPUP_SHOW_AGAIN_DAYS)) \
+         + timedelta(days=settings.PAYMENTS_POPUP_DELAY_FOR_NEW_USERS_DAYS)
+    profile.settings[USERPROFILE_SETTING_POPUP_USER_IS_NEW] = True # means the user registered after Payments have been introduced
     profile.save(update_fields=['settings'])

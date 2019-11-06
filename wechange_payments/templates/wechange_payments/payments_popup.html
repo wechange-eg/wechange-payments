@@ -1,16 +1,49 @@
 {% load i18n cosinnus_tags %}
 
-{% trans "(POP1) wechange is becoming even fairer" as title %}
+{% if payment_popup_times_closed_before > 0 or request.GET.popup_type == 'repeat' %}
+	{% comment %} Default, long running, monthly reappearing version {% endcomment %}
+	
+	{% trans "(POP1-repeat) popup header" as title %}
+	{% captureas body %}
+		<p>
+			{% trans "(POP2-repeat) dear user," %}
+		</p>
+		<p>
+			{% trans "(POP3-repeat) popup body text " as pop_text %}
+			{{ pop_text|linebreaksbr }}
+		</p>
+		<hr class="invisible" />
+	{% endcaptureas %}
+{% elif payment_popup_user_registered_after_payments or request.GET.popup_type == 'newuser' %}
+	{% comment %} Newly registered user, 5-day or so delayed version {% endcomment %}
+	
+	{% trans "(POP1-newuser) popup header" as title %}
+	{% captureas body %}
+		<p>
+			{% trans "(POP2-newuser) Dear WECHANGE-Community," %}
+		</p>
+		<p>
+			{% trans "(POP3-newuser) popup body text" as pop_text %}
+			{{ pop_text|linebreaksbr }}
+		</p>
+		<hr class="invisible" />
+	{% endcaptureas %}
+{% else %}
+	{% comment %} Old user (registered before payments were introduced) one-time shown version {% endcomment %}
+	
+	{% trans "(POP1-release) popup header" as title %}
+	{% captureas body %}
+		<p>
+			{% trans "(POP2-release) dear user," %}
+		</p>
+		<p>
+			{% trans "(POP3-release) popup body text" as pop_text %}
+			{{ pop_text|linebreaksbr }}
+		</p>
+		<hr class="invisible" />
+	{% endcaptureas %}
+{% endif %}
 
-{% captureas body %}
-	<p>
-		{% trans "(POP2) Dear WECHANGE-Community," %}
-	</p>
-	<p>
-		{% trans "(POP3) solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. solidary price model text. " as pop_text %}
-		{{ pop_text|linebreaksbr }}
-	</p>
-	<hr class="invisible" />
 	{% comment %}  
 	Inspirational quote is out for now	
 	
@@ -21,7 +54,6 @@
 		
 	</p>
 	{% endcomment %}
-{% endcaptureas %}
 
 {% captureas buttons %}
 	<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
