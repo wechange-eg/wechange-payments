@@ -3,13 +3,13 @@
 {% if payment_popup_times_closed_before > 0 or request.GET.popup_type == 'repeat' %}
 	{% comment %} Default, long running, monthly reappearing version {% endcomment %}
 	
-	{% trans "(POP1-repeat) popup header" as title %}
+	{% trans "popup header" context "(POP1-repeat)" as title %}
 	{% captureas body %}
 		<p>
-			{% trans "(POP2-repeat) dear user," %}
+			{% trans "dear user," context "(POP2-repeat)" %}
 		</p>
 		<p>
-			{% trans "(POP3-repeat) popup body text " as pop_text %}
+			{% trans "popup body text " context "(POP3-repeat)" as pop_text %}
 			{{ pop_text|linebreaksbr }}
 		</p>
 		<hr class="invisible" />
@@ -17,13 +17,13 @@
 {% elif payment_popup_user_registered_after_payments or request.GET.popup_type == 'newuser' %}
 	{% comment %} Newly registered user, 5-day or so delayed version {% endcomment %}
 	
-	{% trans "(POP1-newuser) popup header" as title %}
+	{% trans "popup header" context "(POP1-newuser)" as title %}
 	{% captureas body %}
 		<p>
-			{% trans "(POP2-newuser) Dear WECHANGE-Community," %}
+			{% trans "Dear WECHANGE-Community," context "(POP2-newuser)" %}
 		</p>
 		<p>
-			{% trans "(POP3-newuser) popup body text" as pop_text %}
+			{% trans "popup body text" context "(POP3-newuser)" as pop_text %}
 			{{ pop_text|linebreaksbr }}
 		</p>
 		<hr class="invisible" />
@@ -31,13 +31,13 @@
 {% else %}
 	{% comment %} Old user (registered before payments were introduced) one-time shown version {% endcomment %}
 	
-	{% trans "(POP1-release) popup header" as title %}
+	{% trans "popup header" context "(POP1-release)" as title %}
 	{% captureas body %}
 		<p>
-			{% trans "(POP2-release) dear user," %}
+			{% trans "dear user," context "(POP2-release)" %}
 		</p>
 		<p>
-			{% trans "(POP3-release) popup body text" as pop_text %}
+			{% trans "popup body text" context "(POP3-release)" as pop_text %}
 			{{ pop_text|linebreaksbr }}
 		</p>
 		<hr class="invisible" />
@@ -48,9 +48,9 @@
 	Inspirational quote is out for now	
 	
 	<p>
-		<b>{% trans "(POP4a) 'inspirational quote'" %}</b>
+		<b>{% trans "'inspirational quote'" context "(POP4a)" %}</b>
 		<br/>
-		{% trans "(POP4b) quote credit" %}</b>
+		{% trans "quote credit" context "(POP4b)" %}</b>
 		
 	</p>
 	{% endcomment %}
@@ -58,12 +58,12 @@
 {% captureas buttons %}
 	<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
         <span class="rounded-button-inner">
-            {% trans "(POP5) Learn more" %}
+            {% trans "Learn more" context "(POP5)" %}
         </span>
     </a>
     <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted">
         <span class="rounded-button-inner">
-            {% trans "(POP6) Choose amount" %}
+            {% trans "Choose amount" context "(POP6)" %}
         </span>
     </a>
 {% endcaptureas %}

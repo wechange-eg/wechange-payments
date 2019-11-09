@@ -14,9 +14,9 @@
 
 {% block page_title %}
 	{% if is_update_form %}
-		{% trans "(PF1a) Update payment information" %}
+		{% trans "Update payment information" context "(PF1a)" %}
 	{% else %}
-		{% trans "(PF1) Your Contribution" %}
+		{% trans "Your Contribution" context "(PF1)" %}
 	{% endif %}
 {% endblock %}
 
@@ -27,9 +27,9 @@
 {% block breadcrumb %}
 	{{ block.super }}
 	{% if is_update_form %}
-		<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "(PF1a) Update payment information" %}</a></li>
+		<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "Update payment information" context "(PF1a)" %}</a></li>
 	{% else %}
-		<li><a class="active" href="{% url 'wechange-payments:payment-update' %}">{% trans "(PF1) Your Contribution" %}</a></li>
+		<li><a class="active" href="{% url 'wechange-payments:payment-update' %}">{% trans "Your Contribution" context "(PF1)" %}</a></li>
 	{% endif %}
 {% endblock %}
 
@@ -79,12 +79,12 @@
 					<div class="button-section clearfix">
 						<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 					        <span class="rounded-button-inner">
-					            {% trans "(PF2) Learn more" %}
+					            {% trans "Learn more" context "(PF2)" %}
 					        </span>
 					    </a>
 		                <a class="rounded-button button-color-primary-inverted focus-slider-onclick" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-								{% trans "(PF3) Choose Contribution" context "payment step button" %}
+								{% trans "Choose Contribution" context "(PF3)" %}
 					        </span>
 					    </a>
 					    
@@ -99,19 +99,19 @@
 					<hr/>
 					
 					{% if displayed_subscription and displayed_subscription.state != 1 %}
-						<h3>{% trans "(PF15a) Confirm your monthly Contribution" %}:</h3>
+						<h3>{% trans "Confirm your monthly Contribution" context "(PF15a)" %}:</h3>
 					{% elif displayed_subscription and displayed_subscription.state == 1 %}
-						<h3>{% trans "(PF15b) Choose your new monthly Contribution" %}:</h3>
+						<h3>{% trans "Choose your new monthly Contribution" context "(PF15b)" %}:</h3>
 					{% else %}
-						<h3>{% trans "(PF15) Choose your monthly Contribution" %}:</h3>
+						<h3>{% trans "Choose your monthly Contribution" context "(PF15)" %}:</h3>
 					{% endif %}
 					
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
         			
         			<div class="large-space">
         				<span>
-        					{% trans "(PF26) Choose the amount you would like to contribute using the slider. You may also choose a higher amount by entering it manually." %}
-        					{% trans "(PF24) Contribution amount includes 19% VAT" %}
+        					{% trans "Choose the amount you would like to contribute using the slider. You may also choose a higher amount by entering it manually." context "(PF26)" %}
+        					{% trans "Contribution amount includes 19% VAT" context "(PF24)" %}
         				</span>
         			</div>
         			
@@ -120,22 +120,22 @@
         				Gone, because step1 disabled
         				<a class="rounded-button button-color-secondary" href="#step1" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-					            &lt; {% trans "(PF16) I changed my mind" context "payment step button" %}
+					            &lt; {% trans "I changed my mind" context "(PF16)" %}
 					        </span>
 					    </a>
         				{% endcomment %}
 					    
 					    <a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
 					        <span class="rounded-button-inner">
-					            {% trans "(PF2) Learn more" %}
+					            {% trans "Learn more" context "(PF2)" %}
 					        </span>
 					    </a>
 		                <a class="pull-right rounded-button button-color-primary-inverted" href="#step3" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
 					        	{% if displayed_subscription and displayed_subscription.state != 1 %}
-					        		{% trans "(PF4a) Confirm Contribution Amount" context "payment step button" %}
+					        		{% trans "Confirm Contribution Amount" context "(PF4a)" %}
 					        	{% else %}
-									{% trans "(PF4) Set Contribution Amount" context "payment step button" %}
+									{% trans "Set Contribution Amount" context "(PF4)" %}
 								{% endif %}
 					        </span>
 					    </a>
@@ -172,7 +172,7 @@
 				    {% endif %}
 				
 					<h2>
-						{% trans "(PF5)  Almost done! Please enter your account information below." %}
+						{% trans " Almost done! Please enter your account information below." context "(PF5)" %}
 					</h2>
 		            
 					{% trans "Payment Type" as label %}
@@ -258,19 +258,19 @@
 		        	
 		        	<hr class="invisible"/>
 		        	<div class="large-space">
-			        	{% trans "(PF18) No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment." context "payment step explanation" %}
+			        	{% trans "No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment." context "(PF18)" %}
 				    </div>
 				    
 				    <hr class="invisible"/>
 					<div class="button-section clearfix">
 						<a class="rounded-button button-color-secondary focus-slider-onclick" href="#step2" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-					            &lt; {% trans "(PF8) Modify Contribution Amount" context "payment step button" %}
+					            &lt; {% trans "Modify Contribution Amount" context "(PF8)" %}
 					        </span>
 					    </a>
 					    <a class="pull-right rounded-button button-color-primary-inverted  to-step4-button">
 					        <span class="rounded-button-inner">
-								{% trans "(PF17) Confirm data and continue" context "payment step button" %}
+								{% trans "Confirm data and continue" context "(PF17)" %}
 					        </span>
 					    </a>
 					    <a class="hidden-step-4-button" href="#step4" role="tab" data-toggle="tab" style="display: none;"></a>
@@ -279,7 +279,7 @@
 				
 				<div class="tab-pane" id="step4">
 				
-					<h2>{% trans "(PF19) Review and Confirm Payment" %}</h2>
+					<h2>{% trans "Review and Confirm Payment" context "(PF19)" %}</h2>
 					
 					<div class="payment-summary payment-info-page">
 						<div class="large-space">
@@ -343,18 +343,18 @@
 						</div>
 					
 						<p>
-							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html %}(PF7) By clicking on "Confirm and pay" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
-							{% trans "(PF7a) This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT. The VAT is shown on the invoice." %}
+							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html context "(PF7)" %}By clicking on "Confirm and pay" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
+							{% trans "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT. The VAT is shown on the invoice." context "(PF7a)" %}
 							<br/><br/>
 							{% if displayed_subscription and displayed_subscription.next_due_date %}
-								{% blocktrans with date=displayed_subscription.next_due_date|localize %}(PF21) The next debit will be made on {{ date }}.{% endblocktrans %}
+								{% blocktrans with date=displayed_subscription.next_due_date|localize context "(PF21)" %}The next debit will be made on {{ date }}.{% endblocktrans %}
 							{% else %}
-								{% trans "(PF20) The next debit will be made immediately." %}
+								{% trans "The next debit will be made immediately." context "(PF20)" %}
 							{% endif %}
-							{% trans "(PF22) You can adjust the amount of your monthly contribution or cancel payments at any time." %}
+							{% trans "You can adjust the amount of your monthly contribution or cancel payments at any time." context "(PF22)" %}
 						</p>
 						
-						{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(PF23) Thank you for supporting {{ portal_name }}!{% endblocktrans %}
+						{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(PF23)" %}Thank you for supporting {{ portal_name }}!{% endblocktrans %}
 					</div>
 					
 					<div data-only-required-step="#step4">
@@ -364,12 +364,12 @@
 				    <div class="button-section clearfix">
 						<a class="rounded-button button-color-secondary focus-slider-onclick" href="#step3" role="tab" data-toggle="tab">
 					        <span class="rounded-button-inner">
-					            &lt; {% trans "(PF25) Change payment information" context "payment step button" %}
+					            &lt; {% trans "Change payment information" context "(PF25)" %}
 					        </span>
 					    </a>
 					    <button type="submit" class="pull-right rounded-button button-color-primary-inverted">
 					        <span class="rounded-button-inner">
-								{% trans "(PF9) Confirm and pay" context "payment step button (legally binding!)" %}
+								{% trans "Confirm and pay" context "(PF9 - legally binding!)" %}
 					        </span>
 					    </button>		
 					

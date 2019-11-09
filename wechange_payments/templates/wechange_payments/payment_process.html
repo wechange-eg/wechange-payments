@@ -6,7 +6,7 @@
 {% endblock %}
 
 
-{% block page_title %}{% trans "(PRC1) Payment processing..." %}{% endblock %}
+{% block page_title %}{% trans "Payment processing..." context "(PRC1)" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -14,41 +14,41 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "(PRC1) Payment processing..." %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "Payment processing..." context "(PRC1)" %}</a></li>
 {% endblock %}
 
 {% block content %}
     
     <!-- a box with semi transparent background -->
     <div class="v2-content">
-		<h3>{% trans "(PRC1) Payment processing..." %}</h3>
+		<h3>{% trans "Payment processing..." context "(PRC1)" %}</h3>
 		
 		{% if payment.status == 1 %}
 			<p>
-				{% trans "(PRC2) Please complete your payment with the payment provider, or restart the payment process." %}
+				{% trans "Please complete your payment with the payment provider, or restart the payment process." context "(PRC2)" %}
 			</p>
 		{% elif payment.status == 2 %}
 			<meta http-equiv="refresh" content="5" />
 			<p>
-				{% trans "(PRC3) Please wait while your payment is being processed..." %}
+				{% trans "Please wait while your payment is being processed..." context "(PRC3)" %}
 				<i class="fa fa-spinner fa-spin"></i>
 			</p>
 			{% if show_taking_long_message %}
 				<hr class="invisible" />
 				<p>
-					{% trans "(PRC4) Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!" %}
+					{% trans "Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!" context "(PRC4)" %}
 				</p>
 				<p>
-					{% trans "(PRC5) If your payment has not been processed after a day, please contact our support!" %}
+					{% trans "If your payment has not been processed after a day, please contact our support!" context "(PRC5)" %}
 					{% if COSINNUS_CURRENT_PORTAL.support_email %}
-						<a href="#" data-toggle="modal" data-target="#supportModal">{% trans "(LN6) Contact our Support" %}</a>
+						<a href="#" data-toggle="modal" data-target="#supportModal">{% trans "Contact our Support" context "(LN6)" %}</a>
 					{% endif %}
 				</p>
 			{% endif %}
 		{% else %}
 		<p>
 			{% comment %} This case should never be shown here! {% endcomment %}
-			{% trans "(PRC4) An unexpected error has occured during your payment." %}
+			{% trans "An unexpected error has occured during your payment." context "(PRC4)" %}
 			{% trans "Please try again or contact our support for assistance!" %}
 		</p>
 		{% endif %}

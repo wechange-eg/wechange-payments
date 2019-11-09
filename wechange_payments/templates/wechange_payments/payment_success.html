@@ -6,7 +6,7 @@
 {% endblock %}
 
 
-{% block page_title %}{% trans "(SC1) Payment Success" %}{% endblock %}
+{% block page_title %}{% trans "Payment Success" context "(SC1)" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -14,7 +14,7 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "(SC2) Payments" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:payment' %}">{% trans "Payments" context "(SC2)" %}</a></li>
 {% endblock %}
 
 {% block content %}
@@ -23,10 +23,10 @@
         <div class="error-frame alert alert-danger alert-dismissable">
             <i class="fa fa-exclamation-triangle fa-3x"></i>
 	        <p class="error-message">
-	        	{% trans "(SC3) Your payment was processed successfully, but your Contribution could not be activated due to an internal server error." %}
+	        	{% trans "Your payment was processed successfully, but your Contribution could not be activated due to an internal server error." context "(SC3)" %}
 	        </p>
 			<p>	        	
-				{% trans "(SC4) Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!" %}
+				{% trans "Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!" context "(SC4)" %}
 			</p>
 			<p>	        	
 	        	{% if COSINNUS_CURRENT_PORTAL.support_email %}
@@ -38,10 +38,10 @@
     
     <!-- a box with semi transparent background -->
     <div class="v2-content">
-		<h1>{% trans "(SC5) Thank you for subscribing!" %}</h1>
+		<h1>{% trans "Thank you for subscribing!" context "(SC5)" %}</h1>
 		
 		<p>
-			{% trans "(SC6) Thank you text" %}
+			{% trans "Thank you text" context "(SC6)" %}
 		</p>
 		
 		{% if payment.type == 'dd' %}
@@ -57,12 +57,12 @@
 		    <div class="button-section clearfix">
 		    	<a href="{% get_non_cms_root_url %}" class="rounded-button button-color-primary-inverted">
 			        <span class="rounded-button-inner">
-	                    {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(SC8) Back to {{ portal_name }}{% endblocktrans %}
+	                    {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(SC8)" %}Back to {{ portal_name }}{% endblocktrans %}
 			        </span>
 			    </a>
 	            <a href="{% url "wechange-payments:payment-infos" %}" class="pull-right rounded-button button-color-primary-inverted">
 			        <span class="rounded-button-inner">
-	                    {% trans "(SC7) Show payment summary" %}
+	                    {% trans "Show payment summary" context "(SC7)" %}
 			        </span>
 			    </a>
 			</div>

@@ -1,7 +1,7 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
-{% block page_title %}{% trans "(TS1) Cancel your monthly Contribution" %}{% endblock %}
+{% block page_title %}{% trans "Cancel your monthly Contribution" context "(TS1)" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -9,32 +9,32 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:cancel-subscription' %}">{% trans "(TS1) Cancel your monthly Contribution" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:cancel-subscription' %}">{% trans "Cancel your monthly Contribution" context "(TS1)" %}</a></li>
 {% endblock %}
 
 {% block content %}
     
     <!-- a box with semi transparent background -->
     <div class="v2-content">
-    	<h2>{% trans "(TS1) Cancel your monthly Contribution" %}</h2>
+    	<h2>{% trans "Cancel your monthly Contribution" context "(TS1)" %}</h2>
     	
     	<p>
-    		{% trans "(TS2) sorry and think-about-it-again-please text" %}
+    		{% trans "sorry and think-about-it-again-please text" context "(TS2)" %}
     	</p>
     	
-    	<h3>{% trans "(TS3) What happens when you cancel your monthly Contribution" %}</h3>
+    	<h3>{% trans "What happens when you cancel your monthly Contribution" context "(TS3)" %}</h3>
     	<p>
 			{% if current_subscription.state == 3 %}
-				{% trans "(TS4) (explanation) No payments have been made yet. Your monthly Contribution will be cancelled." %}
+				{% trans "No payments have been made yet. Your monthly Contribution will be cancelled." context "(TS4) (explanation)" %}
 			{% elif current_subscription.state == 2 %}
-				{% blocktrans with date=current_subscription.next_due_date|localize %}(TS5) (explanation) Your monthly Contribution will be terminated and no future payments will be made. Your currently paid Contribution status will remain active until {{ date }}.{% endblocktrans %}
+				{% blocktrans with date=current_subscription.next_due_date|localize context "(TS5)" %}(explanation) Your monthly Contribution will be terminated and no future payments will be made. Your currently paid Contribution status will remain active until {{ date }}.{% endblocktrans %}
 			{% endif %}
 		</p>
 		
 		<div class="button-section clearfix">
-            <a class="pull-right rounded-button button-color-secondary" data-toggle="modal" data-target="#cancel_confirm_modal">
+		    <a href="{% url "wechange-payments:my-subscription" %}" class="pull-right rounded-button button-color-primary-inverted">
 		        <span class="rounded-button-inner">
-					{% trans "(TS6) Cancel your Contribution" %}
+					{% trans "Modify Contribution Amount" context "(MS5)" %}
 		        </span>
 		    </a>
 		    <a href="{% url "wechange-payments:overview" %}" class="pull-left rounded-button button-color-tertiary">
@@ -45,15 +45,15 @@
 		</div>
 		
 		<div class="button-section clearfix">
-            <a href="{% url "wechange-payments:my-subscription" %}" class="pull-right rounded-button button-color-primary-inverted">
+            <a class="pull-right rounded-button button-color-secondary" data-toggle="modal" data-target="#cancel_confirm_modal">
 		        <span class="rounded-button-inner">
-					{% trans "(MS5) Modify Contribution Amount" context "payment step button" %}
+					{% trans "Cancel your Contribution" context "(TS6)" %}
 		        </span>
 		    </a>
 		</div>
     	
-	    {% captureas label %}{% trans "(TS7) Confirm Contribution canceling confirm-dialog header" %}{% endcaptureas %}
-	    {% captureas title %}{% trans "(TS8) Confirm Contribution canceling confirm-dialog text" %}{% endcaptureas %}
+	    {% captureas label %}{% trans "Confirm Contribution canceling confirm-dialog header" context "(TS7)" %}{% endcaptureas %}
+	    {% captureas title %}{% trans "Confirm Contribution canceling confirm-dialog text" context "(TS8)" %}{% endcaptureas %}
 	    {% include "cosinnus/modal_box.html" with id="cancel_confirm_modal" label=label title=title title_icon="fa-close" form_action="." %}
     </div>
     

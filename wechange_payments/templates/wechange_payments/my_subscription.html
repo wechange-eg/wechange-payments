@@ -7,7 +7,7 @@
 	{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=subscription.amount %}
 {% endblock %}
 
-{% block page_title %}{% trans "(MS1) Your Contribution" %}{% endblock %}
+{% block page_title %}{% trans "Your Contribution" context "(MS1)" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -15,7 +15,7 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "(MS1) Your Contribution" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "Your Contribution" context "(MS1)" %}</a></li>
 {% endblock %}
 
 {% block content %}
@@ -33,22 +33,22 @@
 		    
 		    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
 		    
-		    <h2>{% blocktrans with amount=subscription.amount|intify %}(MS2) Your current Contribution is {{ amount }} Euro per month{% endblocktrans %}</h2>
+		    <h2>{% blocktrans with amount=subscription.amount|intify context "(MS2)" %}Your current Contribution is {{ amount }} Euro per month{% endblocktrans %}</h2>
 			<p>
-				{% trans "(MS3) Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" %}
+				{% trans "Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" context "(MS3)" %}
 			</p>
 			<p>
-				<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}">{% trans "(MS4) Learn more" %}</a>
+				<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}">{% trans "Learn more" context "(MS4)" %}</a>
 			</p>
 
 			<hr/>
 			
-			<h3>{% trans "(MS7) Change your monthly Contribution" %}:</h3>
+			<h3>{% trans "Change your monthly Contribution" context "(MS7)" %}:</h3>
 			
         	<div class="large-space">
 				<span>
-					{% trans "(MS8) If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually." %}
-					{% trans "(PF24) Contribution amount includes 19% VAT" %}
+					{% trans "If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually." context "(MS8)" %}
+					{% trans "Contribution amount includes 19% VAT" context "(PF24)" %}
 				</span>
 			</div>
 			
@@ -61,20 +61,20 @@
 				{% endcomment %}
                 <button type="submit" class="pull-right rounded-button button-color-primary-inverted"> 
 			        <span class="rounded-button-inner">
-						{% trans "(MS5) Modify Contribution Amount" context "payment step button" %}
+						{% trans "Modify Contribution Amount" context "(MS5)" %}
 			        </span>
 			    </button>
 			    	
 				    <a href="{% url "wechange-payments:cancel-subscription" %}" class="pull-left rounded-button button-color-tertiary">
 				        <span class="rounded-button-inner">
-	                		{% trans "(MS6) Cancel your Contribution" %}
+	                		{% trans "Cancel your Contribution" context "(MS6)" %}
 				        </span>
 				    </a>
 			    {% comment %}  
 		    	No changing payment infos here for now
 			    <a href="{% url "wechange-payments:payment-update" %}" class="pull-left rounded-button button-color-secondary">
 			        <span class="rounded-button-inner">
-						{% trans "(TS9) Change payment information" %}
+						{% trans "Change payment information" context "(TS9)" %}
 			        </span>
 			    </a>
 			    {% endcomment %}

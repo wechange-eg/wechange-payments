@@ -1,31 +1,31 @@
-{% load l10n i18n %}
+{% load l10n i18n cosinnus_tags %}
 
 {% if subscription and subscription.state == 1 %}
 	{% comment %} Case for a still running, canceled subscription {% endcomment %}
-	<h2>{% trans "(PF10) Your monthly Contributions will end soon!" %}</h2>
+	<h2>{% trans "Your monthly Contributions will end soon!" context "(PF10)" %}</h2>
 	<p>
-		{% trans "(PF11) Your paid contribution is valid until" %}
+		{% trans "Your paid contribution is valid until" context "(PF11)" %}
 		{{ subscription.next_due_date|localize }}
 	</p>
 	<p>
-		{% trans "(PF12) We're sorry to see you go! To continue contributing, simply create a new Contribution! Don't worry, we will start charging you only when your current Contribution runs out!" as desc_text %}
+		{% trans "We're sorry to see you go! To continue contributing, simply create a new Contribution! Don't worry, we will start charging you only when your current Contribution runs out!" context "(PF12)" as desc_text %}
 		{{ desc_text|linebreaksbr }}
 	</p>
 {% elif subscription %}
 	{% comment %} Case for a still running subscription (update payment info form) {% endcomment %}
-	<h2>{% trans "(PF10a) Update your payment information" %}</h2>
+	<h2>{% trans "Update your payment information" context "(PF10a)" %}</h2>
 	<p>
-		{% blocktrans with date=subscription.next_due_date|localize %}(PF11a) You can choose a new payment method or update your payment information here. The next payment will be made when your Contribution is due, on {{ date }}.{% endblocktrans %}
+		{% blocktrans with date=subscription.next_due_date|localize context "(PF11a)" %}You can choose a new payment method or update your payment information here. The next payment will be made when your Contribution is due, on {{ date }}.{% endblocktrans %}
 	</p>
 	<p>
-		{% trans "(PF11x) If you only want to change the amount you contribute each month using the same payment information, you can do this here" %}:
-		<a href="{% url 'wechange-payments:my-subscription' %}">{% trans "(PF1) Your Contribution" %}</a>
+		{% trans "If you only want to change the amount you contribute each month using the same payment information, you can do this here" context "(PF11x)" %}:
+		<a href="{% url 'wechange-payments:my-subscription' %}">{% trans "Your Contribution" context "(PF1)" %}</a>
 	</p>
 {% else %}
 	{% comment %} Case for no subscription {% endcomment %}
-	<h2>{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}(PF13) You are using {{ portal_name }} free of charge.{% endblocktrans %}</h2>
+	<h2>{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(PF13)" %}You are using {{ portal_name }} free of charge.{% endblocktrans %}</h2>
 	<p>
-		{% trans "(PF14) Final description text for First Payment Step box" as desc_text %}
+		{% trans "Final description text for First Payment Step box" context "(PF14)" as desc_text %}
 		{{ desc_text|linebreaksbr }}
 	</p>
 {% endif %}
