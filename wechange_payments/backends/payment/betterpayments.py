@@ -22,14 +22,9 @@ from wechange_payments.models import TransactionLog, Payment, Subscription
 from wechange_payments.payment import create_subscription_for_payment
 from wechange_payments.utils.utils import send_admin_mail_notification
 
-
 logger = logging.getLogger('wechange-payments')
 
-
 BETTERPAYMENTS_API_ENDPOINT_PAYMENT = '/rest/payment'
-BETTERPAYMENTS_API_ENDPOINT_AUTHORIZE_PAYMENT = '/rest/authorize'
-BETTERPAYMENTS_API_ENDPOINT_CAPTURE_PAYMENT = '/rest/capture'
-
 
 # a list of sensitive parameter keys that should be dropped from postback data and not saved in our DB
 BETTERPAYMENT_SENSITIVE_POSTBACK_PARAMS = [
@@ -315,13 +310,9 @@ class BetterPaymentBackend(BaseBackend):
             @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (Payment`, None) if successful or (None, Str-error-message)
         """
-        if make_postponed:
-            # TODO: Postponed payments are not yet possible!
-            if True:
-                return None, 'Achtung! Zahlungsdaten aktualisieren und weitere Beiträge während eines laufenden monatlichen Beitrags einrichten ist aktuell noch nicht möglich!'
+        if make_postponed and not settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
+            return None, _('Making postponed payments is currently not possible!')
             
-            post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_AUTHORIZE_PAYMENT
-            logger.warn('REMOVEME: now doing CAPTURE payment')
         else:
             post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
         data = {

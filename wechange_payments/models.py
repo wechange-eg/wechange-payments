@@ -154,6 +154,39 @@ class Subscription(models.Model):
             due subscription payments
         * Pattern is: <precondition> + <addition> --> <result>
         
+        Case A: If PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED == False:
+        ---------------
+            Postponed payments are not implemented right now. 
+            Betterpayments does not support these, but another payment provider might.
+            Any payment info changes trigger the current subscription to be instantly
+            terminated, and a new subscription to be created, which gets the remaining
+            runtime of the current subscription added to it.
+        
+        1. <None> + Sub --> Sub becomes S2 
+                (new subscription)
+        2. S2 + Sub --> S2 becomes S0, Sub becomes S2 
+                (updated payment infos, old sub is terminated, new Sub gets time of old S2 added)
+        3. S1 + Sub --> S1 becomes S0, Sub becomes S2 
+                (canceled Subscriptions, created new subscription before next payment due, 
+                old sub is terminated, new Sub gets time of old S2 added)
+        4. <None> + Cycle() --> no effect 
+                (user has no subscription)
+        5. S2(due) + Cycle(success) --> S2
+                (successfully booked a recurring payment for a due subscription)
+        6. S2(due) + Cycle(payment-failure) --> S2 becomes S99
+                (due subscription is suspended because payment for subscription failed 
+                because of no-longer-correct payment infos) 
+        7. S1(due) + Cycle() --> S1 becomes S0
+                (cancelled subscription is terminated after its due date arrives, no further 
+                subscriptions are waiting to be activated)
+        
+        Case B (NOT IMPLEMENTED): If PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED == True:
+        ---------------
+        Should postponed payments ever be fully implemented, there is a
+        waiting state for postponed payments, that are meant for future 
+        subscriptions to wait to become active until the current one runs out.
+        This is how it should act out:
+        
         1. <None> + Sub --> Sub becomes S2 
                 (new subscription)
         2. S2 + Sub --> S2 becomes S1, Sub becomes S3 
@@ -200,7 +233,7 @@ class Subscription(models.Model):
     STATE_2_ACTIVE = 2
     # A new subscription waiting for next payment due date, but with another subscription with the state STATE_1_CANCELLED_BUT_ACTIVE.
     # There can only be one subscription with state 3 active at a time.
-    STATE_3_WATING_TO_BECOME_ACTIVE = 3
+    STATE_3_WAITING_TO_BECOME_ACTIVE = 3
     # A special state that a subscription gets put in when its payments have been unsuccessful or redacted
     # This will be kept and can be shown to the user as current subscription,
     # but can be terminated by them, and it gets terminated immediately if a
@@ -210,13 +243,19 @@ class Subscription(models.Model):
     # - A subscription can only ever go from higher number states to lower number states, never back up again!
     #     (except for the special STATE_99_FAILED_PAYMENTS_SUSPENDED state)
     # - There should only ever be one subscription for each user in both states 1 and 2 combined
-    STATES = (
+    STATES = [
         (STATE_0_TERMINATED, _('Terminated.')),
         (STATE_1_CANCELLED_BUT_ACTIVE, _('Cancelled, but still active')),
         (STATE_2_ACTIVE, _('Active')),
-        (STATE_3_WATING_TO_BECOME_ACTIVE, _('Waiting, becoming active at next payment due date')),
+    ]
+    # switch for not-implemented postponed subscriptions
+    if settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
+        STATES += [
+            (STATE_3_WAITING_TO_BECOME_ACTIVE, _('Waiting, becoming active at next payment due date')),
+        ]
+    STATES += [
         (STATE_99_FAILED_PAYMENTS_SUSPENDED, _('Suspended, because of payment errors')),
-    )
+    ]
     
     ACTIVE_STATES = (
         STATE_1_CANCELLED_BUT_ACTIVE,
@@ -234,8 +273,8 @@ class Subscription(models.Model):
         STATE_1_CANCELLED_BUT_ACTIVE: ACTIVE_STATES,
         STATE_2_ACTIVE: (STATE_1_CANCELLED_BUT_ACTIVE,
                          STATE_2_ACTIVE,
-                         STATE_3_WATING_TO_BECOME_ACTIVE),
-        STATE_3_WATING_TO_BECOME_ACTIVE: STATE_3_WATING_TO_BECOME_ACTIVE,
+                         STATE_3_WAITING_TO_BECOME_ACTIVE),
+        STATE_3_WAITING_TO_BECOME_ACTIVE: STATE_3_WAITING_TO_BECOME_ACTIVE,
     }
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
@@ -298,7 +337,7 @@ class Subscription(models.Model):
         """ Returns the currently waiting subscription for a user. """
         if not user.is_authenticated:
             return None
-        return get_object_or_None(cls, user=user, state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE)
+        return get_object_or_None(cls, user=user, state=Subscription.STATE_3_WAITING_TO_BECOME_ACTIVE)
     
     @classmethod
     def get_suspended_for_user(cls, user):
@@ -340,15 +379,21 @@ class Subscription(models.Model):
     
     def set_next_due_date(self, last_target_date):
         """ Sets the `next_due_date` based on the date of the last target date.
-            This will set the due date to the target date's next month, with the day of month of the reference payment,
-            or the last day of month if it is a shorter month.
+            This will set the due date to one month ahead of the target date's, 
+            with the day of month of the reference payment, or the last day of month
+            if it is a shorter month.
             Should be called after a recurring payment has been successfully made. """
-        next_month_date = last_target_date + relativedelta.relativedelta(months=1)
+        self.next_due_date = self.get_due_date_after_next(last_target_date) 
+    
+    def get_due_date_after_next(self, target_date=None):
+        if target_date is None:
+            target_date = self.next_due_date
+        next_month_date = target_date + relativedelta.relativedelta(months=1)
         try:
             next_month_date.replace(day=self.reference_payment.completed_at.day)
         except:
             pass
-        self.next_due_date = next_month_date
+        return next_month_date
     
     def save(self, *args, **kwargs):
         """ Do sanity checks: 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-11 12:28+0100\n"
+"POT-Creation-Date: 2019-11-11 18:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,6 +47,9 @@ msgstr ""
 
 #, python-format
 msgid "Error: \"%(error_message)s\" (%(error_code)d)"
+msgstr ""
+
+msgid "Making postponed payments is currently not possible!"
 msgstr ""
 
 msgid "The payment provider could not be reached."
@@ -413,25 +416,34 @@ msgctxt "(MS6)"
 msgid "Cancel your Contribution"
 msgstr ""
 
-msgctxt "(PF10)"
+msgctxt "(PF30)"
 msgid "Your monthly Contributions will end soon!"
 msgstr ""
 
-msgctxt "(PF11)"
+msgctxt "(PF31)"
 msgid "Your paid contribution is valid until"
 msgstr ""
 
-msgctxt "(PF12)"
-msgid "We're sorry to see you go! To continue contributing, simply create a new Contribution! Don't worry, we will start charging you only when your current Contribution runs out!"
-msgstr ""
-
-msgctxt "(PF10a)"
-msgid "Update your payment information"
+msgctxt "(PF32)"
+msgid "We're sorry to see you go! To continue contributing, you can create a new Contribution right now."
 msgstr ""
 
 #, python-format
-msgctxt "(PF11a)"
-msgid "You can choose a new payment method or update your payment information here. The next payment will be made when your Contribution is due, on %(date)s."
+msgctxt "(PF33)"
+msgid "We have to process your first new payment immediately, but any time left on your old Contribution will be added on to your new one. That means that your next monthly payment will only be due on %(date)s."
+msgstr ""
+
+msgctxt "(PF40)"
+msgid "Update your payment information"
+msgstr ""
+
+msgctxt "(PF41)"
+msgid "You can choose a new payment method or update your payment information here."
+msgstr ""
+
+#, python-format
+msgctxt "(PF43)"
+msgid "We have to process your first new payment immediately, but any time left on your current Contribution will be added on to your new one. That means that your next monthly payment will only be due on %(date)s."
 msgstr ""
 
 msgctxt "(PF11x)"
@@ -577,13 +589,17 @@ msgctxt "(PF7a)"
 msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19%% VAT. The VAT is shown on the invoice."
 msgstr ""
 
-#, python-format
-msgctxt "(PF21)"
-msgid "The next debit will be made on %(date)s."
+msgctxt "(PF20a)"
+msgid "The next debit using your new payment information will be made immediately."
 msgstr ""
 
 msgctxt "(PF20)"
 msgid "The next debit will be made immediately."
+msgstr ""
+
+#, python-format
+msgctxt "(PF21)"
+msgid "Your monthly payments will resume on %(date)s, a month after your old Contribution would have been due."
 msgstr ""
 
 msgctxt "(PF22)"
@@ -843,6 +859,9 @@ msgid "Please correct the errors in the highlighted fields!"
 msgstr ""
 
 msgid "Please fill out all of the missing fields!"
+msgstr ""
+
+msgid "You currently already have an active subscription!"
 msgstr ""
 
 msgid "The entered payment information is invalid. Please make sure you entered everything correctly!"

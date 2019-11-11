@@ -68,6 +68,14 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the user tries to access their unretrieved invoice, or with a gather-all-missing cronjob
     INVOICE_PROVIDER_RETRY_MINUTES = 5
     
+    # A lock for currently not-implemented behaviour, meant to make it clearer that the code
+    # is not yet ready for WAITING, postponed payments that get cashed in later.
+    # currently (and with the switch set to False), new subscriptions can only replace 
+    # the active subscription instantly and prolong its running time!
+    # DO NOT set this to True right now!
+    POSTPONED_PAYMENTS_IMPLEMENTED = False
+    
+    
     """ Betterpayment settings """
     
     BETTERPAYMENT_API_KEY = ''

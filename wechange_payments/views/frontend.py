@@ -202,7 +202,7 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
         subscription = get_object_or_None(Subscription, user=self.request.user, state__in=[
             Subscription.STATE_1_CANCELLED_BUT_ACTIVE,
             Subscription.STATE_2_ACTIVE,
-            Subscription.STATE_3_WATING_TO_BECOME_ACTIVE,
+            Subscription.STATE_3_WAITING_TO_BECOME_ACTIVE,
         ])
         if not subscription or subscription.state in Subscription.ALLOWED_TO_MAKE_NEW_SUBSCRIPTION_STATES:
             return reverse('wechange-payments:payment')

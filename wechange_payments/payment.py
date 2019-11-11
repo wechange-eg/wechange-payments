@@ -27,7 +27,6 @@ def create_subscription_for_payment(payment):
     try:
         user = payment.user
         active_sub = Subscription.get_active_for_user(user)
-        waiting_sub = Subscription.get_waiting_for_user(user)
         cancelled_sub = Subscription.get_canceled_for_user(user)
         suspended_sub = Subscription.get_suspended_for_user(user)
         
@@ -47,30 +46,21 @@ def create_subscription_for_payment(payment):
                 suspended_sub.terminated = now()
                 suspended_sub.save()
             
-            if not active_sub and not waiting_sub and not cancelled_sub:
+            if not active_sub and not cancelled_sub:
                 # 1. (new subscription)
                 subscription.set_next_due_date(now().date())
                 subscription.state = Subscription.STATE_2_ACTIVE
-            elif active_sub and not waiting_sub and not cancelled_sub: 
-                # 2. (updated payment infos, becomes active next due date)
-                subscription.next_due_date = active_sub.next_due_date 
-                subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
-                active_sub.state = Subscription.STATE_1_CANCELLED_BUT_ACTIVE
-                active_sub.cancelled = now()
-                active_sub.save()
-            elif not active_sub and not waiting_sub and cancelled_sub:
-                # 3. (canceled Subscriptions, created new subscription before next payment due)
-                subscription.next_due_date = cancelled_sub.next_due_date 
-                subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
-            elif not active_sub and waiting_sub:
-                # 4. and 5. (updated payment infos again, 
-                # or replaced a waiting subscription before it became active)
-                # this may mean there is currently a cancelled sub, but we leave that alone here
-                subscription.next_due_date = waiting_sub.next_due_date
-                subscription.state = Subscription.STATE_3_WATING_TO_BECOME_ACTIVE
-                waiting_sub.state = Subscription.STATE_0_TERMINATED
-                waiting_sub.terminated = now()
-                waiting_sub.save()
+            elif active_sub or cancelled_sub: 
+                # 2 and 3.. (updated payment infos, new sub becomes active sub, current one is terminated,
+                #    remaining time is added to new sub)
+                replaced_sub = active_sub or cancelled_sub
+                subscription.set_next_due_date(replaced_sub.next_due_date)
+                subscription.state = Subscription.STATE_2_ACTIVE
+                replaced_sub.state = Subscription.STATE_0_TERMINATED
+                replaced_sub.cancelled = now()
+                replaced_sub.terminated = now()
+                replaced_sub.save()
+                
             else:
                 logger.critical('Payments: "Unreachable" case reached for subscription state situation for a user! Could not save the user\'s new subscription! This has to be checked out manually!.',
                     extra={'payment-id': payment.id, 'payment': payment, 'user': user})
@@ -105,16 +95,18 @@ def process_due_subscription_payments():
             if settings.DEBUG:
                 raise
     
-    # for each waiting sub, check to see if the user has neither an active or canceled sub 
-    # (i.e. their canceled sub was just terminated)
-    for waiting_sub in Subscription.objects.filter(state=Subscription.STATE_3_WATING_TO_BECOME_ACTIVE):
-        active_or_canceled_sub = Subscription.get_current_for_user(waiting_sub.user)
-        if not active_or_canceled_sub:
-            # if there were no active subs, activate the waiting sub. its due date should have
-            # been set to the last sub at creation time.
-            waiting_sub.state = Subscription.STATE_2_ACTIVE
-            waiting_sub.save()
-            logger.warn('REMOVEME: Done activated a waiting sub after terminating an old expired sub!')
+    # switch for not-implemented postponed subscriptions
+    if settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
+        # for each waiting sub, check to see if the user has neither an active or canceled sub 
+        # (i.e. their canceled sub was just terminated)
+        for waiting_sub in Subscription.objects.filter(state=Subscription.STATE_3_WAITING_TO_BECOME_ACTIVE):
+            active_or_canceled_sub = Subscription.get_current_for_user(waiting_sub.user)
+            if not active_or_canceled_sub:
+                # if there were no active subs, activate the waiting sub. its due date should have
+                # been set to the last sub at creation time.
+                waiting_sub.state = Subscription.STATE_2_ACTIVE
+                waiting_sub.save()
+                logger.warn('REMOVEME: Done activated a waiting sub after terminating an old expired sub!')
 
     # if an active subscription has its payment is due trigger a new payment on it
     for active_sub in Subscription.objects.filter(state=Subscription.STATE_2_ACTIVE):

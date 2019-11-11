@@ -51,24 +51,6 @@
         <!-- a box with semi transparent background -->
         <div class="v2-content">
 		    
-		    {% if SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %} 
-				{% if displayed_subscription %}
-			    	<div class="alert alert-warning alert-dismissable">
-			            <i class="fa fa-exclamation fa-3x"></i>
-			            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&#215;</button>
-				        <p style="">
-							Achtung! Zahlungsdaten aktualisieren und weitere Beiträge während eines laufenden monatlichen Beitrags einrichten ist aktuell noch nicht möglich!
-							<br/><br/>
-							Die Zahlung wird am Ende des Dialogs fehlschlagen! Um eine weitere Zahlung zu veranlassen, kann zu Testzwecken die aktuelle Beitragszahlung komplett entfernt werden, indem hier geklickt wird:
-							<br/><br/>
-							<a href="{% url 'wechange-payments:debug-delete-subscription' %}">
-						    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE ALL CURRENT, CANCELED, AND QUEUED SUBSCRIPTIONS
-						    </a>
-						</p>
-				    </div>
-			    {% endif %}
-		    {% endif %}
-		    
 		    <div class="tab-content">
 		    	
 		    	{% comment %}  
@@ -356,7 +338,12 @@
 							{% trans "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT. The VAT is shown on the invoice." context "(PF7a)" %}
 							<br/><br/>
 							{% if displayed_subscription and displayed_subscription.next_due_date %}
-								{% blocktrans with date=displayed_subscription.next_due_date|localize context "(PF21)" %}The next debit will be made on {{ date }}.{% endblocktrans %}
+								{% if displayed_subscription.state == 1 %}
+									{% trans "The next debit using your new payment information will be made immediately." context "(PF20a)" %}
+								{% else %}
+									{% trans "The next debit will be made immediately." context "(PF20)" %}
+								{% endif %}
+								{% blocktrans with date=displayed_subscription.get_due_date_after_next|localize context "(PF21)" %}Your monthly payments will resume on {{ date }}, a month after your old Contribution would have been due.{% endblocktrans %}
 							{% else %}
 								{% trans "The next debit will be made immediately." context "(PF20)" %}
 							{% endif %}

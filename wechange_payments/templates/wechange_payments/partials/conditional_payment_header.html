@@ -2,20 +2,25 @@
 
 {% if subscription and subscription.state == 1 %}
 	{% comment %} Case for a still running, canceled subscription {% endcomment %}
-	<h2>{% trans "Your monthly Contributions will end soon!" context "(PF10)" %}</h2>
+	<h2>{% trans "Your monthly Contributions will end soon!" context "(PF30)" %}</h2>
 	<p>
-		{% trans "Your paid contribution is valid until" context "(PF11)" %}
+		{% trans "Your paid contribution is valid until" context "(PF31)" %}
 		{{ subscription.next_due_date|localize }}
 	</p>
 	<p>
-		{% trans "We're sorry to see you go! To continue contributing, simply create a new Contribution! Don't worry, we will start charging you only when your current Contribution runs out!" context "(PF12)" as desc_text %}
-		{{ desc_text|linebreaksbr }}
+		{% trans "We're sorry to see you go! To continue contributing, you can create a new Contribution right now." context "(PF32)" %} 
+	</p>
+	<p>
+		{% blocktrans with date=subscription.get_due_date_after_next|localize context "(PF33)" %}We have to process your first new payment immediately, but any time left on your old Contribution will be added on to your new one. That means that your next monthly payment will only be due on {{ date }}.{% endblocktrans %}
 	</p>
 {% elif subscription %}
 	{% comment %} Case for a still running subscription (update payment info form) {% endcomment %}
-	<h2>{% trans "Update your payment information" context "(PF10a)" %}</h2>
+	<h2>{% trans "Update your payment information" context "(PF40)" %}</h2>
 	<p>
-		{% blocktrans with date=subscription.next_due_date|localize context "(PF11a)" %}You can choose a new payment method or update your payment information here. The next payment will be made when your Contribution is due, on {{ date }}.{% endblocktrans %}
+		{% trans "You can choose a new payment method or update your payment information here." context "(PF41)" %}
+	</p>
+	<p>
+		{% blocktrans with date=subscription.get_due_date_after_next|localize context "(PF43)" %}We have to process your first new payment immediately, but any time left on your current Contribution will be added on to your new one. That means that your next monthly payment will only be due on {{ date }}.{% endblocktrans %}
 	</p>
 	<p>
 		{% trans "If you only want to change the amount you contribute each month using the same payment information, you can do this here" context "(PF11x)" %}:

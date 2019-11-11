@@ -70,6 +70,16 @@ def make_payment(request, on_success_func=None, make_postponed=False):
         if missing_params:
             return JsonResponse({'error': _('Please fill out all of the missing fields!'), 'missing_parameters': missing_params}, status=500)
         
+        # safety catch: if we don't have the postponed flag (i.e. we are not voluntarily updating
+        # the current payment with a new one), and we have an active subscription, block the payment
+        if Subscription.get_active_for_user(user) and not make_postponed:
+            return JsonResponse({'error': _('You currently already have an active subscription!')}, status=500)
+        
+        # if postponed waiting payments are not implemented, we just make a non-postponed payment
+        # which will replace the current one
+        if not settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
+            make_postponed = False
+        
         if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
             payment, error = backend.make_sepa_payment(params, user=user, make_postponed=make_postponed)
         elif payment_type == PAYMENT_TYPE_CREDIT_CARD:
