@@ -199,11 +199,15 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
         and to the my subscription view if there is an active subscription. """
     
     def get_redirect_url(self, *args, **kwargs):
-        subscription = get_object_or_None(Subscription, user=self.request.user, state__in=[
+        non_terminated_states = [
             Subscription.STATE_1_CANCELLED_BUT_ACTIVE,
             Subscription.STATE_2_ACTIVE,
-            Subscription.STATE_3_WAITING_TO_BECOME_ACTIVE,
-        ])
+        ]
+        if settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
+            non_terminated_states += [
+                Subscription.STATE_3_WAITING_TO_BECOME_ACTIVE,
+            ]
+        subscription = get_object_or_None(Subscription, user=self.request.user, state__in=non_terminated_states)
         if not subscription or subscription.state in Subscription.ALLOWED_TO_MAKE_NEW_SUBSCRIPTION_STATES:
             return reverse('wechange-payments:payment')
         else:

@@ -110,7 +110,7 @@ class BaseBackend(object):
                 missing_params.append(param)
         return missing_params
     
-    def user_pre_payment_safety_checks(self, user):
+    def user_pre_recurring_payment_safety_checks(self, user):
         """ Executes a series of hardcoded safety checks to verify that the a payment
             may be executed for a user. Meant as a second independent check to make 
             sure that no irregularly frequent or too-high amounts will be processed
@@ -122,11 +122,11 @@ class BaseBackend(object):
         # --------- Pre-Payment Safety checks ----------
         # 0. Currently not accepting user-less payments
         if not user:
-            logger.warn('Payments: user_pre_payment_safety_checks was prevented because a userless payment was attempted.')
+            logger.warn('Payments: user_pre_recurring_payment_safety_checks was prevented because a userless payment was attempted.')
             return False
         # 1. User is active
         if not user.is_active:
-            logger.warn('Payments: user_pre_payment_safety_checks was prevented for an inactive user.', 
+            logger.warn('Payments: user_pre_recurring_payment_safety_checks was prevented for an inactive user.', 
                 extra={'user': user})
             return False
         
@@ -138,7 +138,7 @@ class BaseBackend(object):
         seven_days = now() - timedelta(days=14)
         paid_payments = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=seven_days)
         if paid_payments.count() > 0:
-            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_payment_safety_checks` was prevented because of an existing successful Payment for this user in the last 7 days!', 
+            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_recurring_payment_safety_checks` was prevented because of an existing successful Payment for this user in the last 7 days!', 
                 extra={'user': user})
             return False
         # 3. No payments for this user over the hardcapped payment amount in the last 27 days
@@ -146,7 +146,7 @@ class BaseBackend(object):
         paid_payments_month = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=twenty_eight_days)
         payment_sum = paid_payments_month.aggregate(Sum('amount')).get('amount__sum', 0.00)
         if payment_sum > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT:
-            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_payment_safety_checks` was prevented because the sum of Payment amounts for this user in the last 28 days exceeds the maximum hardcap payment amount!', 
+            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_recurring_payment_safety_checks` was prevented because the sum of Payment amounts for this user in the last 28 days exceeds the maximum hardcap payment amount!', 
                 extra={'user': user, 'payment_sum': payment_sum})
             return False
         return True

@@ -188,9 +188,6 @@ class BetterPaymentBackend(BaseBackend):
             @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message)
          """
-        if not self.user_pre_payment_safety_checks(user):
-            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
-        
         order_id = str(uuid.uuid4())
         mandate_result = self._create_sepa_mandate(order_id)
         if isinstance(mandate_result, six.string_types):
@@ -230,8 +227,6 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
-        if not self.user_pre_payment_safety_checks(user):
-            return None, ('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
         return self._make_redirected_payment(params, PAYMENT_TYPE_CREDIT_CARD, user=user, make_postponed=make_postponed)
     
     def make_paypal_payment(self, params, user=None, make_postponed=False):
@@ -240,8 +235,6 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @param make_postponed: If True, makes a pre-authorizes payment that won't not cashed in yet
             @return: A tuple of (`Payment`, None) if successful or (None, Str-error-message) """
-        if not self.user_pre_payment_safety_checks(user):
-            return None, ('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
         return self._make_redirected_payment(params, PAYMENT_TYPE_PAYPAL, user=user, make_postponed=make_postponed)
     
     def make_recurring_payment(self, reference_payment):
@@ -251,7 +244,7 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @return: A tuple of (`Payment`, None) if successful, returning the *new* Payment,
                 or (None, Str-error-message) """
-        if not self.user_pre_payment_safety_checks(reference_payment.user):
+        if not self.user_pre_recurring_payment_safety_checks(reference_payment.user):
             return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
         # additional check: reference payment must be coming from an active subscription!
         if not reference_payment.subscription or not reference_payment.subscription.state == Subscription.STATE_2_ACTIVE:
@@ -312,7 +305,6 @@ class BetterPaymentBackend(BaseBackend):
         """
         if make_postponed and not settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
             return None, _('Making postponed payments is currently not possible!')
-            
         else:
             post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
         data = {
