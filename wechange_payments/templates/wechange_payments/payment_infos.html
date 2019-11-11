@@ -56,13 +56,13 @@
 					<td>{% trans "Contribution Status" context "(INF2)" %}</td>
 					<td>
 						{% if subscription.state == 3 %}
-							{% trans "Will become active after your last Contribution expires." context "subscription status" context "(INF3)" %}
+							{% trans "Will become active after your last Contribution expires." context "(INF3-subscription status)" %}
 						{% elif subscription.state == 2 %}
-							{% trans "Active since" context "subscription status" context "(INF4)" %}
+							{% trans "Active since" context "(INF4-subscription status)" %}
 							{{ subscription.created.date|localize }}
 						{% elif subscription.state == 1 %}
 							{% comment %} If a newer subscription with state 3 exists, this case won't be shown {% endcomment %}
-							{% trans "Cancelled" context "subscription status" context "(INF5)" %}.
+							{% trans "Cancelled" context "(INF5-subscription status)" %}.
 							{% trans "Expires" %}: 
 							{{ subscription.next_due_date|localize }}
 						{% endif %}

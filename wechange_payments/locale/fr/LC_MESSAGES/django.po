@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-09 15:14+0100\n"
+"POT-Creation-Date: 2019-11-11 11:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -554,9 +554,13 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
+msgctxt "(PF9 - legally binding!)"
+msgid "Confirm and pay"
+msgstr ""
+
 #, python-format
 msgctxt "(PF7)"
-msgid "By clicking on \"Confirm and pay\" you grant Wechange eG permission to debit %(amount)s Euro per month (incl. 19%% VAT) from you via %(payment_method)s."
+msgid "By clicking on \"%(confirm_and_pay_button_text)s\" you grant Wechange eG permission to debit %(amount)s Euro per month (incl. 19%% VAT) from you via %(payment_method)s."
 msgstr ""
 
 #, python-format
@@ -584,10 +588,6 @@ msgstr ""
 
 msgctxt "(PF25)"
 msgid "Change payment information"
-msgstr ""
-
-msgctxt "(PF9 - legally binding!)"
-msgid "Confirm and pay"
 msgstr ""
 
 msgctxt "(INF1)"
@@ -722,24 +722,55 @@ msgctxt "(SC7)"
 msgid "Show payment summary"
 msgstr ""
 
-msgctxt "(POP1-repeat)"
-msgid "popup header"
+msgctxt "(POP1-repeat-rnd1)"
+msgid "popup header 1"
 msgstr ""
 
+msgctxt "(POP1-repeat-rnd2)"
+msgid "popup header 2"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd3)"
+msgid "popup header 3"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd4)"
+msgid "popup header 4"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd5)"
+msgid "popup header 5"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd6)"
+msgid "popup header 6"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd7)"
+msgid "popup header 7"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd8)"
+msgid "popup header 8"
+msgstr ""
+
+#, python-format
 msgctxt "(POP2-repeat)"
-msgid "dear user,"
+msgid "Dear %(username)s,"
 msgstr ""
 
+#, python-format
 msgctxt "(POP3-repeat)"
-msgid "popup body text "
+msgid "popup body text with time of becoming a member in text. You joined us %(join_time_verbal)s."
 msgstr ""
 
 msgctxt "(POP1-newuser)"
 msgid "popup header"
 msgstr ""
 
+#, python-format
 msgctxt "(POP2-newuser)"
-msgid "Dear WECHANGE-Community,"
+msgid "Dear %(username)s,"
 msgstr ""
 
 msgctxt "(POP3-newuser)"
@@ -750,8 +781,9 @@ msgctxt "(POP1-release)"
 msgid "popup header"
 msgstr ""
 
+#, python-format
 msgctxt "(POP2-release)"
-msgid "dear user,"
+msgid "Dear %(username)s,"
 msgstr ""
 
 msgctxt "(POP3-release)"
@@ -760,6 +792,10 @@ msgstr ""
 
 msgctxt "(POP5)"
 msgid "Learn more"
+msgstr ""
+
+msgctxt "(POP6-repeat)"
+msgid "Ok, choose amount now"
 msgstr ""
 
 msgctxt "(POP6)"

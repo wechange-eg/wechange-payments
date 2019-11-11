@@ -341,9 +341,11 @@
 			    				</tr>
 				    		</table>
 						</div>
-					
+						
+						{% trans "Confirm and pay" context "(PF9 - legally binding!)" as confirm_and_pay_button_text %}
+						
 						<p>
-							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html context "(PF7)" %}By clicking on "Confirm and pay" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
+							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html confirm_and_pay_button_text=confirm_and_pay_button_text context "(PF7)" %}By clicking on "{{ confirm_and_pay_button_text }}" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
 							{% trans "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT. The VAT is shown on the invoice." context "(PF7a)" %}
 							<br/><br/>
 							{% if displayed_subscription and displayed_subscription.next_due_date %}
@@ -369,7 +371,7 @@
 					    </a>
 					    <button type="submit" class="pull-right rounded-button button-color-primary-inverted">
 					        <span class="rounded-button-inner">
-								{% trans "Confirm and pay" context "(PF9 - legally binding!)" %}
+								{{ confirm_and_pay_button_text }}
 					        </span>
 					    </button>		
 					

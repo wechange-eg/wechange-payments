@@ -1,74 +1,99 @@
 {% load i18n cosinnus_tags %}
 
-{% if payment_popup_times_closed_before > 0 or request.GET.popup_type == 'repeat' %}
-	{% comment %} Default, long running, monthly reappearing version {% endcomment %}
-	
-	{% trans "popup header" context "(POP1-repeat)" as title %}
-	{% captureas body %}
-		<p>
-			{% trans "dear user," context "(POP2-repeat)" %}
-		</p>
-		<p>
-			{% trans "popup body text " context "(POP3-repeat)" as pop_text %}
-			{{ pop_text|linebreaksbr }}
-		</p>
-		<hr class="invisible" />
-	{% endcaptureas %}
-{% elif payment_popup_user_registered_after_payments or request.GET.popup_type == 'newuser' %}
-	{% comment %} Newly registered user, 5-day or so delayed version {% endcomment %}
-	
-	{% trans "popup header" context "(POP1-newuser)" as title %}
-	{% captureas body %}
-		<p>
-			{% trans "Dear WECHANGE-Community," context "(POP2-newuser)" %}
-		</p>
-		<p>
-			{% trans "popup body text" context "(POP3-newuser)" as pop_text %}
-			{{ pop_text|linebreaksbr }}
-		</p>
-		<hr class="invisible" />
-	{% endcaptureas %}
-{% else %}
-	{% comment %} Old user (registered before payments were introduced) one-time shown version {% endcomment %}
-	
-	{% trans "popup header" context "(POP1-release)" as title %}
-	{% captureas body %}
-		<p>
-			{% trans "dear user," context "(POP2-release)" %}
-		</p>
-		<p>
-			{% trans "popup body text" context "(POP3-release)" as pop_text %}
-			{{ pop_text|linebreaksbr }}
-		</p>
-		<hr class="invisible" />
-	{% endcaptureas %}
-{% endif %}
+{% with random="01234567"|make_list|random %}
 
-	{% comment %}  
-	Inspirational quote is out for now	
-	
-	<p>
-		<b>{% trans "'inspirational quote'" context "(POP4a)" %}</b>
-		<br/>
-		{% trans "quote credit" context "(POP4b)" %}</b>
+	{% if payment_popup_times_closed_before > 0 or request.GET.popup_type == 'repeat' %}
+		{% comment %} Default, long running, monthly reappearing version {% endcomment %}
 		
-	</p>
-	{% endcomment %}
+		{% if random == "0" %}
+			{% trans "popup header 1" context "(POP1-repeat-rnd1)" as title %}
+		{% elif random == "1" %}
+			{% trans "popup header 2" context "(POP1-repeat-rnd2)" as title %}
+		{% elif random == "2" %}
+			{% trans "popup header 3" context "(POP1-repeat-rnd3)" as title %}
+		{% elif random == "3" %}
+			{% trans "popup header 4" context "(POP1-repeat-rnd4)" as title %}
+		{% elif random == "4" %}
+			{% trans "popup header 5" context "(POP1-repeat-rnd5)" as title %}
+		{% elif random == "5" %}
+			{% trans "popup header 6" context "(POP1-repeat-rnd6)" as title %}
+		{% elif random == "6" %}
+			{% trans "popup header 7" context "(POP1-repeat-rnd7)" as title %}
+		{% else %}
+			{% trans "popup header 8" context "(POP1-repeat-rnd8)" as title %}
+		{% endif %}
+		{% captureas body %}
+			<p>
+				{% blocktrans with username=user.first_name context "(POP2-repeat)" %}Dear {{ username }},{% endblocktrans %}
+			</p>
+			<p>
+				{% captureas join_time_verbal %}<span class="moment-data-date" data-date="{{ user.date_joined|date:'c' }}"></span>{% endcaptureas %}
+				{% captureas pop_text%}{% blocktrans with join_time_verbal=join_time_verbal context "(POP3-repeat)" %}popup body text with time of becoming a member in text. You joined us {{ join_time_verbal }}.{% endblocktrans %}{% endcaptureas %}
+				{{ pop_text|linebreaksbr }}
+			</p>
+			<hr class="invisible" />
+		{% endcaptureas %}
+	{% elif payment_popup_user_registered_after_payments or request.GET.popup_type == 'newuser' %}
+		{% comment %} Newly registered user, 5-day or so delayed version {% endcomment %}
+		
+		{% trans "popup header" context "(POP1-newuser)" as title %}
+		{% captureas body %}
+			<p>
+				{% blocktrans with username=user.first_name context "(POP2-newuser)" %}Dear {{ username }},{% endblocktrans %}
+			</p>
+			<p>
+				{% trans "popup body text" context "(POP3-newuser)" as pop_text %}
+				{{ pop_text|linebreaksbr }}
+			</p>
+			<hr class="invisible" />
+		{% endcaptureas %}
+	{% else %}
+		{% comment %} Old user (registered before payments were introduced) one-time shown version {% endcomment %}
+		
+		{% trans "popup header" context "(POP1-release)" as title %}
+		{% captureas body %}
+			<p>
+				{% blocktrans with username=user.first_name context "(POP2-release)" %}Dear {{ username }},{% endblocktrans %}
+			</p>
+			<p>
+				{% trans "popup body text" context "(POP3-release)" as pop_text %}
+				{{ pop_text|linebreaksbr }}
+			</p>
+			<hr class="invisible" />
+		{% endcaptureas %}
+	{% endif %}
+	
+		{% comment %}  
+		Inspirational quote is out for now	
+		
+		<p>
+			<b>{% trans "'inspirational quote'" context "(POP4a)" %}</b>
+			<br/>
+			{% trans "quote credit" context "(POP4b)" %}</b>
+			
+		</p>
+		{% endcomment %}
+	
+	{% captureas buttons %}
+		<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
+	        <span class="rounded-button-inner">
+	            {% trans "Learn more" context "(POP5)" %}
+	        </span>
+	    </a>
+	    <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted">
+	        <span class="rounded-button-inner">
+	        	{% if payment_popup_times_closed_before > 0 or request.GET.popup_type == 'repeat' %}
+	        		{% trans "Ok, choose amount now" context "(POP6-repeat)" %}
+	        	{% else %}
+	            	{% trans "Choose amount" context "(POP6)" %}
+	            {% endif %}
+	        </span>
+	    </a>
+	{% endcaptureas %}
+	
+	{% include "cosinnus/v2/elements/modal_box.html" with id="payments_popup" title=title body=body buttons=buttons %}
 
-{% captureas buttons %}
-	<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
-        <span class="rounded-button-inner">
-            {% trans "Learn more" context "(POP5)" %}
-        </span>
-    </a>
-    <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted">
-        <span class="rounded-button-inner">
-            {% trans "Choose amount" context "(POP6)" %}
-        </span>
-    </a>
-{% endcaptureas %}
-
-{% include "cosinnus/v2/elements/modal_box.html" with id="payments_popup" title=title body=body buttons=buttons %}
+{% endwith %}
 
 <script type="text/javascript">
 	$('#payments_popup button.close').on('click', function(){
