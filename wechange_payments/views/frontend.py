@@ -163,7 +163,11 @@ class PaymentProcessView(RequireLoggedInMixin, DetailView):
             return redirect(reverse('wechange-payments:payment-success', kwargs={'pk': self.object.pk}))
         elif self.object.status not in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
             messages.error(self.request, str(_('This payment session has expired.')) + ' ' + str(_('Please try again or contact our support for assistance!')))
-            return redirect('wechange-payments:overview')
+            # redirect user to the payment form they were coming from
+            if Subscription.get_active_for_user(self.request.user):
+                return redirect('wechange-payments:payment-update')
+            else:
+                return redirect('wechange-payments:payment')
         return super(PaymentProcessView, self).dispatch(request, *args, **kwargs)
     
     def get_context_data(self, *args, **kwargs):
