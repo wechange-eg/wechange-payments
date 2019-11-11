@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-11 11:29+0100\n"
+"POT-Creation-Date: 2019-11-11 12:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -255,7 +255,7 @@ msgctxt "(TS5)"
 msgid "(explanation) Your monthly Contribution will be terminated and no future payments will be made. Your currently paid Contribution status will remain active until %(date)s."
 msgstr ""
 
-msgctxt "(MS5)"
+msgctxt "(MS5-rethink-cancelling)"
 msgid "Modify Contribution Amount"
 msgstr ""
 
@@ -405,6 +405,10 @@ msgctxt "(PF24)"
 msgid "Contribution amount includes 19%% VAT"
 msgstr ""
 
+msgctxt "(MS5)"
+msgid "Modify Contribution Amount"
+msgstr ""
+
 msgctxt "(MS6)"
 msgid "Cancel your Contribution"
 msgstr ""
@@ -466,8 +470,13 @@ msgctxt "(PF15)"
 msgid "Choose your monthly Contribution"
 msgstr ""
 
+#, python-format
 msgctxt "(PF26)"
-msgid "Choose the amount you would like to contribute using the slider. You may also choose a higher amount by entering it manually."
+msgid "Choose the amount you would like to contribute using the slider. The contribution amount includes 19%% VAT."
+msgstr ""
+
+msgctxt "(PF24)"
+msgid "You may also choose a higher amount by entering it directly in the text box!"
 msgstr ""
 
 msgctxt "(PF2)"
@@ -624,15 +633,15 @@ msgctxt "(INF2)"
 msgid "Contribution Status"
 msgstr ""
 
-msgctxt "(INF3)"
+msgctxt "(INF3-subscription status)"
 msgid "Will become active after your last Contribution expires."
 msgstr ""
 
-msgctxt "(INF4)"
+msgctxt "(INF4-subscription status)"
 msgid "Active since"
 msgstr ""
 
-msgctxt "(INF5)"
+msgctxt "(INF5-subscription status)"
 msgid "Cancelled"
 msgstr ""
 
@@ -645,6 +654,10 @@ msgstr ""
 
 msgctxt "(INF6)"
 msgid "Current monthly contribution"
+msgstr ""
+
+msgctxt "(INF8.2)"
+msgid "Set up new Contribution"
 msgstr ""
 
 msgctxt "(INF8.1)"

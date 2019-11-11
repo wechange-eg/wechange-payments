@@ -49,7 +49,7 @@
 		</div>
 		<hr class="invisible" />
 		
-		{% if subscription.state >= 2 %}
+		{% if subscription.state > 0 %}
 		<div class="large-space">
     		<table>
 				<tr>
@@ -71,77 +71,87 @@
 				<tr>
 					<td>{% trans "Next payment scheduled" context "(INF7)" %}</td>
 					<td>
-						{{ subscription.next_due_date|localize }}
+						{% if subscription.state == 1 %}
+							-
+						{% else %}
+							{{ subscription.next_due_date|localize }}
+						{% endif %}
 					</td>
 				</tr>
-				<tr>
-					<td>{% trans "Current monthly contribution" context "(INF6)" %}</td>
-					<td>
-						<span>{{ subscription.amount|intify }} €</span>
-					</td>
-				</tr>
+				{% if subscription.state > 1 %}
+					<tr>
+						<td>{% trans "Current monthly contribution" context "(INF6)" %}</td>
+						<td>
+							<span>{{ subscription.amount|intify }} €</span>
+						</td>
+					</tr>
+				{% endif %}
 			</table>
 		</div>
 		<div>
     		<a href="{% url "wechange-payments:payment" %}" class="rounded-button button-color-secondary">
 		        <span class="rounded-button-inner">
-					{% trans "Adjust contribution amount or cancel your Contribution" context "(INF8.1)" %}
+		        	{% if subscription.state == 1 %}
+		        		{% trans "Set up new Contribution" context "(INF8.2)" %}
+		        	{% else %}
+						{% trans "Adjust contribution amount or cancel your Contribution" context "(INF8.1)" %}
+					{% endif %}
 		        </span>
 		    </a>
 		</div>
 		
 		{% endif %}
 		
-		<hr class=""></hr>
-		<hr class="invisible"></hr>
-		
-		<h2>{% trans "Your Payment Information" context "(INF1)" %}</h2>
-    	<div class="large-space">
-    		{% with payment=subscription.reference_payment %}
-    			<table>
-    				<tr>
-    					<td>{% trans "Payment Type" %}</td>
-    					<td>{{ payment.get_type_string }}</td>
-    				</tr>
-	    			{% if payment.type == 'dd' %}
-    				<tr>
-    					<td>{% trans "Account Holder" %}</td>
-    					<td>{{ payment.extra_data.account_holder }}</td>
-    				</tr>
-	    			<tr>
-    					<td>{% trans "IBAN" %}</td>
-    					<td>{{ payment.extra_data.iban }}</td>
-    				</tr>
-	    			{% endif %}
-	    		</table>
-	    		
-	    		<h4>{% trans "Billing Address" %}</h4>
-	    		<table>
-	    			<tr>
-    					<td>{% trans "Name" %}</td>
-    					<td>{{ payment.first_name }} {{ payment.last_name }}</td>
-    				</tr>
-    				<tr>
-    					<td>{% trans "Address" %}</td>
-    					<td>{{ payment.address }}</td>
-    				</tr>
-    				<tr>
-    					<td>{% trans "Postal Code" %}</td>
-    					<td>{{ payment.postal_code|stringformat:"05d" }}</td>
-    				</tr>
-    				<tr>
-    					<td>{% trans "City" %}</td>
-    					<td>{{ payment.city }}</td>
-    				</tr>
-    				<tr>
-    					<td>{% trans "Country" %}</td>
-    					<td>{{ payment.country }}</td>
-    				</tr>
-	    		</table>
-    		{% endwith %}
-    	</div>
-    	
-    	{% if subscription.state != 1 %}
+		{% if subscription.state > 1 %}
+			<hr class=""></hr>
+			<hr class="invisible"></hr>
+			
+			<h2>{% trans "Your Payment Information" context "(INF1)" %}</h2>
+	    	<div class="large-space">
+	    		{% with payment=subscription.reference_payment %}
+	    			<table>
+	    				<tr>
+	    					<td>{% trans "Payment Type" %}</td>
+	    					<td>{{ payment.get_type_string }}</td>
+	    				</tr>
+		    			{% if payment.type == 'dd' %}
+	    				<tr>
+	    					<td>{% trans "Account Holder" %}</td>
+	    					<td>{{ payment.extra_data.account_holder }}</td>
+	    				</tr>
+		    			<tr>
+	    					<td>{% trans "IBAN" %}</td>
+	    					<td>{{ payment.extra_data.iban }}</td>
+	    				</tr>
+		    			{% endif %}
+		    		</table>
+		    		
+		    		<h4>{% trans "Billing Address" %}</h4>
+		    		<table>
+		    			<tr>
+	    					<td>{% trans "Name" %}</td>
+	    					<td>{{ payment.first_name }} {{ payment.last_name }}</td>
+	    				</tr>
+	    				<tr>
+	    					<td>{% trans "Address" %}</td>
+	    					<td>{{ payment.address }}</td>
+	    				</tr>
+	    				<tr>
+	    					<td>{% trans "Postal Code" %}</td>
+	    					<td>{{ payment.postal_code }}</td>
+	    				</tr>
+	    				<tr>
+	    					<td>{% trans "City" %}</td>
+	    					<td>{{ payment.city }}</td>
+	    				</tr>
+	    				<tr>
+	    					<td>{% trans "Country" %}</td>
+	    					<td>{{ payment.country }}</td>
+	    				</tr>
+		    		</table>
+	    		{% endwith %}
+	    	</div>
+	    	
 	    	<div>
 	    		<a href="{% url "wechange-payments:payment-update" %}" class="rounded-button button-color-secondary">
 			        <span class="rounded-button-inner">

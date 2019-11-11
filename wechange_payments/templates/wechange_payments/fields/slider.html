@@ -31,19 +31,23 @@
             </div>
             
             <div class="donation-outcome low-amount">
-                {% trans "Low amount text" context "(SLD1)" %}
+                {% trans "Low amount text" context "(SLD1)" as sld1 %}
+                {{ sld1|linebreaksbr }}
             </div>
             
             <div class="donation-outcome medium-amount">
-                {% trans "Medium amount text" context "(SLD2)" %}
+                {% trans "Medium amount text" context "(SLD2)" as sld2 %}
+                {{ sld2|linebreaksbr }}
             </div>
             
             <div class="donation-outcome high-amount">
-                {% trans "High amount text" context "(SLD3)" %}
+                {% trans "High amount text" context "(SLD3)" as sld3 %}
+                {{ sld3|linebreaksbr }}
             </div>
             
             <div class="donation-outcome very-high-amount">
-                {% trans "Very high amount text" context "(SLD4)" %}
+                {% trans "Very high amount text" context "(SLD4)" as sld4 %}
+                {{ sld4|linebreaksbr }}
             </div>
           
         </div>

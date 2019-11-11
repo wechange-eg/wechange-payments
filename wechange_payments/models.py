@@ -91,7 +91,7 @@ class Payment(models.Model):
     email = models.EmailField(blank=True, null=True)
     address = models.CharField(blank=True, null=True, max_length=255)
     city = models.CharField(blank=True, null=True, max_length=255)
-    postal_code = models.IntegerField(blank=True, null=True)
+    postal_code = models.CharField(blank=True, null=True, max_length=255)
     country = CountryField(blank=True, null=True)
     
     backend = models.CharField(_('Backend class used'), max_length=255)

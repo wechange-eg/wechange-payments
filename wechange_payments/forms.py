@@ -27,7 +27,7 @@ class PaymentsForm(forms.Form):
     email = forms.EmailField()
     address = forms.CharField()
     city = forms.CharField()
-    postal_code = forms.IntegerField()
+    postal_code = forms.CharField()
     country = CountryField().formfield()
     
     tos_check = forms.BooleanField(required=True)
