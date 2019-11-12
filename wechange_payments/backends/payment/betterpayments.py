@@ -19,7 +19,8 @@ from wechange_payments.backends.payment.base import BaseBackend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
 from wechange_payments.models import TransactionLog, Payment, Subscription
-from wechange_payments.payment import create_subscription_for_payment
+from wechange_payments.payment import create_subscription_for_payment,\
+    suspend_failed_subscription
 from wechange_payments.utils.utils import send_admin_mail_notification
 
 logger = logging.getLogger('wechange-payments')
@@ -249,6 +250,9 @@ class BetterPaymentBackend(BaseBackend):
         # additional check: reference payment must be coming from an active subscription!
         if not reference_payment.subscription or not reference_payment.subscription.state == Subscription.STATE_2_ACTIVE:
             return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -7}
+        # additional check: reference payment must be coming from an active subscription that has no pending payments!
+        if reference_payment.subscription.recurring_payment_pending:
+            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -8}
         
         # collect params from reference payment
         order_id = str(uuid.uuid4())
@@ -277,12 +281,12 @@ class BetterPaymentBackend(BaseBackend):
             payment.completed_at = now()
         else:
             payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
-        
+            
         try:
             payment.save()
         except Exception as e:
             logger.warning('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
-            
+        
         if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             signals.successful_payment_made.send(sender=self, payment=payment)
             self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
@@ -528,24 +532,33 @@ class BetterPaymentBackend(BaseBackend):
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription
                     # depending on `is_postponed_payment` and the payment.status, switch states here to preauthorized or paid!
-                    create_new_subscription = True
+                    create_new_subscription = False
                     if payment.is_postponed_payment and \
                             payment.status in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
                         payment.status = Payment.STATUS_PREAUTHORIZED_UNPAID
+                        create_new_subscription = True
                     elif payment.is_postponed_payment and payment.status == Payment.STATUS_PREAUTHORIZED_UNPAID:
                         payment.status = Payment.STATUS_PAID
                         payment.completed_at = now()
                         # we do not change our subscription here because one should already have been created
                         # at the time of pre-authorization for this payment
-                        create_new_subscription = False
                     else:
                         payment.status = Payment.STATUS_PAID
                         payment.completed_at = now()
+                        # if this is the first, reference payment, we trigger creating a new subscription
+                        if payment.is_reference_payment:
+                            create_new_subscription = True
+                            
                     payment.save()
                     signals.successful_payment_made.send(sender=self, payment=payment)
-                    # IMPORTANT: if this is a recurring payment for a running subscription, don't start a subscription!
-                    if payment.is_reference_payment and create_new_subscription:
+                    
+                    if create_new_subscription:
                         create_subscription_for_payment(payment)
+                    elif not payment.is_reference_payment:
+                        # for recurring payments, if this was the last payment,
+                        # mark the subscription as not having a pending payment 
+                        payment.subscription.recurring_payment_pending = False
+                        payment.subscription.save()
                     self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
                 elif status == self.BETTERPAYMENT_STATUS_CANCELED:
                     # case 'error', 'canceled', 'declined': mark the payment as canceled. no further action is required.
@@ -555,9 +568,23 @@ class BetterPaymentBackend(BaseBackend):
                     # case 'error', 'declined': mark the payment as failed
                     payment.status = Payment.STATUS_FAILED
                     payment.save()
-                    self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                    # TODO-FAIL: if the payment is a recurring one, we take the safe route and suspend the 
+                    # subscription. we do NOT want to cause multiple failed booking attempts on a user's account
+                    if not payment.is_reference_payment:
+                        suspend_failed_subscription(payment.subscription, payment=payment)
+                    else:
+                        # if it was a first payment, we simply inform the user that the payment failed 
+                        # and set the subscription to state ended
+                        self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                        payment.subscription.state = Subscription.STATE_0_TERMINATED
+                        payment.subscription.save()
+                        # TODO-FAIL: is this ok? to set subscription to state 0?
                 elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
-                    # TODO: add refund logic, cancel subscription probably?
+                    # TODO-FAIL: on a chargeback, immediately set the subscription to problematic FAILED and 
+                    # thus stop any further transactions. 
+                    payment.status = Payment.STATUS_RETRACTED
+                    payment.save()
+                    
                     extra = {'betterpayment_status_code': str(status), 'internal_transaction_id': str(payment.internal_transaction_id), 'vendor_transaction_id': str(payment.vendor_transaction_id)}
                     content = ('We received a Refund or Chargeback for a payment in the WECHANGE Geschäftsmodell.\n' +\
                         '\n' +\
@@ -569,6 +596,8 @@ class BetterPaymentBackend(BaseBackend):
                         'vendor_transaction_id: %(vendor_transaction_id)s\n') % extra 
                     send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', content)
                     logger.critical('NYI: Received a postback for a refund, but refunding logic not yet implemented! (A mail was also sent!', extra=extra)
+                    
+                    suspend_failed_subscription(payment.subscription, payment=payment)
                 else:
                     # we do not know what to do with this status
                     logger.critical('NYI: Received postback with a status we cannot handle (Status: %d)!' % status, extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
