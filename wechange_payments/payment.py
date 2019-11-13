@@ -113,20 +113,14 @@ def process_due_subscription_payments():
     # if an active subscription has its payment is due trigger a new payment on it
     for active_sub in Subscription.objects.filter(state=Subscription.STATE_2_ACTIVE):
         logger.warn('REMOVEME: Checking sub for renewability')
-        # Note: this will cash in both regular active subs and just-now-activated-waiting-subs
         if active_sub.check_payment_due() and active_sub.user.is_active:
             try:
-                if active_sub.recurring_payment_pending == True:
-                    # TODO-FAIL: if a  subscription's recurring payment is still pending, we do not book another payment
-                    # but if the payment has been made over 1 day ago and is still due, we trigger a critical alert!
-                    if active_sub.last_payment.status in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED] and\
-                            active_sub.last_payment.last_action_at < (now() - timedelta(days=1)):
+                if active_sub.has_pending_payment():
+                    # if a  subscription's recurring payment is still pending, we do not book another payment
+                    if active_sub.last_payment.last_action_at < (now() - timedelta(days=1)):
+                        # but if the payment has been made over 1 day ago and is still due, we trigger a critical alert!
                         extra={'user': active_sub.user, 'subscription': active_sub, 'internal_transaction_id': str(active_sub.last_payment.internal_transaction_id)}
                         logger.critical('Payments: A recurring payment that has been started over 1 day ago still has its status at pending and has not received a postback! Only postbacks can set payments to not pending. The subscription is therefore also pending and is basically frozen. This needs to be investigated manually!', extra=extra)
-                    else:
-                        # should be unreachable. putting this in to be safe
-                        logger.error('Payments: Reached an unreachable state, where an active subscription has `recurring_payment_pending` == True but its `last_payment` is not in a pending state!', 
-                                     extra={'user': active_sub.user, 'subscription': active_sub})
                     continue
                 
                 logger.warn('REMOVEME: Starting sub recurrent payment')
@@ -153,26 +147,34 @@ def book_next_subscription_payment(subscription):
     reference_payment = subscription.reference_payment
     
     # make a cash-in call on a preauthorized payment, or a recurring call on a previously cashed payment 
-    if reference_payment.is_postponed_payment and reference_payment.status == Payment.STATUS_PREAUTHORIZED_UNPAID:
-        # cash in a pre-authorized payment
-        payment, error = backend.cash_in_postponed_payment(reference_payment)
-    elif (reference_payment.is_postponed_payment and reference_payment.status == Payment.STATUS_PAID) or not reference_payment.is_postponed_payment:
-        # book a new recurring payment
-        payment, error = backend.make_recurring_payment(reference_payment)
-    else:
-        logger.error('Payments: Did not know how to make a further payment from a reference payment due to incompatible payment states!', 
+    if reference_payment.is_postponed_payment and settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
+        if reference_payment.status == Payment.STATUS_PREAUTHORIZED_UNPAID:
+            # cash in a pre-authorized payment
+            payment, error = backend.cash_in_postponed_payment(reference_payment)
+        elif reference_payment.status == Payment.STATUS_PAID:
+            # book a new recurring payment
+            payment, error = backend.make_recurring_payment(reference_payment)
+        else:
+            logger.error('Payments: Did not know how to make a further payment from a reference payment due to incompatible payment states!', 
                          extra={'user': subscription.user, 'subscription': subscription})
-        return
+            return
+    else:
+        payment, error = backend.make_recurring_payment(reference_payment)
+
     
     if error or not payment:
-        # TODO-FAIL: the server might just be down, or some error could have occured that has nothing
+        # TODO: TODO-ERROR-STATE: should we always retry when we get an error back instantly, or sometimes
+        # even suspend the subscription here immediately, instead of only when a postback
+        # comes back as fail? 
+        
+        subscription.num_attempts_recurring += 1
+        # the server might just be down, or some error could have occured that has nothing
         # to do with the actual payment. so we retry this 3 different times
-        if 1 < 3:
+        if subscription.num_attempts_recurring < 3:
             # we haven't retried 3 times, count up tries in the subscription  
             logger.error('Payments: Trying to make the next subscription payment returned an error (from our backend or provider backend). Retrying next day.', 
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             subscription.has_problems = True
-            subscription # counter
             subscription.save()
         else:
             # we have retried 3 times. appearently the problem is with the payment itself
@@ -183,24 +185,16 @@ def book_next_subscription_payment(subscription):
         
         return
     
-    # TODO-FAIL: clear subscription retry times
+    # clear subscription retry times on success
     subscription.has_problems = False
-    subscription # counter
+    subscription.num_attempts_recurring = 0
     
-    # TODO-FAIL: we should probably not advance the subscription yet, but wait for the postback?
-    # but that's kinda risky. maybe we should put in another flag in the sub,
-    # which means "is active and due, but has pending transactions", which can only be resolved 
-    # by the postback for the last payment either failing or succeeding.
-    # this way we prevent accidentally booking twice on a sub that we missed the postback on for whatever reasons
-    
-    # advance subscription due date and save payment to subscription
-    # TODO-FAIL:  specifically this set_next_due_date should be only done in a successful postback
-    subscription.set_next_due_date(subscription.next_due_date) 
+    # advance subscription due date and save payment to subscription if payment was already instantly successfully paid
+    # otherwise set_next_due_date will be done in a successful postback
+    if payment.status == Payment.STATUS_PAID:
+        subscription.set_next_due_date(subscription.next_due_date) 
     
     subscription.last_payment = payment
-    if payment.status == Payment.STATUS_COMPLETED_BUT_UNCONFIRMED:
-        # set pending payment status which prevents fürther payments from this active subscription
-        subscription.recurring_payment_pending = True
     subscription.save()
     payment.subscription = subscription
     payment.save()
