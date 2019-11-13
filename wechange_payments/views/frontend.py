@@ -203,6 +203,10 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
         and to the my subscription view if there is an active subscription. """
     
     def get_redirect_url(self, *args, **kwargs):
+        suspended = Subscription.get_suspended_for_user(self.request.user)
+        if suspended:
+            return reverse('wechange-payments:suspended-subscription')
+        
         non_terminated_states = [
             Subscription.STATE_1_CANCELLED_BUT_ACTIVE,
             Subscription.STATE_2_ACTIVE,
@@ -258,6 +262,40 @@ class MySubscriptionView(RequireLoggedInMixin, TemplateView):
         return context
         
 my_subscription = MySubscriptionView.as_view()
+
+
+class SuspendedSubscriptionView(RequireLoggedInMixin, TemplateView):
+    """ Shows informations about the currently suspended subscription. """
+    
+    template_name = 'wechange_payments/suspended_subscription.html'
+    
+    def dispatch(self, request, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            return super(SuspendedSubscriptionView, self).dispatch(request, *args, **kwargs)
+        self.suspended_subscription = Subscription.get_suspended_for_user(self.request.user)
+        if not self.suspended_subscription:
+            return redirect('wechange-payments:overview')
+        return super(SuspendedSubscriptionView, self).dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super(SuspendedSubscriptionView, self).get_context_data(*args, **kwargs)
+        problematic_statuses = [
+            Payment.STATUS_CANCELED, 
+            Payment.STATUS_COMPLETED_BUT_UNCONFIRMED,
+            Payment.STATUS_FAILED, 
+            Payment.STATUS_RETRACTED,
+        ]
+        context.update({
+            'suspended_subscription': self.suspended_subscription,
+        })
+        if self.suspended_subscription.last_payment and \
+                    self.suspended_subscription.last_payment.status in problematic_statuses:
+            context.update({
+                'problematic_payment': self.suspended_subscription.last_payment,
+            })
+        return context
+        
+suspended_subscription = SuspendedSubscriptionView.as_view()
 
 
 class PaymentInfosView(RequireLoggedInMixin, TemplateView):

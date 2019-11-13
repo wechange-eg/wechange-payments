@@ -1,5 +1,14 @@
 {% load i18n cosinnus_tags payments_tags %}
 
+{% comment %} `suspended_subscription` comes from the context processor {% endcomment %}
+{% if suspended_subscription %}
+	<div class="app-etherpad">
+    {% url 'wechange-payments:suspended-subscription' as payment_url %}
+    {% trans "Current Payment Issues" context "(FC1)" as label %}
+    {% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-exclamation-triangle" label=label show_required=True href=payment_url  %}
+	</div>
+{% endif %}
+
 {% url 'wechange-payments:overview' as payment_url %}
 {% trans "Your Contribution" context "(LN1)" as label %}
 {% include "cosinnus/leftnav_button.html" with extra_classes="regular-space" icon="fa-eur" label=label show_required=True href=payment_url  %}

@@ -1,0 +1,87 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block page_title %}{% trans "Current Payment Issues" context "(FC1)" %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+{% block breadcrumb %}
+	{{ block.super }}
+	<li><a class="active" href="{% url 'wechange-payments:my-subscription' %}">{% trans "Current Payment Issues" context "(FC1)" %}</a></li>
+{% endblock %}
+
+{% block content %}
+    
+    <!-- a box with semi transparent background -->
+    <div class="v2-content white-content payment-info-page">
+	    
+	    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
+	    
+	    <h2>{% trans "Your Current Contribution had issues!" context "(FC2)" %}</h2>
+		<p>
+            {% trans "We encountered an error when we tried to book your most recent monthly contribution. Your contribution is paused suspended until the issues are resolved." context "(FC3)" %}
+        </p>
+        <p>
+            {% trans "Please see below for details on the problem and review your selected payment method. If you wish to select a new payment method, simply update your payment information." context "(FC4)" %}
+        </p>
+        <p>
+            {% trans "If you have any questions about the issue or would like assistance, please contact our support and provide us with the issue reference number!" context "(FC5)" %}
+        </p>
+        
+        <hr/>
+        
+        <h3>
+            {% trans "Issue Reference Number: " context "(FC6)" %}
+            {% if problematic_payment %}
+                {{ problematic_payment.internal_transaction_id }}    
+            {% else %}
+                {{ suspended_subscription.id }}
+            {% endif %}
+        </h3>
+        <div class="large-space">
+            <table>
+		        <tr>
+		            <td>{% trans "Issue Details" context "(FC7)" %}</td>
+		            <td>
+                        {% if 0 and problematic_payment %}
+                            {% comment %}  
+	                            TODO: Display Payment Provider Error Message!
+	                            then remove the `if 0`
+                            {% endcomment %}
+                        {% else %}
+                            {% trans "Specific issue details cannot be displayed for this issue." context "(FC8)" %}
+                            <br/><br/>
+                            {% trans "If you wish to continue contributing, please update your payment information, or contact our support! Sorry for the inconveniences!" context "(FC9)" %}
+                        {% endif %}
+		            </td>
+		        </tr>
+		    </table>
+        </div>
+        
+        <hr/>
+		
+		<h3>{% trans "Your Payment Information" context "(INF1)" %}</h3>
+		<div class="large-space">
+            {% include 'wechange_payments/partials/subscription_payment_information.html' with subscription=suspended_subscription %}
+        </div>
+        
+            
+		<div class="button-section clearfix">
+		    <a class="rounded-button button-color-secondary" href="#" data-toggle="modal" data-target="#supportModal">
+		        <span class="rounded-button-inner">
+            		{% trans "Contact support" context "(LN5)" %}
+		        </span>
+		    </a>
+		    <a href="{% url "wechange-payments:payment" %}" class="pull-right rounded-button button-color-primary-inverted">
+                <span class="rounded-button-inner">
+                    {% trans "Renew payment information" context "(FC11)" %}
+                </span>
+            </a>
+		</div>
+	    
+	</div>
+        
+{% endblock %}
+

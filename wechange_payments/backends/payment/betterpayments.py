@@ -597,8 +597,9 @@ class BetterPaymentBackend(BaseBackend):
                         payment.subscription.state = Subscription.STATE_0_TERMINATED
                         payment.subscription.save()
                 elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
-                    # on a chargeback, immediately suspend the subscription and 
-                    # thus stop any further transactions. 
+                    # on a chargeback, immediately suspend the subscription to stop any further transactions. 
+                    # we also send out an admin mail, because in this case we have to manually retract a bill
+                    # in our accounting system 
                     payment.status = Payment.STATUS_RETRACTED
                     payment.save()
                     

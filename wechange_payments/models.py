@@ -277,11 +277,19 @@ class Subscription(models.Model):
     # if a subsription is in any of these states, no other subscription for the same user
     # may exist. enforced at `Subscription.save()`
     EXLUSIVE_STATE_MAP = {
-        STATE_1_CANCELLED_BUT_ACTIVE: ACTIVE_STATES,
-        STATE_2_ACTIVE: (STATE_1_CANCELLED_BUT_ACTIVE,
-                         STATE_2_ACTIVE,
-                         STATE_3_WAITING_TO_BECOME_ACTIVE),
+        STATE_1_CANCELLED_BUT_ACTIVE: (
+            STATE_1_CANCELLED_BUT_ACTIVE,
+            STATE_2_ACTIVE,
+            STATE_99_FAILED_PAYMENTS_SUSPENDED
+        ),
+        STATE_2_ACTIVE: (
+            STATE_1_CANCELLED_BUT_ACTIVE,
+            STATE_2_ACTIVE,
+            STATE_3_WAITING_TO_BECOME_ACTIVE,
+            STATE_99_FAILED_PAYMENTS_SUSPENDED
+        ),
         STATE_3_WAITING_TO_BECOME_ACTIVE: STATE_3_WAITING_TO_BECOME_ACTIVE,
+        STATE_99_FAILED_PAYMENTS_SUSPENDED: ACTIVE_STATES,
     }
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 

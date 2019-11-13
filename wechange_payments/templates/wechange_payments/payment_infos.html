@@ -108,48 +108,7 @@
 			
 			<h2>{% trans "Your Payment Information" context "(INF1)" %}</h2>
 	    	<div class="large-space">
-	    		{% with payment=subscription.reference_payment %}
-	    			<table>
-	    				<tr>
-	    					<td>{% trans "Payment Type" %}</td>
-	    					<td>{{ payment.get_type_string }}</td>
-	    				</tr>
-		    			{% if payment.type == 'dd' %}
-	    				<tr>
-	    					<td>{% trans "Account Holder" %}</td>
-	    					<td>{{ payment.extra_data.account_holder }}</td>
-	    				</tr>
-		    			<tr>
-	    					<td>{% trans "IBAN" %}</td>
-	    					<td>{{ payment.extra_data.iban }}</td>
-	    				</tr>
-		    			{% endif %}
-		    		</table>
-		    		
-		    		<h4>{% trans "Billing Address" %}</h4>
-		    		<table>
-		    			<tr>
-	    					<td>{% trans "Name" %}</td>
-	    					<td>{{ payment.first_name }} {{ payment.last_name }}</td>
-	    				</tr>
-	    				<tr>
-	    					<td>{% trans "Address" %}</td>
-	    					<td>{{ payment.address }}</td>
-	    				</tr>
-	    				<tr>
-	    					<td>{% trans "Postal Code" %}</td>
-	    					<td>{{ payment.postal_code }}</td>
-	    				</tr>
-	    				<tr>
-	    					<td>{% trans "City" %}</td>
-	    					<td>{{ payment.city }}</td>
-	    				</tr>
-	    				<tr>
-	    					<td>{% trans "Country" %}</td>
-	    					<td>{{ payment.country }}</td>
-	    				</tr>
-		    		</table>
-	    		{% endwith %}
+	    		{% include 'wechange_payments/partials/subscription_payment_information.html' with subscription=subscription %}
 	    	</div>
 	    	
 	    	<div>
