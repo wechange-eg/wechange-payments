@@ -357,10 +357,15 @@ class BetterPaymentBackend(BaseBackend):
         
         result = req.json() # success!
         result['payment_type'] = payment_type
+        log_data = _strip_sensitive_data(result)
+        log_data.update({
+            'user': user.id if user else 'None',
+            'order_id': order_id,
+        })
         TransactionLog.objects.create(
             type=TransactionLog.TYPE_REQUEST,
             url=post_url,
-            data=_strip_sensitive_data(result)
+            data=log_data
         )
         
         """
