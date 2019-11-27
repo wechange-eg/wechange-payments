@@ -62,6 +62,13 @@ class Payment(models.Model):
         (STATUS_CANCELED, _('Canceled')),
     )
     
+    # payments with this status are "done", signalling that
+    # further payments may be made on a subscription
+    FINALIZED_STATUSES = (
+        STATUS_FAILED,
+        STATUS_PAID,
+    )
+    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, editable=False,
         related_name='payments', on_delete=models.CASCADE, null=True)
     subscription = models.ForeignKey('wechange_payments.Subscription', editable=False,
@@ -270,11 +277,19 @@ class Subscription(models.Model):
     # if a subsription is in any of these states, no other subscription for the same user
     # may exist. enforced at `Subscription.save()`
     EXLUSIVE_STATE_MAP = {
-        STATE_1_CANCELLED_BUT_ACTIVE: ACTIVE_STATES,
-        STATE_2_ACTIVE: (STATE_1_CANCELLED_BUT_ACTIVE,
-                         STATE_2_ACTIVE,
-                         STATE_3_WAITING_TO_BECOME_ACTIVE),
+        STATE_1_CANCELLED_BUT_ACTIVE: (
+            STATE_1_CANCELLED_BUT_ACTIVE,
+            STATE_2_ACTIVE,
+            STATE_99_FAILED_PAYMENTS_SUSPENDED
+        ),
+        STATE_2_ACTIVE: (
+            STATE_1_CANCELLED_BUT_ACTIVE,
+            STATE_2_ACTIVE,
+            STATE_3_WAITING_TO_BECOME_ACTIVE,
+            STATE_99_FAILED_PAYMENTS_SUSPENDED
+        ),
         STATE_3_WAITING_TO_BECOME_ACTIVE: STATE_3_WAITING_TO_BECOME_ACTIVE,
+        STATE_99_FAILED_PAYMENTS_SUSPENDED: ACTIVE_STATES,
     }
     
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
@@ -290,15 +305,20 @@ class Subscription(models.Model):
         help_text='A subscription can only ever go from higher number states to lower number states, never back up again!')
     has_problems = models.BooleanField(verbose_name=_('Has Problems'), default=False,
         help_text='An indicator flag that there were payment problems with the subscription\'s last payment. The subscription stays in active state however!')
+    num_attempts_recurring = models.PositiveSmallIntegerField(_('Attempts of booking recurring payment'), blank=False,
+        default=0, editable=False,
+        help_text='If booking a recurring payment for a subscription fails for non-payment-specific reasons, (e.g.. payment provider is down), we use this to count up attempts to retry.')
+    
     next_due_date = models.DateField(verbose_name=_('Next due date'), null=True, blank=True,
         help_text='Set to the next date whenever a payment is processed successfully.')
-    
     amount = models.FloatField(verbose_name=_('Amount'), default='0.0', editable=False,
         help_text='For security reasons, the amount can not be changed through the admin interface!')
-    created = models.DateTimeField(verbose_name=_('Created'), editable=False, auto_now_add=True)
+    
     last_payment = models.ForeignKey('wechange_payments.Payment', verbose_name=_('Last Payment'), 
         on_delete=models.PROTECT, related_name='+', null=False,
         help_text='The most recent payment made.')
+    
+    created = models.DateTimeField(verbose_name=_('Created'), editable=False, auto_now_add=True)
     cancelled = models.DateTimeField(verbose_name=_('Cancelled by User'), editable=False, blank=True, null=True)
     terminated = models.DateTimeField(verbose_name=_('Finally terminated by System'), editable=False, blank=True, null=True)
     
@@ -394,6 +414,12 @@ class Subscription(models.Model):
         except:
             pass
         return next_month_date
+    
+    def has_pending_payment(self):
+        """ Checks if a subscription's `last_payment` is still in a pending
+            state, indicating that no further payments may be booked on it for now """
+        last_payment = self.last_payment
+        return bool(last_payment and last_payment.status not in Payment.FINALIZED_STATUSES)
     
     def save(self, *args, **kwargs):
         """ Do sanity checks: 

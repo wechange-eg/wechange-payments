@@ -19,8 +19,10 @@ def current_subscription(request):
     context = dict()
     
     current_subscription = Subscription.get_current_for_user(request.user)
+    suspended_subscription = Subscription.get_suspended_for_user(request.user)
     context.update({
         'current_subscription': current_subscription,
+        'suspended_subscription': suspended_subscription,
     })
     # determine if payment popup should be shown
     if not current_subscription:

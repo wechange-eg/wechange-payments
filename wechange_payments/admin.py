@@ -50,7 +50,7 @@ admin.site.register(Invoice, InvoiceAdmin)
 
 
 class TransactionLogAdmin(admin.ModelAdmin):
-    list_display = ('created', 'url', 'type', 'data',)
+    list_display = ('created', 'url', 'type', 'created', 'data', )
     list_filter = ('created', 'url', 'type',)
     search_fields = ('url', 'type', 'data',)
     readonly_fields = ('url', 'type', 'data', 'created',)
@@ -62,7 +62,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('user', 'state', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
     list_filter = ('state', 'has_problems', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
-    readonly_fields = ('state', 'amount',)
+    readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring')
     raw_id_fields = ('user',)
     
     if getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):

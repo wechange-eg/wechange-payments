@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^account/contribution/payment/(?P<pk>\d+)/success/$', frontend.payment_success, name='payment-success'),
     url(r'^account/contribution/payment/infos/$', frontend.payment_infos, name='payment-infos'),
     url(r'^account/contribution/mine/$', frontend.my_subscription, name='my-subscription'),
+    url(r'^account/contribution/suspended/$', frontend.suspended_subscription, name='suspended-subscription'),
     #url(r'^account/contribution/past/$', frontend.past_subscriptions, name='past-subscriptions'),
     url(r'^account/contribution/cancel/$', frontend.cancel_subscription, name='cancel-subscription'),
     url(r'^account/contribution/debug-delete/$', frontend.debug_delete_subscription, name='debug-delete-subscription'),

@@ -19,7 +19,8 @@ from wechange_payments.backends.payment.base import BaseBackend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
 from wechange_payments.models import TransactionLog, Payment, Subscription
-from wechange_payments.payment import create_subscription_for_payment
+from wechange_payments.payment import create_subscription_for_payment,\
+    suspend_failed_subscription
 from wechange_payments.utils.utils import send_admin_mail_notification
 
 logger = logging.getLogger('wechange-payments')
@@ -44,7 +45,7 @@ def _strip_sensitive_data(params):
     params = copy(params)
     for sensitive_key in BETTERPAYMENT_SENSITIVE_POSTBACK_PARAMS:
         if sensitive_key in params:
-            del params[sensitive_key]
+            params[sensitive_key] = '***'
     return params
 
 
@@ -249,6 +250,9 @@ class BetterPaymentBackend(BaseBackend):
         # additional check: reference payment must be coming from an active subscription!
         if not reference_payment.subscription or not reference_payment.subscription.state == Subscription.STATE_2_ACTIVE:
             return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -7}
+        # additional check: reference payment must be coming from an active subscription that has no pending payments!
+        if reference_payment.subscription.has_pending_payment():
+            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -8}
         
         # collect params from reference payment
         order_id = str(uuid.uuid4())
@@ -277,12 +281,12 @@ class BetterPaymentBackend(BaseBackend):
             payment.completed_at = now()
         else:
             payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
-        
+            
         try:
             payment.save()
         except Exception as e:
             logger.warning('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
-            
+        
         if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             signals.successful_payment_made.send(sender=self, payment=payment)
             self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
@@ -353,10 +357,15 @@ class BetterPaymentBackend(BaseBackend):
         
         result = req.json() # success!
         result['payment_type'] = payment_type
+        log_data = _strip_sensitive_data(result)
+        log_data.update({
+            'user': user.id if user else 'None',
+            'order_id': order_id,
+        })
         TransactionLog.objects.create(
             type=TransactionLog.TYPE_REQUEST,
             url=post_url,
-            data=result
+            data=log_data
         )
         
         """
@@ -492,15 +501,16 @@ class BetterPaymentBackend(BaseBackend):
     def handle_postback(self, request, params):
         """ Does Checksum validation and if valid saves the postback data as TransactionLog """
         if self._validate_incoming_checksum(params, 'postback'):
+            # drop sensitive data from postback
             params = _strip_sensitive_data(params)
             try:
-                # drop sensitive data from postback
                 TransactionLog.objects.create(
                     type=TransactionLog.TYPE_POSTBACK,
                     data=params,
                 )
             except Exception as e:
-                logger.error('Payments: Error during postback processing! Postbacked data could not be saved!', extra={'params': params, 'exception': e})
+                logger.error('Payments: Error during postback processing! Postbacked data could not be saved!', 
+                             extra={'params': params, 'exception': e})
             
             try:
                 missing_params = [param for param in ['transaction_id', 'order_id', 'status_code'] if param not in params]
@@ -514,7 +524,8 @@ class BetterPaymentBackend(BaseBackend):
                     internal_transaction_id=params['order_id']
                 )
                 if payment is None:
-                    logger.error('BetterPayments Postback: Could not match a Payment object for given Postback!', extra={'params': params})
+                    logger.error('BetterPayments Postback: Could not match a Payment object for given Postback!', 
+                                 extra={'params': params})
                     return
                 
                 # Transaction Statuses see https://testdashboard.betterpayment.de/docs/#transaction-statuses
@@ -524,29 +535,54 @@ class BetterPaymentBackend(BaseBackend):
                     return
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS and payment.status == Payment.STATUS_PAID:
                     # got a postback on an already paid Payment, so we do not do anything
-                    logger.info('Received a postback for a successful payment, but the payment\'s status was already PAID!', extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    logger.info('Payments: Received a postback for a successful payment, but the payment\'s status was already PAID!', 
+                                extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription
                     # depending on `is_postponed_payment` and the payment.status, switch states here to preauthorized or paid!
-                    create_new_subscription = True
-                    if payment.is_postponed_payment and \
-                            payment.status in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
-                        payment.status = Payment.STATUS_PREAUTHORIZED_UNPAID
-                    elif payment.is_postponed_payment and payment.status == Payment.STATUS_PREAUTHORIZED_UNPAID:
-                        payment.status = Payment.STATUS_PAID
-                        payment.completed_at = now()
-                        # we do not change our subscription here because one should already have been created
-                        # at the time of pre-authorization for this payment
-                        create_new_subscription = False
+                    create_new_subscription = False
+                    advance_subscription_due_date = False
+                    if settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED and payment.is_postponed_payment:
+                        # TODO: incomplete logic for postponed payments
+                        if payment.status in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
+                            payment.status = Payment.STATUS_PREAUTHORIZED_UNPAID
+                            create_new_subscription = True
+                        elif payment.status == Payment.STATUS_PREAUTHORIZED_UNPAID:
+                            payment.status = Payment.STATUS_PAID
+                            payment.completed_at = now()
+                            # we do not change our subscription here because one should already have been created
+                            # at the time of pre-authorization for this payment
                     else:
                         payment.status = Payment.STATUS_PAID
                         payment.completed_at = now()
+                        # if this is the first and thus reference payment, we trigger creating a new subscription
+                        if payment.is_reference_payment:
+                            create_new_subscription = True
+                        else:
+                            advance_subscription_due_date = True
+                            
                     payment.save()
                     signals.successful_payment_made.send(sender=self, payment=payment)
-                    # IMPORTANT: if this is a recurring payment for a running subscription, don't start a subscription!
-                    if payment.is_reference_payment and create_new_subscription:
-                        create_subscription_for_payment(payment)
                     self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                    
+                    if create_new_subscription:
+                        # create a new subscription for a reference payment
+                        create_subscription_for_payment(payment)
+                        logger.info('Payments: Successfully created a subscription for an initial payment from a postback.', 
+                                    extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    if advance_subscription_due_date:
+                        # advance the subscription due date for a recurring payment that was 
+                        # marked as successful by a postback
+                        subscription = payment.subscription
+                        if subscription:
+                            subscription.set_next_due_date(subscription.next_due_date) 
+                            subscription.save()
+                            logger.info('Payments: Successfully advanced the due date of a subscription after a recurring payment from a postback.', 
+                                        extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                        else:
+                            logger.critical('Payments: Received a success postback for a previously unpaid recurring payment from a postback, but there was no subscription attached that we could advance the due date for! This needs to be investigated!', 
+                                            extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    
                 elif status == self.BETTERPAYMENT_STATUS_CANCELED:
                     # case 'error', 'canceled', 'declined': mark the payment as canceled. no further action is required.
                     payment.status = Payment.STATUS_CANCELED
@@ -555,9 +591,23 @@ class BetterPaymentBackend(BaseBackend):
                     # case 'error', 'declined': mark the payment as failed
                     payment.status = Payment.STATUS_FAILED
                     payment.save()
-                    self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                    # if the payment is a recurring one, we take the safe route and suspend the 
+                    # subscription. we do NOT want to cause multiple failed booking attempts on a user's account
+                    if not payment.is_reference_payment:
+                        suspend_failed_subscription(payment.subscription, payment=payment)
+                    else:
+                        # if it was a first payment, we simply inform the user that the payment failed 
+                        # and set the subscription to state ended
+                        self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                        payment.subscription.state = Subscription.STATE_0_TERMINATED
+                        payment.subscription.save()
                 elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
-                    # TODO: add refund logic, cancel subscription probably?
+                    # on a chargeback, immediately suspend the subscription to stop any further transactions. 
+                    # we also send out an admin mail, because in this case we have to manually retract a bill
+                    # in our accounting system 
+                    payment.status = Payment.STATUS_RETRACTED
+                    payment.save()
+                    
                     extra = {'betterpayment_status_code': str(status), 'internal_transaction_id': str(payment.internal_transaction_id), 'vendor_transaction_id': str(payment.vendor_transaction_id)}
                     content = ('We received a Refund or Chargeback for a payment in the WECHANGE Geschäftsmodell.\n' +\
                         '\n' +\
@@ -569,6 +619,8 @@ class BetterPaymentBackend(BaseBackend):
                         'vendor_transaction_id: %(vendor_transaction_id)s\n') % extra 
                     send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', content)
                     logger.critical('NYI: Received a postback for a refund, but refunding logic not yet implemented! (A mail was also sent!', extra=extra)
+                    
+                    suspend_failed_subscription(payment.subscription, payment=payment)
                 else:
                     # we do not know what to do with this status
                     logger.critical('NYI: Received postback with a status we cannot handle (Status: %d)!' % status, extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
