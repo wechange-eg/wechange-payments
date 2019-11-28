@@ -75,6 +75,14 @@ class WechangePaymentsDefaultSettings(AppConf):
     # DO NOT set this to True right now!
     POSTPONED_PAYMENTS_IMPLEMENTED = False
     
+    """ Test System settings """
+    
+    # if True, enables additional views for payments
+    TEST_PHASE = False
+    
+    # WARNING: never enable this setting in a production environment!
+    # if set to True, will skip the hardcoded safety checks in `user_pre_recurring_payment_safety_checks()`
+    OVERRIDE_SAFETY_CHECKS = False
     
     """ Betterpayment settings """
     

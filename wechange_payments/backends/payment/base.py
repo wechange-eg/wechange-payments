@@ -131,7 +131,7 @@ class BaseBackend(object):
             return False
         
         # skip this safety measure for test servers
-        if getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):
+        if getattr(settings, 'PAYMENTS_OVERRIDE_SAFETY_CHECKS', False):
             return True
         
         # 2. No existing successful payment in the last 14 days

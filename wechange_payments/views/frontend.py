@@ -493,7 +493,7 @@ cancel_subscription = CancelSubscriptionView.as_view()
 
 def debug_delete_subscription(request):
     """ DEBUG VIEW, completely removes a subscription or processing payment. Only works during the test phase! """
-    if not getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False):
+    if not getattr(settings, 'PAYMENTS_TEST_PHASE', False):
         return HttpResponseForbidden('Not available.')
     if not request.user.is_authenticated:
         return HttpResponseForbidden('You must be logged in to do that!')

@@ -55,7 +55,7 @@
 		
 		
 		
-	    {% if payment.status == 2 and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
+	    {% if payment.status == 2 and SETTINGS.PAYMENTS_TEST_PHASE %}
 	    <hr>
 	    <a href="{% url 'wechange-payments:debug-delete-subscription' %}">
 	    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE THE PROCESSING PAYMENT WHICH IS STILL RUNNING

@@ -125,7 +125,7 @@
 					        </span>
 					    </a>
 					    
-					    {% if displayed_subscription and SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %}
+					    {% if displayed_subscription and SETTINGS.PAYMENTS_TEST_PHASE %}
 						    <hr>
 						    <a href="{% url 'wechange-payments:debug-delete-subscription' %}">
 						    	TESTPHASE ONLY: CLICK HERE TO COMPLETELY REMOVE ALL CURRENT, CANCELED, AND QUEUED SUBSCRIPTIONS
@@ -140,7 +140,7 @@
 				        <p class="error-message"></p>
 				    </div>
 					
-				    {% if SETTINGS.COSINNUS_PAYMENTS_TEST_PHASE %} 
+				    {% if SETTINGS.PAYMENTS_TEST_PHASE %} 
 				    	<div class="alert alert-warning alert-dismissable">
 				            <i class="fa fa-exclamation fa-3x"></i>
 				            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&#215;</button>

@@ -221,7 +221,7 @@ class PaymentsUnitTest(TestCase):
     def test_2_anonymous_access_locked(self):
         pass
     
-    @unittest.skipIf(getattr(settings, 'COSINNUS_PAYMENTS_TEST_PHASE', False), 'Test skipped because payment system is in test-server mode!')
+    @unittest.skipIf(getattr(settings, 'PAYMENTS_TEST_PHASE', False), 'Test skipped because payment system is in test-server mode!')
     def test_3_hardcoded_security_checks(self):
         pass
         # check if
