@@ -376,7 +376,6 @@ class Subscription(models.Model):
             self.state = self.STATE_0_TERMINATED
             self.terminated = now()
             self.save()
-            logger.warn('REMOVEME: Done ended old expired sub!')
             
     def check_payment_due(self):
         """ Returns true if the subscription is active and `next_due_date` is in the past or today.
@@ -428,10 +427,12 @@ class Subscription(models.Model):
         created = bool(self.pk is None)
         # state must be lower if changed
         if not created:
-            if self.state > self._old_state:
-                logger.error('Fatal: Sanity check failed for subscription: Tried to save a subscription with a state higher than it previously was!',
+            if self.state > self._old_state and self.state != Subscription.STATE_99_FAILED_PAYMENTS_SUSPENDED:
+                logger.error('Payments: Fatal: Sanity check failed for subscription: \
+                    Tried to save a subscription with a state higher than it previously was!',
                     extra={'user': self.user, 'subscription_pk': self.pk, 'state': self.state, 'prev_state': self._old_state}) 
-                ('Fatal: Sanity check failed for subscription: Tried to save a subscription with a state higher than it previously was!')
+            raise Exception('Payments: Fatal: Sanity check failed for subscription: \
+                    Tried to save a subscription with a state higher than it previously was!')
         # no other subscription for the user with an exclusive state may exist
         exclusive_states = Subscription.EXLUSIVE_STATE_MAP.get(self.state, [])
         if exclusive_states:
@@ -439,10 +440,10 @@ class Subscription(models.Model):
             if self.pk is not None:
                 exclusive_qs = exclusive_qs.exclude(pk=self.pk)
             if exclusive_qs.count() > 0:
-                logger.error('Fatal: Sanity check failed for subscription: \
+                logger.error('Payments: Fatal: Sanity check failed for subscription: \
                     Tried to save a subscription when another subscription with an exclusive state exists for the same user!',
                     extra={'user': self.user, 'subscription_pk': self.pk, 'state': self.state}) 
-                raise Exception('Fatal: Sanity check failed for subscription: \
+                raise Exception('Payments: Fatal: Sanity check failed for subscription: \
                     Tried to save a subscription when another subscription with an exclusive state exists for the same user!')
         super(Subscription, self).save(*args, **kwargs)
         

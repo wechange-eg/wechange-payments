@@ -65,7 +65,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring')
     raw_id_fields = ('user',)
     
-    if getattr(settings, 'PAYMENTS_TEST_PHASE', False):
+    if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ADMIN_ONLY', False):
         actions = ['debug_timeshift_due_date', 'debug_process_subscriptions_now']
     
         def debug_timeshift_due_date(self, request, queryset):

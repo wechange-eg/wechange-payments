@@ -61,6 +61,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     LATE_PAYMENT_PROCESS_MESSAGE_SECONDS = 30
     
     # should SEPA payments be treated as instantly paid, or wait for a success postback from betterpayments?
+    # all signs for betterpayment point to "yes"
     SEPA_IS_INSTANTLY_SUCCESSFUL = True
     
     # how many minutes since the last `last_action_at` should we wait before attempting another

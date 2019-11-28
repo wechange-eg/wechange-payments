@@ -393,10 +393,8 @@ class BetterPaymentBackend(BaseBackend):
             return (None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': _('Unexpected response from payment provider.'), 'error_code': -2})
         
         if result.get('error_code') != 0:
-            # ignore some errors for sentry warnings (126: invalid account info)
-            
-            if getattr(settings, 'PAYMENTS_TEST_PHASE', False):
-                logger.info('Payments API error extra special data:', extra=data)
+            # in test or admin-only test phase, we print and save out extra info for failed payments to be able to debug them
+            if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ADMIN_ONLY', False):
                 special_data = copy(data)
                 special_data.update({
                     'TYPE': 'SPECIAL ERROR DEBUG',
@@ -408,7 +406,7 @@ class BetterPaymentBackend(BaseBackend):
                     data=special_data
                 )
                 
-                
+            # ignore some errors for sentry warnings (126: invalid account info)
             if result.get('error_code') not in [126,]: 
                 extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
                 logger.warn('Payments: API Calling SEPA Payment returned an error!', extra=extra)
@@ -550,7 +548,8 @@ class BetterPaymentBackend(BaseBackend):
                     return
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS and payment.status == Payment.STATUS_PAID:
                     # got a postback on an already paid Payment, so we do not do anything
-                    logger.info('Payments: Received a postback for a successful payment, but the payment\'s status was already PAID!', 
+                    # should be an info, but have this as warn to be alerted during testphase
+                    logger.warn('Payments: Received a postback for a successful payment, but the payment\'s status was already PAID!', 
                                 extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription

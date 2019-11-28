@@ -108,11 +108,9 @@ def process_due_subscription_payments():
                 # been set to the last sub at creation time.
                 waiting_sub.state = Subscription.STATE_2_ACTIVE
                 waiting_sub.save()
-                logger.warn('REMOVEME: Done activated a waiting sub after terminating an old expired sub!')
 
     # if an active subscription has its payment is due trigger a new payment on it
     for active_sub in Subscription.objects.filter(state=Subscription.STATE_2_ACTIVE):
-        logger.warn('REMOVEME: Checking sub for renewability')
         if active_sub.check_payment_due() and active_sub.user.is_active:
             try:
                 if active_sub.has_pending_payment():
@@ -122,10 +120,7 @@ def process_due_subscription_payments():
                         extra={'user': active_sub.user, 'subscription': active_sub, 'internal_transaction_id': str(active_sub.last_payment.internal_transaction_id)}
                         logger.critical('Payments: A recurring payment that has been started over 1 day ago still has its status at pending and has not received a postback! Only postbacks can set payments to not pending. The subscription is therefore also pending and is basically frozen. This needs to be investigated manually!', extra=extra)
                     continue
-                
-                logger.warn('REMOVEME: Starting sub recurrent payment')
                 book_next_subscription_payment(active_sub)
-                logger.warn('REMOVEME: Finished sub recurrent payment')
             except Exception as e:
                 logger.error('Payments: Exception while trying to book the next subscruption payment for a due subscription!', 
                          extra={'user': active_sub.user, 'subscription': active_sub, 'exception': e})
@@ -164,21 +159,20 @@ def book_next_subscription_payment(subscription):
     
     if error or not payment:
         # TODO: TODO-ERROR-STATE: should we always retry when we get an error back instantly, or sometimes
-        # even suspend the subscription here immediately, instead of only when a postback
-        # comes back as fail? 
+        # even suspend the subscription here immediately, instead of only when a postback comes back as fail? 
         
         subscription.num_attempts_recurring += 1
         # the server might just be down, or some error could have occured that has nothing
         # to do with the actual payment. so we retry this 3 different times
         if subscription.num_attempts_recurring < 3:
             # we haven't retried 3 times, count up tries in the subscription  
-            logger.error('Payments: Trying to make the next subscription payment returned an error (from our backend or provider backend). Retrying next day.', 
+            logger.error('Payments: (will retry) Trying to make the next subscription payment returned an error (from our backend or provider backend). Retrying next day.', 
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             subscription.has_problems = True
             subscription.save()
         else:
             # we have retried 3 times. appearently the problem is with the payment itself
-            logger.error('Payments: Trying to make the next subscription payment returned an error (from our backend or provider backend). Failed 3 times for this subscription and giving up.', 
+            logger.error('Payments: (giving up) Trying to make the next subscription payment returned an error (from our backend or provider backend). Failed 3 times for this subscription and giving up.', 
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             # set the subscription to failed and email the user
             suspend_failed_subscription(subscription)
@@ -200,7 +194,6 @@ def book_next_subscription_payment(subscription):
     payment.save()
     logger.info('Payments: Advanced the due_date of a subscription and saved it after a payment was made. ', 
         extra={'user': subscription.user, 'subscription': subscription})
-    logger.warn('REMOVEME: Done new sub payment')
     return payment
 
 
