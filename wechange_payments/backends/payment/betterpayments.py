@@ -210,6 +210,8 @@ class BetterPaymentBackend(BaseBackend):
                 else:
                     payment.status = Payment.STATUS_PAID
                     payment.completed_at = now()
+                    logger.info('Payments: Successfully paid and completed an initial SEPA payment (instantly successful without postback)',
+                        extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
             else:
                 payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
             payment.save()
@@ -279,6 +281,14 @@ class BetterPaymentBackend(BaseBackend):
         if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             payment.status = Payment.STATUS_PAID
             payment.completed_at = now()
+            logger.info('Payments: Successfully paid and completed a recurring SEPA payment (instantly successful without postback)',
+                extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
+            # advance subscription due date and save payment to subscription if payment was already instantly successfully paid
+            # otherwise set_next_due_date will be done in a successful postback
+            subscription = payment.subscription
+            if subscription:
+                subscription.set_next_due_date(subscription.next_due_date) 
+            
         else:
             payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
             
@@ -453,7 +463,11 @@ class BetterPaymentBackend(BaseBackend):
             backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__),
             extra_data=extra_data,
         )
+        logger.info('Payments: Successfully completed the first step of %s payment of type "%s"' \
+                % ('an initial' if payment.is_reference_payment else 'a recurring', payment_type),
+            extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
         payment.save()
+        
         return (payment, None)
     
     def _make_redirected_payment(self, params, payment_type, user=None, make_postponed=False):
@@ -548,8 +562,7 @@ class BetterPaymentBackend(BaseBackend):
                     return
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS and payment.status == Payment.STATUS_PAID:
                     # got a postback on an already paid Payment, so we do not do anything
-                    # should be an info, but have this as warn to be alerted during testphase
-                    logger.warn('Payments: Received a postback for a successful payment, but the payment\'s status was already PAID!', 
+                    logger.info('Payments: Received a postback for a successful payment, but the payment\'s status was already PAID!', 
                                 extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription
@@ -569,6 +582,8 @@ class BetterPaymentBackend(BaseBackend):
                     else:
                         payment.status = Payment.STATUS_PAID
                         payment.completed_at = now()
+                        logger.info('Payments: Received a status "paid" postback for a successful payment of type "%s"' % payment.type,
+                            extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
                         # if this is the first and thus reference payment, we trigger creating a new subscription
                         if payment.is_reference_payment:
                             create_new_subscription = True
@@ -605,6 +620,8 @@ class BetterPaymentBackend(BaseBackend):
                     # case 'error', 'declined': mark the payment as failed
                     payment.status = Payment.STATUS_FAILED
                     payment.save()
+                    logger.info('Payments: Received a status "error" or "declined" postback for a postback.',
+                        extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
                     # if the payment is a recurring one, we take the safe route and suspend the 
                     # subscription. we do NOT want to cause multiple failed booking attempts on a user's account
                     if not payment.is_reference_payment:

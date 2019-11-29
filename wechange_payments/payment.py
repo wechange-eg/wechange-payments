@@ -183,10 +183,9 @@ def book_next_subscription_payment(subscription):
     subscription.has_problems = False
     subscription.num_attempts_recurring = 0
     
-    # advance subscription due date and save payment to subscription if payment was already instantly successfully paid
-    # otherwise set_next_due_date will be done in a successful postback
-    if payment.status == Payment.STATUS_PAID:
-        subscription.set_next_due_date(subscription.next_due_date) 
+    # Note: advancing the subscription due_date is done is done in the backend.
+    #     it will be done either just after the call to `make_recurring_payment()`,
+    #     or after the successful payment postback is received.
     
     subscription.last_payment = payment
     subscription.save()
@@ -212,6 +211,8 @@ def suspend_failed_subscription(subscription, payment=None):
         if payment:
             subscription.last_payment = payment
         subscription.save()
+        logger.info('Payments: Suspended a subscription for a user because of one or more failed payments',
+            extra={'user': subscription.user.id, 'subscription_id': subscription.id})
         # TODO: send email to user, informing them of the suspension
 
 
