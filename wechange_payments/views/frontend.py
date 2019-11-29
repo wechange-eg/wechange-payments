@@ -30,11 +30,20 @@ from wechange_payments.models import Subscription, Payment, \
 from wechange_payments.payment import cancel_subscription as do_cancel_subscription
 from wechange_payments.tests.example_data import TEST_DATA_SEPA_PAYMENT_FORM
 
-
 logger = logging.getLogger('wechange-payments')
 
 
-class PaymentView(RequireLoggedInMixin, TemplateView):
+class CheckAdminOnlyPhaseMixin(object):
+    """ Checks if COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY is enabled, 
+        and if so restricts access to the view to superusers only. """
+
+    def dispatch(self, request, *args, **kwargs):
+        if getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) and not request.user.is_superuser:
+            raise PermissionDenied()
+        return super(CheckAdminOnlyPhaseMixin, self).dispatch(request, *args, **kwargs)
+
+
+class PaymentView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     
     template_name = 'wechange_payments/payment_form.html'
     
@@ -109,7 +118,7 @@ class PaymentUpdateView(PaymentView):
 payment_update = PaymentUpdateView.as_view()
 
 
-class PaymentSuccessView(RequireLoggedInMixin, DetailView):
+class PaymentSuccessView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
     """ This view shows the "thank-you" screen once the Payment+Subscription is complete. """
     
     model = Payment
@@ -141,7 +150,7 @@ class PaymentSuccessView(RequireLoggedInMixin, DetailView):
 payment_success = PaymentSuccessView.as_view()
 
 
-class PaymentProcessView(RequireLoggedInMixin, DetailView):
+class PaymentProcessView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
     """ A view that will be redirected to while a payment is still being processed.
         It will automatically refresh itself, wait for the Payment to be set to STATUS_PAID
         (in the background, initiated by a postback request from Better Payment) and
@@ -182,7 +191,7 @@ class PaymentProcessView(RequireLoggedInMixin, DetailView):
 payment_process = PaymentProcessView.as_view()
 
 
-class WelcomePageView(RequireLoggedInMixin, TemplateView):
+class WelcomePageView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ A welcome page that introduces the user to payments after registering. """
     
     template_name = 'wechange_payments/welcome_page.html'
@@ -198,7 +207,7 @@ welcome_page = WelcomePageView.as_view()
 
 
 
-class OverviewView(RequireLoggedInMixin, RedirectView):
+class OverviewView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, RedirectView):
     """ Redirects to the payment view if the user has no active subscriptions
         and to the my subscription view if there is an active subscription. """
     
@@ -224,7 +233,7 @@ class OverviewView(RequireLoggedInMixin, RedirectView):
 overview = OverviewView.as_view()
 
 
-class MySubscriptionView(RequireLoggedInMixin, TemplateView):
+class MySubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ Shows informations about the active or queued subscription and lets the user
         adjust the payment amount. """
     
@@ -264,7 +273,7 @@ class MySubscriptionView(RequireLoggedInMixin, TemplateView):
 my_subscription = MySubscriptionView.as_view()
 
 
-class SuspendedSubscriptionView(RequireLoggedInMixin, TemplateView):
+class SuspendedSubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ Shows informations about the currently suspended subscription. """
     
     template_name = 'wechange_payments/suspended_subscription.html'
@@ -298,7 +307,7 @@ class SuspendedSubscriptionView(RequireLoggedInMixin, TemplateView):
 suspended_subscription = SuspendedSubscriptionView.as_view()
 
 
-class PaymentInfosView(RequireLoggedInMixin, TemplateView):
+class PaymentInfosView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ Shows informations about the current subscription and lets the user
         adjust the payment amount. """
     
@@ -329,7 +338,7 @@ class PaymentInfosView(RequireLoggedInMixin, TemplateView):
 payment_infos = PaymentInfosView.as_view()
 
 
-class PastSubscriptionsView(RequireLoggedInMixin, TemplateView):
+class PastSubscriptionsView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ Shows a list of past subscriptions. """
     
     template_name = 'wechange_payments/past_subscriptions.html'
@@ -353,7 +362,7 @@ class PastSubscriptionsView(RequireLoggedInMixin, TemplateView):
 past_subscriptions = PastSubscriptionsView.as_view()
 
 
-class InvoicesView(RequireLoggedInMixin, TemplateView):
+class InvoicesView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ Invoices list view """
     
     template_name = 'wechange_payments/invoices/invoice_list.html'
@@ -377,7 +386,7 @@ class InvoicesView(RequireLoggedInMixin, TemplateView):
 invoices = InvoicesView.as_view()
 
 
-class InvoiceDetailView(DetailView):
+class InvoiceDetailView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
     """ Invoice detail view. 
         If the invoice accessed is not yet ready, we call the provider API invoice creation API
         in the background (honoring the API retry delay) and show the user a message. """
@@ -417,7 +426,7 @@ class InvoiceDetailView(DetailView):
 invoice_detail = InvoiceDetailView.as_view()
 
 
-class InvoiceDownloadView(DetailView):
+class InvoiceDownloadView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
     """ Lets the user download the FileField file of an Invoice
         while the user never gets to see the server file path.
         Mime type is always pdf. """
@@ -461,7 +470,7 @@ class InvoiceDownloadView(DetailView):
 invoice_download = InvoiceDownloadView.as_view()
 
 
-class CancelSubscriptionView(RequireLoggedInMixin, TemplateView):
+class CancelSubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     
     template_name = 'wechange_payments/cancel_subscription.html'
     

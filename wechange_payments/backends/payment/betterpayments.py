@@ -394,7 +394,7 @@ class BetterPaymentBackend(BaseBackend):
         
         if result.get('error_code') != 0:
             # in test or admin-only test phase, we print and save out extra info for failed payments to be able to debug them
-            if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ADMIN_ONLY', False):
+            if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False):
                 special_data = copy(data)
                 special_data.update({
                     'TYPE': 'SPECIAL ERROR DEBUG',

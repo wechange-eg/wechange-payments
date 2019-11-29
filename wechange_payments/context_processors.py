@@ -16,6 +16,11 @@ from wechange_payments.models import Subscription,\
 logger = logging.getLogger('wechange-payments')
 
 def current_subscription(request):
+    # enabled only if payments are enabled
+    if not getattr(settings, 'COSINNUS_PAYMENTS_ENABLED', False) and not \
+            (getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) and request.user.is_superuser):
+        return {}
+    
     context = dict()
     
     current_subscription = Subscription.get_current_for_user(request.user)

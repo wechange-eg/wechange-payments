@@ -431,8 +431,8 @@ class Subscription(models.Model):
                 logger.error('Payments: Fatal: Sanity check failed for subscription: \
                     Tried to save a subscription with a state higher than it previously was!',
                     extra={'user': self.user, 'subscription_pk': self.pk, 'state': self.state, 'prev_state': self._old_state}) 
-            raise Exception('Payments: Fatal: Sanity check failed for subscription: \
-                    Tried to save a subscription with a state higher than it previously was!')
+                raise Exception('Payments: Fatal: Sanity check failed for subscription: \
+                        Tried to save a subscription with a state higher than it previously was!')
         # no other subscription for the user with an exclusive state may exist
         exclusive_states = Subscription.EXLUSIVE_STATE_MAP.get(self.state, [])
         if exclusive_states:

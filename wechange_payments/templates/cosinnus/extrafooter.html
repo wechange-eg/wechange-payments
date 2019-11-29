@@ -3,7 +3,10 @@
 {% block extrafooter_extensions %}
 	{{ block.super }}
 	
-	{% if show_payment_popup or request.GET.force_payment_popup == '1' %}
-		{% include 'wechange_payments/payments_popup.html' %}
-	{% endif %}	
+	{% comment %} Never show the Payments popup if the user would get another popup (the ToS update one) {% endcomment %}
+	{% if not updated_tos_form %}
+		{% if show_payment_popup or request.GET.force_payment_popup == '1' %}
+			{% include 'wechange_payments/payments_popup.html' %}
+		{% endif %}	
+	{% endif %}
 {% endblock %}
