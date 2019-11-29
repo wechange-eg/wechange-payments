@@ -182,10 +182,11 @@ def book_next_subscription_payment(subscription):
     # clear subscription retry times on success
     subscription.has_problems = False
     subscription.num_attempts_recurring = 0
-    
-    # Note: advancing the subscription due_date is done is done in the backend.
-    #     it will be done either just after the call to `make_recurring_payment()`,
-    #     or after the successful payment postback is received.
+
+    # advance subscription due date and save payment to subscription if payment was already instantly successfully paid
+    # otherwise set_next_due_date will be done in a successful postback
+    if payment.status == Payment.STATUS_PAID:
+        subscription.set_next_due_date(subscription.next_due_date)     
     
     subscription.last_payment = payment
     subscription.save()

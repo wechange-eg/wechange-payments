@@ -283,12 +283,6 @@ class BetterPaymentBackend(BaseBackend):
             payment.completed_at = now()
             logger.info('Payments: Successfully paid and completed a recurring SEPA payment (instantly successful without postback)',
                 extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
-            # advance subscription due date and save payment to subscription if payment was already instantly successfully paid
-            # otherwise set_next_due_date will be done in a successful postback
-            subscription = payment.subscription
-            if subscription:
-                subscription.set_next_due_date(subscription.next_due_date) 
-            
         else:
             payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
             
