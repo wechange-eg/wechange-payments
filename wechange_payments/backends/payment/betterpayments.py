@@ -20,7 +20,7 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
 from wechange_payments.models import TransactionLog, Payment, Subscription
 from wechange_payments.payment import create_subscription_for_payment,\
-    suspend_failed_subscription
+    suspend_failed_subscription, handle_successful_postback_for_payment
 from wechange_payments.utils.utils import send_admin_mail_notification
 
 logger = logging.getLogger('wechange-payments')
@@ -561,51 +561,31 @@ class BetterPaymentBackend(BaseBackend):
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription
                     # depending on `is_postponed_payment` and the payment.status, switch states here to preauthorized or paid!
-                    create_new_subscription = False
-                    advance_subscription_due_date = False
                     if settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED and payment.is_postponed_payment:
                         # TODO: incomplete logic for postponed payments
                         if payment.status in [Payment.STATUS_STARTED, Payment.STATUS_COMPLETED_BUT_UNCONFIRMED]:
                             payment.status = Payment.STATUS_PREAUTHORIZED_UNPAID
-                            create_new_subscription = True
+                            # create_new_subscription = True
+                            # TODO incomplete: create new subscription here!
                         elif payment.status == Payment.STATUS_PREAUTHORIZED_UNPAID:
                             payment.status = Payment.STATUS_PAID
                             payment.completed_at = now()
                             # we do not change our subscription here because one should already have been created
                             # at the time of pre-authorization for this payment
+                        payment.save()
+                        # TODO: incomplete!
                     else:
+                        # regular success handling 
                         payment.status = Payment.STATUS_PAID
                         payment.completed_at = now()
                         logger.info('Payments: Received a status "paid" postback for a successful payment of type "%s"' % payment.type,
                             extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
-                        # if this is the first and thus reference payment, we trigger creating a new subscription
-                        if payment.is_reference_payment:
-                            create_new_subscription = True
-                        else:
-                            advance_subscription_due_date = True
-                            
-                    payment.save()
-                    signals.successful_payment_made.send(sender=self, payment=payment)
-                    self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
-                    
-                    if create_new_subscription:
-                        # create a new subscription for a reference payment
-                        create_subscription_for_payment(payment)
-                        logger.info('Payments: Successfully created a subscription for an initial payment from a postback.', 
-                                    extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
-                    if advance_subscription_due_date:
-                        # advance the subscription due date for a recurring payment that was 
-                        # marked as successful by a postback
-                        subscription = payment.subscription
-                        if subscription:
-                            subscription.set_next_due_date(subscription.next_due_date) 
-                            subscription.save()
-                            logger.info('Payments: Successfully advanced the due date of a subscription after a recurring payment from a postback.', 
-                                        extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
-                        else:
-                            logger.critical('Payments: Received a success postback for a previously unpaid recurring payment from a postback, but there was no subscription attached that we could advance the due date for! This needs to be investigated!', 
-                                            extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
-                    
+                        payment.save()
+                        signals.successful_payment_made.send(sender=self, payment=payment)
+                        handle_successful_postback_for_payment(payment)
+                        self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                        
+                        
                 elif status == self.BETTERPAYMENT_STATUS_CANCELED:
                     # case 'error', 'canceled', 'declined': mark the payment as canceled. no further action is required.
                     payment.status = Payment.STATUS_CANCELED

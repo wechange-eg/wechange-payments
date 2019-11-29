@@ -197,6 +197,36 @@ def book_next_subscription_payment(subscription):
     return payment
 
 
+def handle_successful_postback_for_payment(payment):
+    TODO! 
+    AND TEST THIS!
+    """ Handles the actions after a successful payment was made,
+        either after a postback or an instantly successful payment.
+        Either creates a new subscription or advances a current subscription's
+        due_date for a recurring payment """
+    
+    ALSO send the IS_INSTANTLY_SUCCESSFUL logic to here to un-duplicate it!
+    
+    if payment.is_reference_payment:
+        # if this is the first and thus reference payment, we trigger creating a new subscription
+        create_subscription_for_payment(payment)
+        logger.info('Payments: Successfully created a subscription for an initial payment from a postback.', 
+                    extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+    else:
+        # advance the subscription due date for a recurring payment that was 
+        # marked as successful by a postback
+        subscription = payment.subscription
+        if subscription:
+            subscription.set_next_due_date(subscription.next_due_date) 
+            subscription.save()
+            logger.info('Payments: Successfully advanced the due date of a subscription after a recurring payment from a postback.', 
+                        extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+        else:
+            logger.critical('Payments: Received a success postback for a previously unpaid recurring payment from a postback, but there was no subscription attached that we could advance the due date for! This needs to be investigated!', 
+                            extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    
+
+
 def suspend_failed_subscription(subscription, payment=None):
     """ For various reasons, like failed payments to refunds pulled on a payment,
         this sets a subscription into a suspended "has problems and failed" state, where
