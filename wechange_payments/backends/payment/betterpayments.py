@@ -20,7 +20,7 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
 from wechange_payments.models import TransactionLog, Payment, Subscription
 from wechange_payments.payment import create_subscription_for_payment,\
-    suspend_failed_subscription, handle_successful_postback_for_payment
+    suspend_failed_subscription, handle_successful_payment
 from wechange_payments.utils.utils import send_admin_mail_notification
 
 logger = logging.getLogger('wechange-payments')
@@ -582,7 +582,7 @@ class BetterPaymentBackend(BaseBackend):
                             extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
                         payment.save()
                         signals.successful_payment_made.send(sender=self, payment=payment)
-                        handle_successful_postback_for_payment(payment)
+                        handle_successful_payment(payment)
                         self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
                         
                         

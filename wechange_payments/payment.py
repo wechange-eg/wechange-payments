@@ -182,31 +182,27 @@ def book_next_subscription_payment(subscription):
     # clear subscription retry times on success
     subscription.has_problems = False
     subscription.num_attempts_recurring = 0
-
-    # advance subscription due date and save payment to subscription if payment was already instantly successfully paid
-    # otherwise set_next_due_date will be done in a successful postback
-    if payment.status == Payment.STATUS_PAID:
-        subscription.set_next_due_date(subscription.next_due_date)     
     
     subscription.last_payment = payment
     subscription.save()
     payment.subscription = subscription
     payment.save()
+    
+    # advance subscription due date if payment was already instantly successfully paid
+    # otherwise the date advancement will be done in a successful postback
+    if payment.status == Payment.STATUS_PAID:
+        handle_successful_payment(payment)
+        
     logger.info('Payments: Advanced the due_date of a subscription and saved it after a payment was made. ', 
         extra={'user': subscription.user, 'subscription': subscription})
     return payment
 
 
-def handle_successful_postback_for_payment(payment):
-    TODO! 
-    AND TEST THIS!
+def handle_successful_payment(payment):
     """ Handles the actions after a successful payment was made,
-        either after a postback or an instantly successful payment.
+        triggered either after an instantly successful payment or after  a postback was received.
         Either creates a new subscription or advances a current subscription's
-        due_date for a recurring payment """
-    
-    ALSO send the IS_INSTANTLY_SUCCESSFUL logic to here to un-duplicate it!
-    
+        due_date for a recurring payment. """
     if payment.is_reference_payment:
         # if this is the first and thus reference payment, we trigger creating a new subscription
         create_subscription_for_payment(payment)

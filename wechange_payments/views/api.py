@@ -15,7 +15,7 @@ from wechange_payments.models import Subscription,\
     USERPROFILE_SETTING_POPUP_CLOSED, Payment,\
     USERPROFILE_SETTING_POPUP_CLOSED_TIMES
 from wechange_payments.payment import create_subscription_for_payment,\
-    change_subscription_amount
+    change_subscription_amount, handle_successful_payment
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from cosinnus.utils.functions import is_number
@@ -144,7 +144,7 @@ def make_subscription_payment(request):
         def on_success_func(payment):
             try:
                 if payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
-                    create_subscription_for_payment(payment)
+                    handle_successful_payment(payment)
                     redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
                 else:
                     redirect_url = reverse('wechange_payments:payment-process', kwargs={'pk': payment.id})

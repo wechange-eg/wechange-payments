@@ -38,7 +38,8 @@ class CheckAdminOnlyPhaseMixin(object):
         and if so restricts access to the view to superusers only. """
 
     def dispatch(self, request, *args, **kwargs):
-        if getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) and not request.user.is_superuser:
+        if getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) and not request.user.is_superuser \
+            and not getattr(settings, 'COSINNUS_PAYMENTS_ENABLED', False):
             raise PermissionDenied()
         return super(CheckAdminOnlyPhaseMixin, self).dispatch(request, *args, **kwargs)
 

@@ -191,6 +191,7 @@ class PaymentsUnitTest(TestCase):
         self.assertEqual(loyal_subscription.state, Subscription.STATE_2_ACTIVE, 'Due active subscription kept its state after being renews daily subscription processing')
         self.assertEqual(loyal_subscription, Subscription.get_active_for_user(self.loyal_user), 'User has an "active" subscription after subscription processing with due subscriptions')
         self.assertEqual(loyal_subscription, Subscription.get_current_for_user(self.loyal_user), 'User has a "current" subscription after subscription processing with due subscriptions')
+        self.assertGreater(loyal_subscription.next_due_date, time_before_subscription_processing.date(), 'Due active subscription kept its due date in the past after subscription processing')
         
         # loyal user should have a new payment made (a recurrent one), disloyal one should not
         loyal_payments = Payment.objects.filter(user=self.loyal_user).order_by('-last_action_at')
