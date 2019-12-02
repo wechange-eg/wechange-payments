@@ -95,7 +95,7 @@
         					{% trans "Choose the amount you would like to contribute using the slider. The contribution amount includes 19% VAT." context "(PF26)" %}
         				</p>
         				<p>
-        					{% trans "You may also choose a higher amount by entering it directly in the text box!" context "(PF24)" %}
+        					{% trans "You may also choose a higher amount by entering it directly in the text box!" context "(PF24x)" %}
         				</p>
         			</div>
         			
@@ -119,7 +119,7 @@
 					        	{% if displayed_subscription and displayed_subscription.state != 1 %}
 					        		{% trans "Confirm Contribution Amount" context "(PF4a)" %}
 					        	{% else %}
-									{% trans "Set Contribution Amount" context "(PF4)" %}
+									{% trans "Set amount of Contribution" context "(PF4)" %}
 								{% endif %}
 								 &gt;
 					        </span>
@@ -160,7 +160,7 @@
 						{% trans " Almost done! Please enter your account information below." context "(PF5)" %}
 					</h2>
 		            
-					{% trans "Payment Type" as label %}
+					{% trans "Payment Method" as label %}
 					{% captureas select_field_html %}
 						<style>
 							select:invalid { color: gray; }
@@ -282,7 +282,7 @@
 			    					<td>{% trans "Monthly" %}</td>
 			    				</tr>
 			    				<tr>
-			    					<td>{% trans "Payment Type" %}</td>
+			    					<td>{% trans "Payment Method" %}</td>
 			    					<td>
 			    						{% captureas payment_type_html %}
 				    						<span data-summary-payment-type="dd">{% trans "Direct Debit (SEPA)" %}</span>
@@ -335,7 +335,7 @@
 						
 						<p>
 							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html confirm_and_pay_button_text=confirm_and_pay_button_text context "(PF7)" %}By clicking on "{{ confirm_and_pay_button_text }}" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
-							{% trans "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT. The VAT is shown on the invoice." context "(PF7a)" %}
+							{% trans "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT, which is shown on the invoice." context "(PF7a)" %}
 							<br/><br/>
 							{% if displayed_subscription and displayed_subscription.next_due_date %}
 								{% if displayed_subscription.state == 1 %}
@@ -347,7 +347,7 @@
 							{% else %}
 								{% trans "The next debit will be made immediately." context "(PF20)" %}
 							{% endif %}
-							{% trans "You can adjust the amount of your monthly contribution or cancel payments at any time." context "(PF22)" %}
+							{% trans 'You can adjust the amount of your monthly contribution or terminate payments at any time by clicking “Your Contribution” in your user menu.' context "(PF22)" %}
 						</p>
 						
 						{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(PF23)" %}Thank you for supporting {{ portal_name }}!{% endblocktrans %}

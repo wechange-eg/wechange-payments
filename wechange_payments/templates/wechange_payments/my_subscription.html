@@ -35,7 +35,10 @@
 		    
 		    <h2>{% blocktrans with amount=subscription.amount|intify context "(MS2)" %}Your current Contribution is {{ amount }} Euro per month{% endblocktrans %}</h2>
 			<p>
-				{% trans "Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'" context "(MS3)" %}
+                {% captureas desc_text %}{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(MS3)" %}We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.
+
+If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!{% endblocktrans %}{% endcaptureas %}
+                {{ desc_text|linebreaksbr }}
 			</p>
 			<p>
 				<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}">{% trans "Learn more" context "(MS4)" %}</a>
@@ -48,7 +51,7 @@
         	<div class="large-space">
 				<span>
 					{% trans "If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually." context "(MS8)" %}
-					{% trans "Contribution amount includes 19% VAT" context "(PF24)" %}
+					{% trans "Contribution amount includes 19% VAT." context "(PF24)" %}
 				</span>
 			</div>
 			
@@ -67,7 +70,7 @@
 			    	
 				    <a href="{% url "wechange-payments:cancel-subscription" %}" class="pull-left rounded-button button-color-tertiary">
 				        <span class="rounded-button-inner">
-	                		{% trans "Cancel your Contribution" context "(MS6)" %}
+	                		{% trans "Terminate your Contribution" context "(MS6)" %}
 				        </span>
 				    </a>
 			    {% comment %}  

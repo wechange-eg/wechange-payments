@@ -6,21 +6,21 @@
 		{% comment %} Default, long running, monthly reappearing version {% endcomment %}
 		
 		{% if random == "0" %}
-			{% trans "popup header 1" context "(POP1-repeat-rnd1)" as title %}
+			{% trans "The early bird catches the worm!" context "(POP1-repeat-rnd1)" as title %}
 		{% elif random == "1" %}
-			{% trans "popup header 2" context "(POP1-repeat-rnd2)" as title %}
+			{% trans "Does not hurt, but does good for many" context "(POP1-repeat-rnd2)" as title %}
 		{% elif random == "2" %}
-			{% trans "popup header 3" context "(POP1-repeat-rnd3)" as title %}
+			{% trans "Many pennies make a dollar" context "(POP1-repeat-rnd3)" as title %}
 		{% elif random == "3" %}
-			{% trans "popup header 4" context "(POP1-repeat-rnd4)" as title %}
+			{% trans "With small steps to big goals" context "(POP1-repeat-rnd4)" as title %}
 		{% elif random == "4" %}
-			{% trans "popup header 5" context "(POP1-repeat-rnd5)" as title %}
+			{% trans "Come, be among the ones who pay!" context "(POP1-repeat-rnd5)" as title %}
 		{% elif random == "5" %}
-			{% trans "popup header 6" context "(POP1-repeat-rnd6)" as title %}
+			{% trans "How much are we worth to you?" context "(POP1-repeat-rnd6)" as title %}
 		{% elif random == "6" %}
-			{% trans "popup header 7" context "(POP1-repeat-rnd7)" as title %}
+			{% trans "So that WECHANGE can be more than the sum of its parts" context "(POP1-repeat-rnd7)" as title %}
 		{% else %}
-			{% trans "popup header 8" context "(POP1-repeat-rnd8)" as title %}
+			{% trans "Change happens on a small scale" context "(POP1-repeat-rnd8)" as title %}
 		{% endif %}
 		{% captureas body %}
 			<p>
@@ -28,7 +28,9 @@
 			</p>
 			<p>
 				{% captureas join_time_verbal %}<span class="moment-data-date" data-date="{{ user.date_joined|date:'c' }}"></span>{% endcaptureas %}
-				{% captureas pop_text%}{% blocktrans with join_time_verbal=join_time_verbal context "(POP3-repeat)" %}popup body text with time of becoming a member in text. You joined us {{ join_time_verbal }}.{% endblocktrans %}{% endcaptureas %}
+				{% captureas pop_text%}{% blocktrans with join_time_verbal=join_time_verbal context "(POP3-repeat)" %}you joined us at WECHANGE {{ join_time_verbal }} - we are very happy about that! 
+
+Please remember: WECHANGE is only free of charge because enough users* contribute voluntarily. With an average of 5 Euro per month, we can cover the costs of hosting the platform. Every small contribution helps!{% endblocktrans %}{% endcaptureas %}
 				{{ pop_text|linebreaksbr }}
 			</p>
 			<hr class="invisible" />
@@ -36,27 +38,34 @@
 	{% elif payment_popup_user_registered_after_payments or request.GET.popup_type == 'newuser' %}
 		{% comment %} Newly registered user, 5-day or so delayed version {% endcomment %}
 		
-		{% trans "popup header" context "(POP1-newuser)" as title %}
+		{% trans "Your contribution helps!" context "(POP1-newuser)" as title %}
 		{% captureas body %}
 			<p>
 				{% blocktrans with username=user.first_name context "(POP2-newuser)" %}Dear {{ username }},{% endblocktrans %}
 			</p>
 			<p>
-				{% trans "popup body text" context "(POP3-newuser)" as pop_text %}
-				{{ pop_text|linebreaksbr }}
+                {% captureas pop_text %}{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(POP3-newuser)" %}it's great to have you WECHANGE! We hope you like our platform and that you and your projects can benefit.
+
+We try to optimally fullfill your needs and the demands of the community and to develop the platform. This causes high costs - for hosting, maintenance, support and the development of new functions. In order to ensure the maintenance, we rely on voluntary contributions from our users.
+
+With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development. If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!
+{% endblocktrans %}{% endcaptureas %}
+                {{ pop_text|linebreaksbr }}
 			</p>
 			<hr class="invisible" />
 		{% endcaptureas %}
 	{% else %}
 		{% comment %} Old user (registered before payments were introduced) one-time shown version {% endcomment %}
 		
-		{% trans "popup header" context "(POP1-release)" as title %}
+		{% trans "WECHANGE becomes even fairer." context "(POP1-release)" as title %}
 		{% captureas body %}
 			<p>
 				{% blocktrans with username=user.first_name context "(POP2-release)" %}Dear {{ username }},{% endblocktrans %}
 			</p>
 			<p>
-				{% trans "popup body text" context "(POP3-release)" as pop_text %}
+			    {% captureas pop_text %}{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(POP3-release)" %}we understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development. 
+
+If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!{% endblocktrans %}{% endcaptureas %}
 				{{ pop_text|linebreaksbr }}
 			</p>
 			<hr class="invisible" />

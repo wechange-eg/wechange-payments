@@ -1,7 +1,7 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
-{% block page_title %}{% trans "Payment Information" context "(INF1)" %}{% endblock %}
+{% block page_title %}{% trans "Your payment details" context "(INF1)" %}{% endblock %}
 
 {% block leftnav %}
 	{% include 'wechange_payments/leftnav.html' %}
@@ -9,7 +9,7 @@
 
 {% block breadcrumb %}
 	{{ block.super }}
-	<li><a class="active" href="{% url 'wechange-payments:payment-infos' %}">{% trans "Payment Information" context "(INF1)" %}</a></li>
+	<li><a class="active" href="{% url 'wechange-payments:payment-infos' %}">{% trans "Your payment details" context "(INF1)" %}</a></li>
 {% endblock %}
 
 {% block content %}
@@ -20,7 +20,7 @@
     	<div class="large-space">
     		<table>
 				<tr>
-					<td>{% trans "Last Payment" context "(INF10)" %}</td>
+					<td>{% trans "The last payment was made on" context "(INF10)" %}</td>
 					<td>
 						{% if last_payment.status < 3 %}
 							{% blocktrans with date=last_payment.last_action_at.date|localize context "(INF15)" %}Processing. Started at {{ date }}.{% endblocktrans %}
@@ -80,7 +80,7 @@
 				</tr>
 				{% if subscription.state > 1 %}
 					<tr>
-						<td>{% trans "Current monthly contribution" context "(INF6)" %}</td>
+						<td>{% trans "Your current monthly contribution" context "(INF6)" %}</td>
 						<td>
 							<span>{{ subscription.amount|intify }} €</span>
 						</td>
@@ -94,7 +94,7 @@
 		        	{% if subscription.state == 1 %}
 		        		{% trans "Set up new Contribution" context "(INF8.2)" %}
 		        	{% else %}
-						{% trans "Adjust contribution amount or cancel your Contribution" context "(INF8.1)" %}
+						{% trans "Adjust contribution amount or terminate your Contribution" context "(INF8.1)" %}
 					{% endif %}
 		        </span>
 		    </a>
@@ -106,7 +106,7 @@
 			<hr class=""></hr>
 			<hr class="invisible"></hr>
 			
-			<h2>{% trans "Your Payment Information" context "(INF1)" %}</h2>
+			<h2>{% trans "Your payment details" context "(INF1)" %}</h2>
 	    	<div class="large-space">
 	    		{% include 'wechange_payments/partials/subscription_payment_information.html' with subscription=subscription %}
 	    	</div>

@@ -492,7 +492,7 @@ class CancelSubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, Tem
                 messages.success(request, _('(MSG1) Your current Subscription was terminated.'))
                 return redirect('wechange-payments:overview')
         except Exception as e:
-            logger.error('Critical: Could not cancel a subscription!', extra={'exc': force_text(e)})
+            logger.error('Critical: Could not terminate a subscription!', extra={'exc': force_text(e)})
             messages.error(request, _('(MSG2) There was an error terminating your subscription! Please contact the customer support!'))
             if settings.DEBUG:
                 raise

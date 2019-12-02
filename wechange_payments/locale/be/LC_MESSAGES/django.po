@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-11 18:26+0100\n"
+"POT-Creation-Date: 2019-12-02 18:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -178,6 +178,9 @@ msgstr ""
 msgid "Has Problems"
 msgstr ""
 
+msgid "Attempts of booking recurring payment"
+msgstr ""
+
 msgid "Next due date"
 msgstr ""
 
@@ -238,15 +241,15 @@ msgid "Payments"
 msgstr ""
 
 msgctxt "(TS1)"
-msgid "Cancel your monthly Contribution"
+msgid "Stop payments"
 msgstr ""
 
 msgctxt "(TS2)"
-msgid "sorry and think-about-it-again-please text"
+msgid "Too bad you want to end your contribution! Don't you want to reconsider? You can also choose a smaller amount. Every small contribution helps us. If you are dissatisfied with something, we would be happy to receive your feedback at support@wechange.de"
 msgstr ""
 
 msgctxt "(TS3)"
-msgid "What happens when you cancel your monthly Contribution"
+msgid "What happens when you terminate your subscription"
 msgstr ""
 
 msgctxt "(TS4) (explanation)"
@@ -255,7 +258,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(TS5)"
-msgid "(explanation) Your monthly Contribution will be terminated and no future payments will be made. Your currently paid Contribution status will remain active until %(date)s."
+msgid "Your subscription will be terminated and no future payments will be made. Your current payment status will remain active until %(date)s. You can reset the payments at any time."
 msgstr ""
 
 msgctxt "(MS5-rethink-cancelling)"
@@ -266,15 +269,15 @@ msgid "Cancel"
 msgstr ""
 
 msgctxt "(TS6)"
-msgid "Cancel your Contribution"
+msgid "Terminate subscription"
 msgstr ""
 
 msgctxt "(TS7)"
-msgid "Confirm Contribution canceling confirm-dialog header"
+msgid "Do you really want to terminate your subscriptions? You can create a new contribution at any time."
 msgstr ""
 
 msgctxt "(TS8)"
-msgid "Confirm Contribution canceling confirm-dialog text"
+msgid "You don't want to pay monthly contributions anymore?"
 msgstr ""
 
 #, python-format
@@ -282,19 +285,19 @@ msgid "You can contribute any amount up to %(max_amount)s by entering it here. F
 msgstr ""
 
 msgctxt "(SLD1)"
-msgid "Low amount text"
+msgid "Thank you. Every small contribution helps."
 msgstr ""
 
 msgctxt "(SLD2)"
-msgid "Medium amount text"
+msgid "Thank you for helping us to develop WECHANGE."
 msgstr ""
 
 msgctxt "(SLD3)"
-msgid "High amount text"
+msgid "Whoa! You're really helping us!"
 msgstr ""
 
 msgctxt "(SLD4)"
-msgid "Very high amount text"
+msgid "Magnificent! With your support, the WECHANGE community can grow and prosper!"
 msgstr ""
 
 #, python-format
@@ -330,12 +333,16 @@ msgstr ""
 msgid "Invoice for %(amount)s€ from %(date)s"
 msgstr ""
 
+msgctxt "(FC1)"
+msgid "Current Payment Issues"
+msgstr ""
+
 msgctxt "(LN1)"
 msgid "Your Contribution"
 msgstr ""
 
 msgctxt "(LN2)"
-msgid "Payment Information"
+msgid "Your payment details"
 msgstr ""
 
 msgctxt "(LN3)"
@@ -348,6 +355,10 @@ msgstr ""
 
 msgctxt "(LN7)"
 msgid "If you have any questions about your Contribution or encountered any problems, please send an email to"
+msgstr ""
+
+msgctxt "(LN7)"
+msgid "Please include this reference number in your e-mail"
 msgstr ""
 
 msgctxt "(LN5)"
@@ -388,7 +399,10 @@ msgid "Your current Contribution is %(amount)s Euro per month"
 msgstr ""
 
 msgctxt "(MS3)"
-msgid "Text for 'wir verstehen die WECHANGE-plattform als gemeingut... etc'"
+msgid ""
+"We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.\n"
+"\n"
+"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
 msgstr ""
 
 msgctxt "(MS4)"
@@ -405,7 +419,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(PF24)"
-msgid "Contribution amount includes 19%% VAT"
+msgid "Contribution amount includes 19%% VAT."
 msgstr ""
 
 msgctxt "(MS5)"
@@ -413,7 +427,7 @@ msgid "Modify Contribution Amount"
 msgstr ""
 
 msgctxt "(MS6)"
-msgid "Cancel your Contribution"
+msgid "Terminate your Contribution"
 msgstr ""
 
 msgctxt "(PF30)"
@@ -421,7 +435,7 @@ msgid "Your monthly Contributions will end soon!"
 msgstr ""
 
 msgctxt "(PF31)"
-msgid "Your paid contribution is valid until"
+msgid "Your pre-paid contribution is valid until"
 msgstr ""
 
 msgctxt "(PF32)"
@@ -430,15 +444,15 @@ msgstr ""
 
 #, python-format
 msgctxt "(PF33)"
-msgid "We have to process your first new payment immediately, but any time left on your old Contribution will be added on to your new one. That means that your next monthly payment will only be due on %(date)s."
+msgid "For accounting reasons we have to process your new payment immediately, but any time left on your old contribution will be added on to your new one. That means that your next monthly payment will only be due on %(date)s."
 msgstr ""
 
 msgctxt "(PF40)"
-msgid "Update your payment information"
+msgid "Update your payment details"
 msgstr ""
 
 msgctxt "(PF41)"
-msgid "You can choose a new payment method or update your payment information here."
+msgid "You can choose a new payment method or update your payment details here."
 msgstr ""
 
 #, python-format
@@ -447,7 +461,7 @@ msgid "We have to process your first new payment immediately, but any time left 
 msgstr ""
 
 msgctxt "(PF11x)"
-msgid "If you only want to change the amount you contribute each month using the same payment information, you can do this here"
+msgid "If you only want to adjust the amount of your monthly contribution using the same payment details, you can do it here"
 msgstr ""
 
 msgctxt "(PF1)"
@@ -459,8 +473,42 @@ msgctxt "(PF13)"
 msgid "You are using %(portal_name)s free of charge."
 msgstr ""
 
+#, python-format
 msgctxt "(PF14)"
-msgid "Final description text for First Payment Step box"
+msgid ""
+"This is possible because other users are co-financing you.\n"
+"\n"
+"In order to operate and further develop %(portal_name)s on a permanent cost-covering basis, we are dependent on voluntary contributions from our users.\n"
+"\n"
+"With an average monthly contribution of 5 Euro, we can cover the costs of hosting the platform. Therefore, we are grateful if some give a little more to co-finance others.\n"
+"\n"
+"Here you can set your monthly contribution to support %(portal_name)s. We automatically collect the contribution once a month. You can choose between direct debit, credit card and PayPal.\n"
+"\n"
+"You can change or terminate your monthly contribution at any time by clicking on \"Your Contribution\" in your user menu.\n"
+msgstr ""
+
+msgid "Account Holder"
+msgstr ""
+
+msgid "IBAN"
+msgstr ""
+
+msgid "Billing Address"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Address"
+msgstr ""
+
+msgid "Postal Code"
+msgstr ""
+
+msgid "City"
+msgstr ""
+
+msgid "Country"
 msgstr ""
 
 msgid "Past Contributions"
@@ -487,7 +535,7 @@ msgctxt "(PF26)"
 msgid "Choose the amount you would like to contribute using the slider. The contribution amount includes 19%% VAT."
 msgstr ""
 
-msgctxt "(PF24)"
+msgctxt "(PF24x)"
 msgid "You may also choose a higher amount by entering it directly in the text box!"
 msgstr ""
 
@@ -500,30 +548,24 @@ msgid "Confirm Contribution Amount"
 msgstr ""
 
 msgctxt "(PF4)"
-msgid "Set Contribution Amount"
+msgid "Set amount of Contribution"
 msgstr ""
 
 msgctxt "(PF5)"
 msgid " Almost done! Please enter your account information below."
 msgstr ""
 
-msgid "Select Payment Method"
+msgid "Payment Method"
 msgstr ""
 
-msgid "IBAN"
+msgid "Select Payment Method"
 msgstr ""
 
 msgid "BIC"
 msgstr ""
 
-msgid "Account Holder"
-msgstr ""
-
 #, python-format
 msgid "In the next step, you will be redirected to complete the payment process with the payment provider %(payment_provider)s."
-msgstr ""
-
-msgid "Billing Address"
 msgstr ""
 
 msgid "E-Mail"
@@ -533,18 +575,6 @@ msgid "First name"
 msgstr ""
 
 msgid "Last name"
-msgstr ""
-
-msgid "Address"
-msgstr ""
-
-msgid "Postal Code"
-msgstr ""
-
-msgid "City"
-msgstr ""
-
-msgid "Country"
 msgstr ""
 
 msgctxt "(PF18)"
@@ -572,9 +602,6 @@ msgstr ""
 msgid "Monthly"
 msgstr ""
 
-msgid "Name"
-msgstr ""
-
 msgctxt "(PF9 - legally binding!)"
 msgid "Confirm and pay"
 msgstr ""
@@ -586,7 +613,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(PF7a)"
-msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19%% VAT. The VAT is shown on the invoice."
+msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19%% VAT, which is shown on the invoice."
 msgstr ""
 
 msgctxt "(PF20a)"
@@ -603,7 +630,7 @@ msgid "Your monthly payments will resume on %(date)s, a month after your old Con
 msgstr ""
 
 msgctxt "(PF22)"
-msgid "You can adjust the amount of your monthly contribution or cancel payments at any time."
+msgid "You can adjust the amount of your monthly contribution or terminate payments at any time by clicking “Your Contribution” in your user menu."
 msgstr ""
 
 #, python-format
@@ -616,7 +643,7 @@ msgid "Change payment information"
 msgstr ""
 
 msgctxt "(INF1)"
-msgid "Payment Information"
+msgid "Your payment details"
 msgstr ""
 
 msgctxt "(INF17)"
@@ -624,7 +651,7 @@ msgid "Your Contribution"
 msgstr ""
 
 msgctxt "(INF10)"
-msgid "Last Payment"
+msgid "The last payment was made on"
 msgstr ""
 
 #, python-format
@@ -669,7 +696,7 @@ msgid "Next payment scheduled"
 msgstr ""
 
 msgctxt "(INF6)"
-msgid "Current monthly contribution"
+msgid "Your current monthly contribution"
 msgstr ""
 
 msgctxt "(INF8.2)"
@@ -677,11 +704,7 @@ msgid "Set up new Contribution"
 msgstr ""
 
 msgctxt "(INF8.1)"
-msgid "Adjust contribution amount or cancel your Contribution"
-msgstr ""
-
-msgctxt "(INF1)"
-msgid "Your Payment Information"
+msgid "Adjust contribution amount or terminate your Contribution"
 msgstr ""
 
 msgctxt "(TS9)"
@@ -732,11 +755,11 @@ msgid "Please contact the support. Don't worry, we will sort everything out! In 
 msgstr ""
 
 msgctxt "(SC5)"
-msgid "Thank you for subscribing!"
+msgid "Thank you for your Contribution!"
 msgstr ""
 
 msgctxt "(SC6)"
-msgid "Thank you text"
+msgid "You're awesome! With your voluntary monthly contribution we can further develop WECHANGE."
 msgstr ""
 
 msgid "Your SEPA Mandate"
@@ -748,39 +771,39 @@ msgid "Back to %(portal_name)s"
 msgstr ""
 
 msgctxt "(SC7)"
-msgid "Show payment summary"
+msgid "Show payment overview"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd1)"
-msgid "popup header 1"
+msgid "The early bird catches the worm!"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd2)"
-msgid "popup header 2"
+msgid "Does not hurt, but does good for many"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd3)"
-msgid "popup header 3"
+msgid "Many pennies make a dollar"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd4)"
-msgid "popup header 4"
+msgid "With small steps to big goals"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd5)"
-msgid "popup header 5"
+msgid "Come, be among the ones who pay!"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd6)"
-msgid "popup header 6"
+msgid "How much are we worth to you?"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd7)"
-msgid "popup header 7"
+msgid "So that WECHANGE can be more than the sum of its parts"
 msgstr ""
 
 msgctxt "(POP1-repeat-rnd8)"
-msgid "popup header 8"
+msgid "Change happens on a small scale"
 msgstr ""
 
 #, python-format
@@ -790,11 +813,14 @@ msgstr ""
 
 #, python-format
 msgctxt "(POP3-repeat)"
-msgid "popup body text with time of becoming a member in text. You joined us %(join_time_verbal)s."
+msgid ""
+"you joined us at WECHANGE %(join_time_verbal)s - we are very happy about that! \n"
+"\n"
+"Please remember: WECHANGE is only free of charge because enough users* contribute voluntarily. With an average of 5 Euro per month, we can cover the costs of hosting the platform. Every small contribution helps!"
 msgstr ""
 
 msgctxt "(POP1-newuser)"
-msgid "popup header"
+msgid "Your contribution helps!"
 msgstr ""
 
 #, python-format
@@ -803,11 +829,16 @@ msgid "Dear %(username)s,"
 msgstr ""
 
 msgctxt "(POP3-newuser)"
-msgid "popup body text"
+msgid ""
+"it's great to have you WECHANGE! We hope you like our platform and that you and your projects can benefit.\n"
+"\n"
+"We try to optimally fullfill your needs and the demands of the community and to develop the platform. This causes high costs - for hosting, maintenance, support and the development of new functions. In order to ensure the maintenance, we rely on voluntary contributions from our users.\n"
+"\n"
+"With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development. If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!\n"
 msgstr ""
 
 msgctxt "(POP1-release)"
-msgid "popup header"
+msgid "WECHANGE becomes even fairer."
 msgstr ""
 
 #, python-format
@@ -816,7 +847,10 @@ msgid "Dear %(username)s,"
 msgstr ""
 
 msgctxt "(POP3-release)"
-msgid "popup body text"
+msgid ""
+"we understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development. \n"
+"\n"
+"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
 msgstr ""
 
 msgctxt "(POP5)"
@@ -831,6 +865,42 @@ msgctxt "(POP6)"
 msgid "Choose amount"
 msgstr ""
 
+msgctxt "(FC2)"
+msgid "There are issues with you current Contribution!"
+msgstr ""
+
+msgctxt "(FC3)"
+msgid "We encountered an error when we tried to book your most recent monthly contribution. Your contribution is paused suspended until the issues are resolved."
+msgstr ""
+
+msgctxt "(FC4)"
+msgid "Please see below for details on the problem and review your selected payment method. If you wish to select a new payment method, simply update your payment information."
+msgstr ""
+
+msgctxt "(FC5)"
+msgid "If you have any questions about the issue or would like assistance, please contact our support and provide us with the issue reference number!"
+msgstr ""
+
+msgctxt "(FC6)"
+msgid "Issue Reference Number"
+msgstr ""
+
+msgctxt "(FC7)"
+msgid "Issue Details"
+msgstr ""
+
+msgctxt "(FC8)"
+msgid "Specific issue details cannot be displayed for this issue."
+msgstr ""
+
+msgctxt "(FC9)"
+msgid "If you wish to continue contributing, please update your payment information, or contact our support! Sorry for the inconveniences!"
+msgstr ""
+
+msgctxt "(FC11)"
+msgid "Renew payment information"
+msgstr ""
+
 msgctxt "(WC1)"
 msgid "Support us "
 msgstr ""
@@ -840,7 +910,7 @@ msgid "Your Contribution"
 msgstr ""
 
 msgctxt "(WC3)"
-msgid "WECHANGE is based on a solidary pricing model..."
+msgid "WECHANGE is based on a solidary pricing model: You pay a voluntary monthly contribution and thus enable us to continuously develop the platform. Would you like to contribute something? Of course you can also have a look around first."
 msgstr ""
 
 msgctxt "(WC4)"
@@ -882,7 +952,7 @@ msgstr ""
 msgid "Your subscription amount could not be changed because of an unexpected error. Please contact our support!"
 msgstr ""
 
-msgid "(MSG3) Your new subscription amount was saved! Your future subscription payments will be made with this amount. Thank you for your support!"
+msgid "Your changes have been saved! From now on your new chosen contribution amount will be paid. Thank you very much for your support!"
 msgstr ""
 
 msgid "The amount submitted does not seem to be a number!"

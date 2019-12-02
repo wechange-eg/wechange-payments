@@ -38,10 +38,10 @@
     
     <!-- a box with semi transparent background -->
     <div class="v2-content">
-		<h1>{% trans "Thank you for subscribing!" context "(SC5)" %}</h1>
+		<h1>{% trans "Thank you for your Contribution!" context "(SC5)" %}</h1>
 		
 		<p>
-			{% trans "Thank you text" context "(SC6)" %}
+			{% trans "You're awesome! With your voluntary monthly contribution we can further develop WECHANGE." context "(SC6)" %}
 		</p>
 		
 		{% if payment.type == 'dd' %}
@@ -62,7 +62,7 @@
 			    </a>
 	            <a href="{% url "wechange-payments:payment-infos" %}" class="pull-right rounded-button button-color-primary-inverted">
 			        <span class="rounded-button-inner">
-	                    {% trans "Show payment summary" context "(SC7)" %}
+	                    {% trans "Show payment overview" context "(SC7)" %}
 			        </span>
 			    </a>
 			</div>
