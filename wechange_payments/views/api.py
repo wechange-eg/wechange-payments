@@ -12,10 +12,8 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT,\
 
 import logging
 from wechange_payments.models import Subscription,\
-    USERPROFILE_SETTING_POPUP_CLOSED, Payment,\
-    USERPROFILE_SETTING_POPUP_CLOSED_TIMES
-from wechange_payments.payment import create_subscription_for_payment,\
-    change_subscription_amount, handle_successful_payment
+    USERPROFILE_SETTING_POPUP_CLOSED, USERPROFILE_SETTING_POPUP_CLOSED_TIMES
+from wechange_payments.payment import change_subscription_amount
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from cosinnus.utils.functions import is_number
@@ -23,7 +21,6 @@ from django.contrib import messages
 from django.utils.timezone import now
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters
-from wechange_payments import signals
 from wechange_payments.forms import PaymentsForm
 
 logger = logging.getLogger('wechange-payments')
@@ -144,7 +141,6 @@ def make_subscription_payment(request):
         def on_success_func(payment):
             try:
                 if payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
-                    handle_successful_payment(payment)
                     redirect_url = reverse('wechange_payments:payment-success', kwargs={'pk': payment.id})
                 else:
                     redirect_url = reverse('wechange_payments:payment-process', kwargs={'pk': payment.id})

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-02 18:37+0100\n"
+"POT-Creation-Date: 2019-12-03 18:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,6 +65,72 @@ msgid "Credit Card"
 msgstr ""
 
 msgid "Paypal"
+msgstr ""
+
+#, python-format
+msgctxt "(MAILPRE)"
+msgid "(MAILPRE) with variables: %(username)s,"
+msgstr ""
+
+#, python-format
+msgctxt "(MAILLINKS)"
+msgid "(MAILLINKS) %(link_payment_info)s %(link_invoices)s"
+msgstr ""
+
+#, python-format
+msgctxt "(MAILPOST)"
+msgid "(MAILPOST) with variables: %(portal_name)s"
+msgstr ""
+
+#, python-format
+msgctxt "(MAIL2)"
+msgid "(MAIL2) with variables: %(payment_method)s %(contribution_amount)s"
+msgstr ""
+
+#, python-format
+msgctxt "(MAIL1a)"
+msgid "(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s"
+msgstr ""
+
+#, python-format
+msgctxt "(MAIL1b)"
+msgid "(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s"
+msgstr ""
+
+#, python-format
+msgctxt "(MAIL3)"
+msgid "(MAIL3) with variables: %(contribution_amount)s %(next_debit_date)s"
+msgstr ""
+
+#, python-format
+msgctxt "(MAIL4)"
+msgid "(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s"
+msgstr ""
+
+#, python-format
+msgctxt "(MAIL5)"
+msgid "(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s"
+msgstr ""
+
+msgctxt "(MAIL2s)"
+msgid "(MAIL2s) with variables: -"
+msgstr ""
+
+#, python-format
+msgctxt "(MAIL1s)"
+msgid "(MAIL1s) with variables: %(portal_name)s"
+msgstr ""
+
+msgctxt "(MAIL3s)"
+msgid "(MAIL3s) with variables: -"
+msgstr ""
+
+msgctxt "(MAIL4s)"
+msgid "(MAIL4s) with variables: -"
+msgstr ""
+
+msgctxt "(MAIL5s)"
+msgid "(MAIL5s) with variables: -"
 msgstr ""
 
 msgid "PayPal"
@@ -379,14 +445,6 @@ msgid ""
 "Creditor-ID: %(sepa_creditor)s\n"
 "\n"
 "The contribution will be debited from your account within the next few days. Subsequent payments will be made monthly. Please make sure you have sufficient funds to avoid return debit fees. \n"
-"\n"
-"Thank you for your Support!\n"
-"\n"
-"%(payment_recipient_name)s\n"
-"\n"
-msgstr ""
-
-msgid "You have successfully made a SEPA payment!"
 msgstr ""
 
 msgctxt "(MS1)"

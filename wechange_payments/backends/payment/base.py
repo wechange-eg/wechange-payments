@@ -59,36 +59,6 @@ class BaseBackend(object):
         ],
     }
     
-    # email templates depending on payment statuses and types, see `EMAIL_TEMPLATES_STATUS_MAP`
-    EMAIL_TEMPLATES_SUCCESS = {
-        PAYMENT_TYPE_DIRECT_DEBIT: (
-            'wechange_payments/mail/sepa_payment_success.html',
-            'wechange_payments/mail/sepa_payment_success_subj.txt'
-        ),
-        PAYMENT_TYPE_CREDIT_CARD: (
-            'wechange_payments/mail/sepa_payment_success.html',
-            'wechange_payments/mail/sepa_payment_success_subj.txt'
-        ),
-        PAYMENT_TYPE_PAYPAL: (
-            'wechange_payments/mail/sepa_payment_success.html',
-            'wechange_payments/mail/sepa_payment_success_subj.txt'
-        ),  
-    }
-    EMAIL_TEMPLATES_ERROR = {
-        PAYMENT_TYPE_DIRECT_DEBIT: (
-            'wechange_payments/mail/sepa_payment_success.html',
-            'wechange_payments/mail/sepa_payment_success_subj.txt'
-        ),
-        PAYMENT_TYPE_CREDIT_CARD: (
-            'wechange_payments/mail/sepa_payment_success.html',
-            'wechange_payments/mail/sepa_payment_success_subj.txt'
-        ),
-        PAYMENT_TYPE_PAYPAL: (
-            'wechange_payments/mail/sepa_payment_success.html',
-            'wechange_payments/mail/sepa_payment_success_subj.txt'
-        ),  
-    }
-    
     # implement this in the payment backend, matching payment statuses to 
     # template types in `EMAIL_TEMPLATES`
     EMAIL_TEMPLATES_STATUS_MAP = {}
@@ -150,31 +120,6 @@ class BaseBackend(object):
                 extra={'user': user, 'payment_sum': payment_sum})
             return False
         return True
-    
-    def send_payment_status_payment_email(self, email, payment, payment_type):
-        """ Sends a success/error email out to the user, depending on the status of the given payment. """
-        try:
-            email_template_map = self.EMAIL_TEMPLATES_STATUS_MAP.get(payment.status, {})
-            if not email_template_map:
-                logger.warning('Could not find email templates for payment status "%s"' % str(payment.status), extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
-            template, subject_template = email_template_map.get(payment_type, (None, None)) 
-            if not template or not subject_template:
-                logger.warning('Could not find a payment email template for payment type "%s"' % str(payment.status), extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
-            
-            mail_func = resolve_class(settings.PAYMENTS_SEND_MAIL_FUNCTION)
-            data = {
-                'payment': payment,
-            }
-            if settings.PAYMENTS_USE_HOOK_INSTEAD_OF_SEND_MAIL == True:
-                signals.success_email_sender.send(sender=self, to_email=email, template=template, subject_template=subject_template, data=data)
-            else:
-                subject = render_to_string(subject_template, data)
-                message = render_to_string(template, data)
-                mail_func(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
-        except Exception as e:
-            logger.warning('Payments: Sending a payment status email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id, 'exception': e})
-            if settings.DEBUG:
-                raise
         
     def make_sepa_payment(self, params, user=None, make_postponed=False):
         """

@@ -14,14 +14,12 @@ import requests
 import six
 
 from cosinnus.models.group import CosinnusPortal
-from wechange_payments import signals
 from wechange_payments.backends.payment.base import BaseBackend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
 from wechange_payments.models import TransactionLog, Payment, Subscription
-from wechange_payments.payment import create_subscription_for_payment,\
-    suspend_failed_subscription, handle_successful_payment
-from wechange_payments.utils.utils import send_admin_mail_notification
+from wechange_payments.payment import suspend_failed_subscription, handle_successful_payment,\
+    handle_payment_refunded
 
 logger = logging.getLogger('wechange-payments')
 
@@ -67,14 +65,6 @@ class BetterPaymentBackend(BaseBackend):
     BETTERPAYMENT_STATUS_DECLINED = 6
     BETTERPAYMENT_STATUS_REFUNDED = 7
     BETTERPAYMENT_STATUS_CHARGEBACK = 13
-    
-    
-    EMAIL_TEMPLATES_STATUS_MAP = {
-        BETTERPAYMENT_STATUS_SUCCESS: BaseBackend.EMAIL_TEMPLATES_SUCCESS,
-        BETTERPAYMENT_STATUS_ERROR: BaseBackend.EMAIL_TEMPLATES_ERROR,
-        BETTERPAYMENT_STATUS_DECLINED: BaseBackend.EMAIL_TEMPLATES_ERROR,
-    }
-    
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -219,8 +209,7 @@ class BetterPaymentBackend(BaseBackend):
             logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e})
             
         if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
-            signals.successful_payment_made.send(sender=self, payment=payment)
-            self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+            handle_successful_payment(payment)
             
         return payment, None
     
@@ -278,6 +267,10 @@ class BetterPaymentBackend(BaseBackend):
         )
         if error is not None:
             return None, error
+        
+        # attach subscription from reference payment
+        payment.subscription = reference_payment.subscription
+        
         if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             payment.status = Payment.STATUS_PAID
             payment.completed_at = now()
@@ -292,9 +285,8 @@ class BetterPaymentBackend(BaseBackend):
             logger.warning('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
         
         if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
-            signals.successful_payment_made.send(sender=self, payment=payment)
-            self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
-            
+            handle_successful_payment(payment)
+
         return payment, None
     
     def _make_actual_payment(self, payment_type, order_id, params, user=None, original_transaction_id=None, is_recurring=False, make_postponed=False):
@@ -581,10 +573,7 @@ class BetterPaymentBackend(BaseBackend):
                         logger.info('Payments: Received a status "paid" postback for a successful payment of type "%s"' % payment.type,
                             extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
                         payment.save()
-                        signals.successful_payment_made.send(sender=self, payment=payment)
                         handle_successful_payment(payment)
-                        self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
-                        
                         
                 elif status == self.BETTERPAYMENT_STATUS_CANCELED:
                     # case 'error', 'canceled', 'declined': mark the payment as canceled. no further action is required.
@@ -601,9 +590,9 @@ class BetterPaymentBackend(BaseBackend):
                     if not payment.is_reference_payment:
                         suspend_failed_subscription(payment.subscription, payment=payment)
                     else:
-                        # if it was a first payment, we simply inform the user that the payment failed 
-                        # and set the subscription to state ended
-                        self.send_payment_status_payment_email(payment.email, payment, PAYMENT_TYPE_DIRECT_DEBIT)
+                        # if it was a first payment, set the subscription to state ended
+                        # TODO: should we inform the user that the payment failed? 
+                        # send_payment_event_payment_email(payment)
                         payment.subscription.state = Subscription.STATE_0_TERMINATED
                         payment.subscription.save()
                 elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
@@ -612,20 +601,7 @@ class BetterPaymentBackend(BaseBackend):
                     # in our accounting system 
                     payment.status = Payment.STATUS_RETRACTED
                     payment.save()
-                    
-                    extra = {'betterpayment_status_code': str(status), 'internal_transaction_id': str(payment.internal_transaction_id), 'vendor_transaction_id': str(payment.vendor_transaction_id)}
-                    content = ('We received a Refund or Chargeback for a payment in the WECHANGE Geschäftsmodell.\n' +\
-                        '\n' +\
-                        'Since we have no automatic handling of this, we will need to manually handle this. This includes setting the user subscription to TERMINATED, and also putting the chargeback into our Billing System!\n' +\
-                        '\n' +\
-                        'Payment Details:\n' +\
-                        'betterpayment_status_code: %(betterpayment_status_code)s\n' +\
-                        'internal_transaction_id: %(internal_transaction_id)s\n' +\
-                        'vendor_transaction_id: %(vendor_transaction_id)s\n') % extra 
-                    send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', content)
-                    logger.critical('NYI: Received a postback for a refund, but refunding logic not yet implemented! (A mail was also sent!', extra=extra)
-                    
-                    suspend_failed_subscription(payment.subscription, payment=payment)
+                    handle_payment_refunded(payment, status)
                 else:
                     # we do not know what to do with this status
                     logger.critical('NYI: Received postback with a status we cannot handle (Status: %d)!' % status, extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})

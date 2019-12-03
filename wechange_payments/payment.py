@@ -7,8 +7,13 @@ from django.utils.timezone import now
 import logging
 from wechange_payments.models import Subscription, Payment
 from wechange_payments.backends import get_backend
-from wechange_payments.utils.utils import send_admin_mail_notification
 from datetime import timedelta
+from wechange_payments.mails import PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED,\
+    PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED,\
+    send_payment_event_payment_email, PAYMENT_EVENT_SUCCESSFUL_PAYMENT,\
+    PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED,\
+    PAYMENT_EVENT_SUBSCRIPTION_TERMINATED, PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED
+from wechange_payments.utils.utils import send_admin_mail_notification
 
 logger = logging.getLogger('wechange-payments')
 
@@ -42,6 +47,7 @@ def create_subscription_for_payment(payment):
         # the numbers refer to the state-change cases in `Subscription`'s docstring!
         with transaction.atomic():
             
+            mail_event = None
             # terminate any failed suspended subscriptions
             if suspended_sub:
                 suspended_sub.state = Subscription.STATE_0_TERMINATED
@@ -52,6 +58,7 @@ def create_subscription_for_payment(payment):
                 # 1. (new subscription)
                 subscription.set_next_due_date(now().date())
                 subscription.state = Subscription.STATE_2_ACTIVE
+                mail_event = PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED
             elif active_sub or cancelled_sub: 
                 # 2 and 3.. (updated payment infos, new sub becomes active sub, current one is terminated,
                 #    remaining time is added to new sub)
@@ -62,6 +69,7 @@ def create_subscription_for_payment(payment):
                 replaced_sub.cancelled = now()
                 replaced_sub.terminated = now()
                 replaced_sub.save()
+                mail_event = PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED
                 
             else:
                 logger.critical('Payments: "Unreachable" case reached for subscription state situation for a user! Could not save the user\'s new subscription! This has to be checked out manually!.',
@@ -71,6 +79,9 @@ def create_subscription_for_payment(payment):
             
             payment.subscription = subscription
             payment.save()
+            
+            if mail_event:
+                send_payment_event_payment_email(payment, mail_event)
             
             logger.info('Payments: Successfully created a new subscription for a user.',
                         extra={'payment-id': payment.id, 'payment': payment, 'user': user})
@@ -148,13 +159,13 @@ def book_next_subscription_payment(subscription):
             payment, error = backend.cash_in_postponed_payment(reference_payment)
         elif reference_payment.status == Payment.STATUS_PAID:
             # book a new recurring payment
-            payment, error = backend.make_recurring_payment(reference_payment)
+            payment, error = backend.make_recurring_payment(reference_payment, subscription)
         else:
             logger.error('Payments: Did not know how to make a further payment from a reference payment due to incompatible payment states!', 
                          extra={'user': subscription.user, 'subscription': subscription})
             return
     else:
-        payment, error = backend.make_recurring_payment(reference_payment)
+        payment, error = backend.make_recurring_payment(reference_payment, subscription)
 
     
     if error or not payment:
@@ -179,20 +190,16 @@ def book_next_subscription_payment(subscription):
         
         return
     
+    # reload subscription, was probably changed while handling the successful payment
+    subscription.refresh_from_db()
+    
     # clear subscription retry times on success
     subscription.has_problems = False
     subscription.num_attempts_recurring = 0
     
     subscription.last_payment = payment
     subscription.save()
-    payment.subscription = subscription
-    payment.save()
     
-    # advance subscription due date if payment was already instantly successfully paid
-    # otherwise the date advancement will be done in a successful postback
-    if payment.status == Payment.STATUS_PAID:
-        handle_successful_payment(payment)
-        
     logger.info('Payments: Advanced the due_date of a subscription and saved it after a payment was made. ', 
         extra={'user': subscription.user, 'subscription': subscription})
     return payment
@@ -203,6 +210,10 @@ def handle_successful_payment(payment):
         triggered either after an instantly successful payment or after  a postback was received.
         Either creates a new subscription or advances a current subscription's
         due_date for a recurring payment. """
+    # trigger email sending, invoice generation, etc
+    send_payment_event_payment_email(payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
+    
+    # process payment for subscription
     if payment.is_reference_payment:
         # if this is the first and thus reference payment, we trigger creating a new subscription
         create_subscription_for_payment(payment)
@@ -222,6 +233,23 @@ def handle_successful_payment(payment):
                             extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
                     
 
+def handle_payment_refunded(payment, status=None):
+    """ Handles the case when we receive notification of a refunded payment.
+        Since we have no automatism for this yet, we send out an email to the portal admins. """
+    
+    extra = {'betterpayment_status_code': str(status), 'internal_transaction_id': str(payment.internal_transaction_id), 'vendor_transaction_id': str(payment.vendor_transaction_id)}
+    content = ('We received a Refund or Chargeback for a payment in the WECHANGE Geschäftsmodell.\n' +\
+        '\n' +\
+        'Since we have no automatic handling of this, we will need to manually handle this. This includes setting the user subscription to TERMINATED, and also putting the chargeback into our Billing System!\n' +\
+        '\n' +\
+        'Payment Details:\n' +\
+        'betterpayment_status_code: %(betterpayment_status_code)s\n' +\
+        'internal_transaction_id: %(internal_transaction_id)s\n' +\
+        'vendor_transaction_id: %(vendor_transaction_id)s\n') % extra 
+    send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', content)
+    logger.critical('NYI: Received a postback for a refund, but refunding logic not yet implemented! (A mail was also sent!', extra=extra)
+    suspend_failed_subscription(payment.subscription, payment=payment)
+
 
 def suspend_failed_subscription(subscription, payment=None):
     """ For various reasons, like failed payments to refunds pulled on a payment,
@@ -240,7 +268,7 @@ def suspend_failed_subscription(subscription, payment=None):
         subscription.save()
         logger.info('Payments: Suspended a subscription for a user because of one or more failed payments',
             extra={'user': subscription.user.id, 'subscription_id': subscription.id})
-        # TODO: send email to user, informing them of the suspension
+        send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED)
 
 
 def cancel_subscription(user):
@@ -249,7 +277,7 @@ def cancel_subscription(user):
     subscription.state = Subscription.STATE_1_CANCELLED_BUT_ACTIVE
     subscription.cancelled = now()
     subscription.save()
-    # TODO: send email!
+    send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_TERMINATED)
     return True
     
 
@@ -261,7 +289,7 @@ def change_subscription_amount(subscription, amount):
         return False
     subscription.amount = amount
     subscription.save()
-    # TODO: send email!
+    send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED)
     return True
     
 

@@ -3,20 +3,20 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-02 18:37+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2019-12-03 18:06+0100\n"
+"PO-Revision-Date: 2019-12-03 18:06+0100\n"
+"Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.4\n"
 
 #, python-format
 msgid "Started invoice creation for %(number)d payment(s) in background."
@@ -66,6 +66,105 @@ msgstr ""
 
 msgid "Paypal"
 msgstr ""
+
+#, python-format
+msgctxt "(MAILPRE)"
+msgid "(MAILPRE) with variables: %(username)s,"
+msgstr "Dear*r %(username)s,"
+
+#, python-format
+msgctxt "(MAILLINKS)"
+msgid "(MAILLINKS) %(link_payment_info)s %(link_invoices)s"
+msgstr ""
+"Further information about your Contribution can be found under: %(link_payment_info)s\n"
+"You can view your invoices under the following link: %(link_invoices)s"
+
+#, python-format
+msgctxt "(MAILPOST)"
+msgid "(MAILPOST) with variables: %(portal_name)s"
+msgstr ""
+"Thank you!\n"
+"\n"
+"Your %(portal_name)s Support Team"
+
+#, python-format
+msgctxt "(MAIL2)"
+msgid "(MAIL2) with variables: %(payment_method)s %(contribution_amount)s"
+msgstr ""
+"Thank you for your contribution! We have just debited your monthly contribution.\n"
+"\n"
+"Total amount (incl. 19%% VAT): %(contribution_amount)s EURPayment method: %(payment_method)s"
+
+#, python-format
+msgctxt "(MAIL1a)"
+msgid "(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s"
+msgstr ""
+"Thank you for your Contribution! We’re happy to welcome you as a supporter of %(portal_name)s!\n"
+"\n"
+"You have set up a monthly Contribution amount of %(contribution_amount)s Euro. The first payment has just been made, for which you will receive a separate email confirmation.\n"
+"\n"
+"The next debit will be made on %(next_debit_date)s. Please make sure that your account has sufficient funds."
+
+#, python-format
+msgctxt "(MAIL1b)"
+msgid "(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s"
+msgstr ""
+"Thank you for your Contribution! We’re happy to welcome you as a supporter of %(portal_name)s!\n"
+"\n"
+"You have replaced your current Contribution with a new monthly Contribution amount of %(contribution_amount)s Euro. The first payment with your new payment information has just been made, for which you will receive a separate email confirmation.\n"
+"\n"
+"The next debit will be made on %(next_debit_date)s. Please make sure that your account has sufficient funds."
+
+#, python-format
+msgctxt "(MAIL3)"
+msgid "(MAIL3) with variables: %(contribution_amount)s %(next_debit_date)s"
+msgstr ""
+"You have changed your monthly contribution to %(contribution_amount)s Euro.\n"
+"\n"
+"The next debit will be made on %(next_debit_date)s. Please make sure that your account has sufficient funds."
+
+#, python-format
+msgctxt "(MAIL4)"
+msgid "(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s"
+msgstr ""
+"We regret you stopped making your monthly payments. We thank you for your support of our work so far and hope that you will remain loyal to %(portal_name)s.\n"
+"\n"
+"If you just want to change your payment details, please click here and set up the payment again: %(link_new_payment)s\n"
+"\n"
+"If you are dissatisfied with %(portal_name)s, please send your constructive feedback to %(support_email)s!"
+
+#, python-format
+msgctxt "(MAIL5)"
+msgid "(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s"
+msgstr ""
+"Due to an error we could not debit your monthly Contribution! For further details, please click here %(link_payment_issues)s\n"
+"\n"
+"Your monthly contribution is hereby suspended. \n"
+"\n"
+"To continue your monthly Contribution and support %(portal_name)s, please set up a new payment: %(link_new_payment)s\n"
+"\n"
+"Please make sure that your account is still valid and has sufficient funds!"
+
+msgctxt "(MAIL2s)"
+msgid "(MAIL2s) with variables: -"
+msgstr "Monthly Contribution collected"
+
+#, python-format
+msgctxt "(MAIL1s)"
+msgid "(MAIL1s) with variables: %(portal_name)s"
+msgstr "Your Contribution for %(portal_name)s"
+
+msgctxt "(MAIL3s)"
+msgid "(MAIL3s) with variables: -"
+msgstr "Monthly Contribution changed"
+
+msgctxt "(MAIL4s)"
+msgid "(MAIL4s) with variables: -"
+msgstr "Monthly payments ended"
+
+msgctxt "(MAIL5s)"
+msgid "(MAIL5s) with variables: -"
+msgstr "Monthly payments ended"
 
 msgid "PayPal"
 msgstr ""
@@ -379,14 +478,6 @@ msgid ""
 "Creditor-ID: %(sepa_creditor)s\n"
 "\n"
 "The contribution will be debited from your account within the next few days. Subsequent payments will be made monthly. Please make sure you have sufficient funds to avoid return debit fees. \n"
-"\n"
-"Thank you for your Support!\n"
-"\n"
-"%(payment_recipient_name)s\n"
-"\n"
-msgstr ""
-
-msgid "You have successfully made a SEPA payment!"
 msgstr ""
 
 msgctxt "(MS1)"
