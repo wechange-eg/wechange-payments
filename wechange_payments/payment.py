@@ -14,6 +14,7 @@ from wechange_payments.mails import PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED,\
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED,\
     PAYMENT_EVENT_SUBSCRIPTION_TERMINATED, PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED
 from wechange_payments.utils.utils import send_admin_mail_notification
+from wechange_payments import signals
 
 logger = logging.getLogger('wechange-payments')
 
@@ -231,7 +232,8 @@ def handle_successful_payment(payment):
             
     # trigger email sending, invoice generation, etc
     send_payment_event_payment_email(payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
-        
+    signals.successful_payment_made.send(sender=payment, payment=payment)
+    
 
 def handle_payment_refunded(payment, status=None):
     """ Handles the case when we receive notification of a refunded payment.
