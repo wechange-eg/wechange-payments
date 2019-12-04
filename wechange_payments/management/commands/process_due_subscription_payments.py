@@ -22,7 +22,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             initialize_cosinnus_after_startup()
-            process_due_subscription_payments()
+            (ended_subscriptions, booked_subscriptions) = process_due_subscription_payments()
+            logger.info('Manual subscription payment processing finished.',
+                extra={'ended_subscriptions': ended_subscriptions, 'booked_subscriptions': booked_subscriptions})
         except Exception as e:
             logger.error('A critical error occured during daily subscription payment processing and bubbled up completely! Exception was: %s' % force_text(e), 
                          extra={'exception': e, 'trace': traceback.format_exc()})

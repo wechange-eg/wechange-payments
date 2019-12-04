@@ -76,6 +76,12 @@ class WechangePaymentsDefaultSettings(AppConf):
     # DO NOT set this to True right now!
     POSTPONED_PAYMENTS_IMPLEMENTED = False
     
+    """ Cron job settings """
+    # if this contains a list of portal slugs as str, the cron will only run 
+    # if the current portal's slug matches one in the list.
+    # if it is empty, the cron will run without portal restriction
+    CRON_ENABLED_FOR_SPECIFIC_PORTAL_SLUGS_ONLY = []
+    
     """ Test System settings """
     
     # if True, enables additional views for payments

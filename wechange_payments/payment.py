@@ -98,16 +98,20 @@ def process_due_subscription_payments():
     """ Main loop for subscription management. Checks all subscriptions for
         validity, terminates expired subscriptions, activates waiting subscriptions
         and triggers payments on active subscriptions where a payment is due. """
-        
+    
+    ended_subscriptions = 0
     # check for terminating subs, and activate valid waiting subs, afterwards all active subs will be valid 
     for ending_sub in Subscription.objects.filter(state=Subscription.STATE_1_CANCELLED_BUT_ACTIVE):
         try:
-            ending_sub.validate_state_and_cycle()
+            ended = ending_sub.validate_state_and_cycle()
+            if ended:
+                ended_subscriptions += 1
         except Exception as e:
             logger.error('Payments: Exception during the call validate_state_and_cycle on a subscription! This is critical and needs to be fixed!', 
                          extra={'user': ending_sub.user, 'subscription': ending_sub, 'exception': e})
             if settings.DEBUG:
                 raise
+            return (ended_subscriptions, 0)
     
     # switch for not-implemented postponed subscriptions
     if settings.PAYMENTS_POSTPONED_PAYMENTS_IMPLEMENTED:
@@ -120,7 +124,8 @@ def process_due_subscription_payments():
                 # been set to the last sub at creation time.
                 waiting_sub.state = Subscription.STATE_2_ACTIVE
                 waiting_sub.save()
-
+    
+    booked_subscriptions = 0
     # if an active subscription has its payment is due trigger a new payment on it
     for active_sub in Subscription.objects.filter(state=Subscription.STATE_2_ACTIVE):
         if active_sub.check_payment_due() and active_sub.user.is_active:
@@ -132,13 +137,18 @@ def process_due_subscription_payments():
                         extra={'user': active_sub.user, 'subscription': active_sub, 'internal_transaction_id': str(active_sub.last_payment.internal_transaction_id)}
                         logger.critical('Payments: A recurring payment that has been started over 1 day ago still has its status at pending and has not received a postback! Only postbacks can set payments to not pending. The subscription is therefore also pending and is basically frozen. This needs to be investigated manually!', extra=extra)
                     continue
-                book_next_subscription_payment(active_sub)
+                payment_or_none = book_next_subscription_payment(active_sub)
+                if payment_or_none is not None:
+                    booked_subscriptions += 1
             except Exception as e:
                 logger.error('Payments: Exception while trying to book the next subscruption payment for a due subscription!', 
                          extra={'user': active_sub.user, 'subscription': active_sub, 'exception': e})
                 if settings.DEBUG:
                     raise
+                return (ended_subscriptions, booked_subscriptions)
     
+    return (ended_subscriptions, booked_subscriptions)
+
 
 def book_next_subscription_payment(subscription):
     """ Will create and book a new payment (using the reference payment as target) 

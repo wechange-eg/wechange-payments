@@ -370,12 +370,16 @@ class Subscription(models.Model):
         """ This will terminate this subscription if it has been cancelled, 
             and whose next_due_date is in the past! 
             If an old subscription has been terminated, this will check if there
-            is a new waiting subscription to be activated, and if so, activate it. """
+            is a new waiting subscription to be activated, and if so, activate it. 
+            @return: True if the subscription was ended after being cancelled and due, 
+                False otherwise """
         if self.check_termination_due():
             # terminate the subscription if the user cancelled it and it's past its next due_date
             self.state = self.STATE_0_TERMINATED
             self.terminated = now()
             self.save()
+            return True
+        return False
             
     def check_payment_due(self):
         """ Returns true if the subscription is active and `next_due_date` is in the past or today.
