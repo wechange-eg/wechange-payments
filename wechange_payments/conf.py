@@ -111,3 +111,28 @@ class NonPrefixDefaultSettings(AppConf):
     COUNTRIES_FIRST_REPEAT = True
 
 
+""" 
+    Note: You should configure Raven/Sentry to scrub sensitive POSTs, 
+    since logs inside POST requests to betterpayments may contain the
+    `bic` and `iban` keys, containing account information!
+    
+    Do this by either by using sanitized keys with its processor:
+    
+    ```
+    RAVEN_CONFIG = {
+        'dsn': 'https://c8ed0743c9b74e70a3e3bfb4f1ac015d:357b15febba84855af12b1077067f899@sentry.sinntern.de/4',
+        'sanitize_keys': [
+            'iban',
+            'bic',
+        ],
+        'processors': (
+            'raven.processors.SanitizeKeysProcessor',
+            'raven.processors.SanitizePasswordsProcessor',
+        )
+    }
+    ```
+    
+    or by using the complete `raven.processors.RemovePostDataProcessor`.
+    
+"""
+
