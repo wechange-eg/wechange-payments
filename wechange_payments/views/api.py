@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.http.response import JsonResponse, HttpResponseNotAllowed,\
-    HttpResponseForbidden
+    HttpResponseForbidden, HttpResponseNotFound
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 
@@ -248,7 +248,9 @@ def error_endpoint(request):
 def postback_endpoint(request):
     """ For providers that offer a postback URL as logging/validation """
     backend = get_backend()
-    backend.handle_postback(request, request.POST.dict())
+    success = backend.handle_postback(request, request.POST.dict())
+    if not success:
+        return HttpResponseNotFound() 
     return JsonResponse({'status': 'ok'})
 
 

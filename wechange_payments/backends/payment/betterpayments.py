@@ -512,7 +512,12 @@ class BetterPaymentBackend(BaseBackend):
             raise PermissionDenied('The checksum validation failed.')
     
     def handle_postback(self, request, params):
-        """ Does Checksum validation and if valid saves the postback data as TransactionLog """
+        """ Does Checksum validation and if valid saves the postback data as TransactionLogFor a provider backend-only postback to post feedback on a transaction. 
+        
+            Always save the data, and if it could be handled in a proper way, return a 200.
+            Otherwise return a different status.
+            @return: True if a 200 should be returned and the data was handled properly,
+                        False if a 404 should be returned so the postback will be posted again """
         if self._validate_incoming_checksum(params, 'postback'):
             # drop sensitive data from postback
             params = _strip_sensitive_data(params)
@@ -529,7 +534,7 @@ class BetterPaymentBackend(BaseBackend):
                 missing_params = [param for param in ['transaction_id', 'order_id', 'status_code'] if param not in params]
                 if missing_params:
                     logger.error('BetterPayments Postback: Missing parameters: [%s]. Could not handle postback!' % ', '.join(missing_params), extra={'params': params})
-                    return
+                    return False
                 
                 # find referenced payment
                 payment = get_object_or_None(Payment, 
@@ -537,19 +542,22 @@ class BetterPaymentBackend(BaseBackend):
                     internal_transaction_id=params['order_id']
                 )
                 if payment is None:
-                    logger.error('BetterPayments Postback: Could not match a Payment object for given Postback!', 
+                    # sometimes, the returning postback for a transaction is actually faster than
+                    # our DB can save the payment! since we return a non-success here, it will be 
+                    # posted again though.
+                    logger.error('BetterPayments Postback: Could not match a Payment object for given Postback! The postback was possibly too fast for us to save the payment object.', 
                                  extra={'params': params})
-                    return
-                
+                    return False
                 # Transaction Statuses see https://testdashboard.betterpayment.de/docs/#transaction-statuses
                 status = int(params['status_code'])
                 if status in [self.BETTERPAYMENT_STATUS_STARTED, self.BETTERPAYMENT_STATUS_PENDING]:
                     # case 'started', 'pending': no further action required, we are waiting for the transaction to complete
-                    return
+                    return True
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS and payment.status == Payment.STATUS_PAID:
                     # got a postback on an already paid Payment, so we do not do anything
                     logger.info('Payments: Received a postback for a successful payment, but the payment\'s status was already PAID!', 
                                 extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    return True
                 elif status == self.BETTERPAYMENT_STATUS_SUCCESS:
                     # case 'succcess': the payment was successful, update the Payment and start a subscription
                     # depending on `is_postponed_payment` and the payment.status, switch states here to preauthorized or paid!
@@ -574,11 +582,12 @@ class BetterPaymentBackend(BaseBackend):
                             extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
                         payment.save()
                         handle_successful_payment(payment)
-                        
+                    return True
                 elif status == self.BETTERPAYMENT_STATUS_CANCELED:
                     # case 'error', 'canceled', 'declined': mark the payment as canceled. no further action is required.
                     payment.status = Payment.STATUS_CANCELED
                     payment.save()
+                    return True
                 elif status in [self.BETTERPAYMENT_STATUS_ERROR, self.BETTERPAYMENT_STATUS_DECLINED]:
                     # case 'error', 'declined': mark the payment as failed
                     payment.status = Payment.STATUS_FAILED
@@ -595,6 +604,7 @@ class BetterPaymentBackend(BaseBackend):
                         # send_payment_event_payment_email(payment)
                         payment.subscription.state = Subscription.STATE_0_TERMINATED
                         payment.subscription.save()
+                    return True
                 elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
                     # on a chargeback, immediately suspend the subscription to stop any further transactions. 
                     # we also send out an admin mail, because in this case we have to manually retract a bill
@@ -602,13 +612,15 @@ class BetterPaymentBackend(BaseBackend):
                     payment.status = Payment.STATUS_RETRACTED
                     payment.save()
                     handle_payment_refunded(payment, status)
+                    return True
                 else:
                     # we do not know what to do with this status
                     logger.critical('NYI: Received postback with a status we cannot handle (Status: %d)!' % status, extra={'betterpayment_status_code': status, 'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
+                    return True
             except Exception as e:
                 logger.error('Payments: Error during postback processing! Postbacked data was saved, but payment status could not be updated!', extra={'params': params, 'exception': e})
-            
-        return
+                return False
+        return False
     
     def _validate_incoming_checksum(self, params, endpoint):
         """ Validates an incoming request's checksum to make sure it was not faked.

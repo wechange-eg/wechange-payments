@@ -215,7 +215,10 @@ class BaseBackend(object):
         
     def handle_postback(self, request, params):
         """ For a provider backend-only postback to post feedback on a transaction. 
-            Always return 200 on this and save the data. """
+            Always save the data, and if it could be handled in a proper way, return a 200.
+            Otherwise return a different status.
+            @return: True if a 200 should be returned and the data was handled properly,
+                        False if a 404 should be returned so the postback will be posted again """
         raise NotImplemented('Use a proper payment provider backend for this function!')
         
 
