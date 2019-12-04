@@ -406,7 +406,7 @@ class BetterPaymentBackend(BaseBackend):
             # ignore some errors for sentry warnings (126: invalid account info)
             if result.get('error_code') not in [126,]: 
                 extra= {'post_url': post_url, 'data': _strip_sensitive_data(data), 'result': result}
-                logger.warn('Payments: API Calling SEPA Payment returned an error!', extra=extra)
+                logger.warn('Payments: API Calling Payment of type "%s" returned an error!' % payment_type, extra=extra)
             return (None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': result.get('error_message'), 'error_code': result.get('error_code')})
         
         extra_data = {}
