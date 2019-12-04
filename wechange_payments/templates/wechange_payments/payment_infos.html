@@ -169,20 +169,20 @@
 		{% endcomment %}
 
     	{% comment %}  
-    		"Back to PORTAL" and "print as pdf" section, todo later! 
+    		"Back to PORTAL" and "print as pdf" section, to do later! 
     	
     	<hr/>
     	<div>
     		<a href="{% get_non_cms_root_url %}" class="rounded-button button-color-primary-inverted">
 		        <span class="rounded-button-inner">
                     {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(SC8)" %}Back to {{ portal_name }}{% endblocktrans %}
-                    TODO: raus!
+                    TO DO: raus!
 		        </span>
 		    </a>
 		    <a class="pull-right rounded-button button-color-secondary" href="{% url "wechange-payments:payment" %}">
 		        <span class="rounded-button-inner">
-		            {% trans "Print this page or save as PDF" context "(INF19)" %} (TODO!)
-		            TODO: als icon
+		            {% trans "Print this page or save as PDF" context "(INF19)" %} (TO DO!)
+		            TO DO: als icon
 		        </span>
 		    </a>
     	</div>

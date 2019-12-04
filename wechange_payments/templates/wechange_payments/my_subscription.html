@@ -31,8 +31,6 @@
 		        <p class="error-message"></p>
 		    </div>
 		    
-		    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
-		    
 		    <h2>{% blocktrans with amount=subscription.amount|intify context "(MS2)" %}Your current Contribution is {{ amount }} Euro per month{% endblocktrans %}</h2>
 			<p>
                 {% captureas desc_text %}{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(MS3)" %}We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.

@@ -17,8 +17,6 @@
     <!-- a box with semi transparent background -->
     <div class="v2-content white-content payment-info-page">
 	    
-	    {% comment %} TODO: add conditional check and different text for upcoming payments with a cancelled active one! {% endcomment %}
-	    
 	    <h2>{% trans "There are issues with you current Contribution!" context "(FC2)" %}</h2>
 		<p>
             {% trans "We encountered an error when we tried to book your most recent monthly contribution. Your contribution is paused suspended until the issues are resolved." context "(FC3)" %}
@@ -51,6 +49,8 @@
                             {% comment %}  
 	                            TODO: Display Payment Provider Error Message!
 	                            then remove the `if 0`
+	                            Note: The provider error messages are very unhelpful and should
+	                                   probably not be shown to the user.
                             {% endcomment %}
                         {% else %}
                             {% trans "Specific issue details cannot be displayed for this issue." context "(FC8)" %}

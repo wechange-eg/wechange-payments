@@ -249,7 +249,6 @@ def postback_endpoint(request):
     """ For providers that offer a postback URL as logging/validation """
     backend = get_backend()
     backend.handle_postback(request, request.POST.dict())
-    # TODO: why is request being passed here, when there isnt that parameter in the backend??
     return JsonResponse({'status': 'ok'})
 
 
