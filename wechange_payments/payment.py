@@ -159,13 +159,13 @@ def book_next_subscription_payment(subscription):
             payment, error = backend.cash_in_postponed_payment(reference_payment)
         elif reference_payment.status == Payment.STATUS_PAID:
             # book a new recurring payment
-            payment, error = backend.make_recurring_payment(reference_payment, subscription)
+            payment, error = backend.make_recurring_payment(reference_payment)
         else:
             logger.error('Payments: Did not know how to make a further payment from a reference payment due to incompatible payment states!', 
                          extra={'user': subscription.user, 'subscription': subscription})
             return
     else:
-        payment, error = backend.make_recurring_payment(reference_payment, subscription)
+        payment, error = backend.make_recurring_payment(reference_payment)
 
     
     if error or not payment:
@@ -210,9 +210,6 @@ def handle_successful_payment(payment):
         triggered either after an instantly successful payment or after  a postback was received.
         Either creates a new subscription or advances a current subscription's
         due_date for a recurring payment. """
-    # trigger email sending, invoice generation, etc
-    send_payment_event_payment_email(payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
-    
     # process payment for subscription
     if payment.is_reference_payment:
         # if this is the first and thus reference payment, we trigger creating a new subscription
@@ -231,7 +228,10 @@ def handle_successful_payment(payment):
         else:
             logger.critical('Payments: Received a success postback for a previously unpaid recurring payment from a postback, but there was no subscription attached that we could advance the due date for! This needs to be investigated!', 
                             extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id})
-                    
+            
+    # trigger email sending, invoice generation, etc
+    send_payment_event_payment_email(payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
+        
 
 def handle_payment_refunded(payment, status=None):
     """ Handles the case when we receive notification of a refunded payment.

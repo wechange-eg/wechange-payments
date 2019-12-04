@@ -192,16 +192,18 @@ def subscription_change_amount(request):
     amount = amount_or_error_response
     
     subscription = active_sub or waiting_sub
-    success = change_subscription_amount(subscription, amount)
-    
-    if not success:
-        return JsonResponse({'error': _('Your subscription amount could not be changed because of an unexpected error. Please contact our support!')}, status=500)
+    if subscription.amount == amount:
+        messages.success(request, _('The amount you selected was the same amount as before, so we did not change anything!'))
+    else:
+        success = change_subscription_amount(subscription, amount)
+        if not success:
+            return JsonResponse({'error': _('Your subscription amount could not be changed because of an unexpected error. Please contact our support!')}, status=500)
+        messages.success(request, _('Your changes have been saved! From now on your new chosen contribution amount will be paid. Thank you very much for your support!'))
     
     redirect_url = reverse('wechange_payments:my-subscription')
     data = {
         'redirect_to': redirect_url
     }
-    messages.success(request, _('Your changes have been saved! From now on your new chosen contribution amount will be paid. Thank you very much for your support!'))
     return JsonResponse(data)
 
 

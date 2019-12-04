@@ -11,6 +11,7 @@ from cosinnus.models.group import CosinnusPortal
 from cosinnus.templatetags.cosinnus_tags import full_name
 from django.urls.base import reverse
 from django.templatetags.l10n import localize
+from django.utils import translation
 
 logger = logging.getLogger('wechange-payments')
 
@@ -24,16 +25,16 @@ PAYMENT_EVENT_SUCCESSFUL_PAYMENT = 'successful_payment'
 PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED = 'new_subscription'
 PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED = 'replaced_subscription'
 PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED = 'admount_changed'
-PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED = 'suspended_subscription'
 PAYMENT_EVENT_SUBSCRIPTION_TERMINATED = 'terminated_subscription'
+PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED = 'suspended_subscription'
 
 PAYMENT_EVENTS = (
     PAYMENT_EVENT_SUCCESSFUL_PAYMENT,
     PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED,
     PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED,
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED,
-    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED,
     PAYMENT_EVENT_SUBSCRIPTION_TERMINATED,
+    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED,
 )
 
 """ For the i18n strings, see the given Translation Pad/Doc """
@@ -47,16 +48,16 @@ MAIL_BODY = {
     PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1a)', '(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s'),
     PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1b)', '(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s'),
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED: pgettext_lazy('(MAIL3)', '(MAIL3) with variables: %(contribution_amount)s %(next_debit_date)s'),
-    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL4)', '(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s'),
-    PAYMENT_EVENT_SUBSCRIPTION_TERMINATED: pgettext_lazy('(MAIL5)', '(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s'),
+    PAYMENT_EVENT_SUBSCRIPTION_TERMINATED: pgettext_lazy('(MAIL4)', '(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s'),
+    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL5)', '(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s'),
 }
 MAIL_SUBJECT = {
     PAYMENT_EVENT_SUCCESSFUL_PAYMENT: pgettext_lazy('(MAIL2s)', '(MAIL2s) with variables: -'),
     PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1s)', '(MAIL1s) with variables: %(portal_name)s'),
     PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1s)', '(MAIL1s) with variables: %(portal_name)s'),
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED: pgettext_lazy('(MAIL3s)', '(MAIL3s) with variables: -'),
-    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL4s)', '(MAIL4s) with variables: -'),
-    PAYMENT_EVENT_SUBSCRIPTION_TERMINATED: pgettext_lazy('(MAIL5s)', '(MAIL5s) with variables: -'),
+    PAYMENT_EVENT_SUBSCRIPTION_TERMINATED: pgettext_lazy('(MAIL4s)', '(MAIL4s) with variables: -'),
+    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL5s)', '(MAIL5s) with variables: -'),
 }
 
 
@@ -67,6 +68,7 @@ def send_payment_event_payment_email(payment, event):
             `subscription` relation. If all you have is a subscription, supply the `subscription.last_payment`.
         @param event: one of the values of `PAYMENT_EVENTS`. 
     """
+    cur_language = translation.get_language()
     try:
         if not payment.user:
             logger.warning('Sending payment status message was ignored because no user was attached to the payment',
@@ -76,25 +78,31 @@ def send_payment_event_payment_email(payment, event):
             logger.error('Could not send out a payment event email because the event type was unknown.',
                     extra={'payment': payment.id})
             return
-        
-        email = payment.user.email
+        user = payment.user
+        email = user.email
         template = 'wechange_payments/mail/mail_base.html'
         subject_template = 'wechange_payments/mail/subject_base.txt'
         portal = CosinnusPortal.get_current()
         
+        # switch language to user's preference language
+        translation.activate(getattr(user.cosinnus_profile, 'language', settings.LANGUAGES[0][0]))
+        
+        link_html = '[' + str(pgettext_lazy('(URL-LABEL)', 'Link')) + '](' + portal.get_domain() + '%s)'
+        mail_html = '[%s](mailto:%s)'
+        
         # prepare all possible variables
         variables = {
             'payment': payment,
-            'link_payment_info': reverse('wechange_payments:payment-infos'),
-            'link_invoices': reverse('wechange_payments:invoices'),
-            'link_new_payment': reverse('wechange_payments:payment'),
-            'link_payment_issues': reverse('wechange_payments:suspended-subscription'),
+            'link_payment_info': link_html % reverse('wechange_payments:payment-infos'),
+            'link_invoices': link_html % reverse('wechange_payments:invoices'),
+            'link_new_payment': link_html % reverse('wechange_payments:payment'),
+            'link_payment_issues': link_html % reverse('wechange_payments:suspended-subscription'),
             'portal_name': portal.name,
             'username': full_name(payment.user),
-            'contribution_amount': str(payment.amount),
-            'next_debit_date': localize(payment.subscription.get_next_payment_date().date())     ,
+            'contribution_amount': str(int(payment.amount)),
+            'next_debit_date': localize(payment.subscription.get_next_payment_date())     ,
             'payment_method': payment.get_type_string(),
-            'support_email': portal.support_email,
+            'support_email': mail_html % (portal.support_email, portal.support_email),
         }
         # compose email parts
         data = {
@@ -106,11 +114,15 @@ def send_payment_event_payment_email(payment, event):
         }
         # add SEPA mandate info to mail body for successful SEPA payment email
         if payment.type == PAYMENT_TYPE_DIRECT_DEBIT and event == PAYMENT_EVENT_SUCCESSFUL_PAYMENT:
-            data['mail_body'] += '\n\n' + render_to_string('wechange_payments/mail/sepa_mandate_partial.html', variables)
+            sepa_variables = {
+                'payment': payment.subscription.reference_payment,
+                'SETTINGS': settings,
+            }
+            data['mail_body'] += '\n\n-\n\n' + render_to_string('wechange_payments/mail/sepa_mandate_partial.html', sepa_variables)
         
         # send mail
         if settings.PAYMENTS_USE_HOOK_INSTEAD_OF_SEND_MAIL == True:
-            signals.success_email_sender.send(sender=payment, to_email=email, template=template, subject_template=subject_template, data=data)
+            signals.success_email_sender.send(sender=payment, to_user=user, template=template, subject_template=subject_template, data=data)
         else:
             subject = render_to_string(subject_template, data)
             message = render_to_string(template, data)
@@ -118,4 +130,9 @@ def send_payment_event_payment_email(payment, event):
             mail_func(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
     except Exception as e:
         logger.warning('Payments: Sending a payment status email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id, 'exception': e})
+        if settings.DEBUG:
+            raise
         
+    # switch language back to previous
+    translation.activate(cur_language)
+    

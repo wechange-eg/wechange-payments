@@ -48,7 +48,7 @@
 			<hr/>
 			<h3>{% trans "Your SEPA Mandate" %}</h3>
 			
-			{% captureas embedded %}{% include 'wechange_payments/mail/sepa_payment_success.html' with payment=payment %}{% endcaptureas %}
+			{% captureas embedded %}{% include 'wechange_payments/mail/sepa_mandate_partial.html' with payment=payment %}{% endcaptureas %}
 			<code>{{ embedded|linebreaksbr }}
 			</code>
 		{% endif %}

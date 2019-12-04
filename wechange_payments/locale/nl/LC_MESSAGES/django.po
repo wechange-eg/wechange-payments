@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-03 18:06+0100\n"
+"POT-Creation-Date: 2019-12-04 10:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,6 +131,10 @@ msgstr ""
 
 msgctxt "(MAIL5s)"
 msgid "(MAIL5s) with variables: -"
+msgstr ""
+
+msgctxt "(URL-LABEL)"
+msgid "Link"
 msgstr ""
 
 msgid "PayPal"
@@ -1005,6 +1009,9 @@ msgid "You do not currently have a subscription!"
 msgstr ""
 
 msgid "An error occured, and you cannot change your subscription amount at this time. Please contact our support!"
+msgstr ""
+
+msgid "The amount you selected was the same amount as before, so we did not change anything!"
 msgstr ""
 
 msgid "Your subscription amount could not be changed because of an unexpected error. Please contact our support!"
