@@ -20,6 +20,7 @@ from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
 from wechange_payments.models import TransactionLog, Payment, Subscription
 from wechange_payments.payment import suspend_failed_subscription, handle_successful_payment,\
     handle_payment_refunded
+import time
 
 logger = logging.getLogger('wechange-payments')
 
@@ -541,13 +542,23 @@ class BetterPaymentBackend(BaseBackend):
                     vendor_transaction_id=params['transaction_id'],
                     internal_transaction_id=params['order_id']
                 )
+                
                 if payment is None:
                     # sometimes, the returning postback for a transaction is actually faster than
-                    # our DB can save the payment! since we return a non-success here, it will be 
-                    # posted again though.
-                    logger.error('BetterPayments Postback: Could not match a Payment object for given Postback! The postback was possibly too fast for us to save the payment object.', 
-                                 extra={'params': params})
-                    return False
+                    # our DB can save the payment! we wait for 5 seconds and retry.
+                    time.sleep(5)
+                    # find referenced payment again
+                    payment = get_object_or_None(Payment, 
+                        vendor_transaction_id=params['transaction_id'],
+                        internal_transaction_id=params['order_id']
+                    )
+                    if payment is None:
+                        # after waiting and retrying, we give up and error out.
+                        # since we return a non-success here, it will be posted again though.
+                        logger.error('BetterPayments Postback: Could not match a Payment object for given Postback! The postback was possibly too fast for us to save the payment object.', 
+                                     extra={'params': params})
+                        return False
+                
                 # Transaction Statuses see https://testdashboard.betterpayment.de/docs/#transaction-statuses
                 status = int(params['status_code'])
                 if status in [self.BETTERPAYMENT_STATUS_STARTED, self.BETTERPAYMENT_STATUS_PENDING]:
