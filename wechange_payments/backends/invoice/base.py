@@ -7,7 +7,7 @@ from annoying.functions import get_object_or_None
 from django.core.exceptions import ImproperlyConfigured
 
 from wechange_payments.conf import settings
-from wechange_payments.models import Invoice
+from wechange_payments.models import Invoice, Payment
 
 
 logger = logging.getLogger('wechange-payments')
@@ -33,6 +33,10 @@ class BaseInvoiceBackend(object):
             return
         
         try:
+            # only create invoices for successfully paid Payments!
+            if payment.status != Payment.STATUS_PAID:
+                return
+            
             invoice = get_object_or_None(Invoice, payment=payment)
             if not invoice:
                 invoice = Invoice.objects.create(

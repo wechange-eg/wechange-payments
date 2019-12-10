@@ -4,8 +4,6 @@ from wechange_payments.signals import successful_payment_made
 from wechange_payments.backends import get_invoice_backend
 
 import logging
-from wechange_payments.mails import PAYMENT_EVENT_SUCCESSFUL_PAYMENT,\
-    send_payment_event_payment_email
 logger = logging.getLogger('wechange-payments')
 
 
