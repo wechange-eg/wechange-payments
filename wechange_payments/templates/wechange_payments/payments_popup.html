@@ -63,10 +63,14 @@ With every Euro you spend, you help us to make WECHANGE better. With an average 
 				{% blocktrans with username=user.first_name context "(POP2-release)" %}Dear {{ username }},{% endblocktrans %}
 			</p>
 			<p>
-			    {% captureas pop_text %}{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(POP3-release)" %}we understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development. 
+			    {% captureas pop_text %}{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(POP3-release)" %}we consider WECHANGE a common good: Therefore we decided that, from now on, you will be able to open new groups and use all group functions with your teams, for free!
 
-If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!{% endblocktrans %}{% endcaptureas %}
+Correspondingly, we invite you to pay for the use of WECHANGE whatever feels right. Even with a very small contribution, you help us making WECHANGE better. With an average of 5 Euros per month you enable us to cover the costs of hosting the platform. Beyond that your share is dedicated to further development.{% endblocktrans %}{% endcaptureas %}
+
 				{{ pop_text|linebreaksbr }}
+			</p>
+			<p>
+			    <b>{% trans "Choose your voluntary monthly contribution to WECHANGE now. We count on you!" context "(POP4-release)" %}</b>
 			</p>
 			<hr class="invisible" />
 		{% endcaptureas %}

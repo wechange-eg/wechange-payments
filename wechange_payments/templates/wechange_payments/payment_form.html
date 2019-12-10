@@ -226,7 +226,7 @@
 		            <div id="organisation_frame">
 			            {% trans "Organisation" as label %}
 			            {% trans "If the contribution is not paid by you as a private individual, but in the name and on behalf of an institution, organisation or company, please enter the name and billing address of the organisation." as org_legend %}
-	                    {% include 'cosinnus/fields/default_field.html' with field=form.organisation label=label legend=org_legend show_required=False %}
+	                    {% include 'cosinnus/fields/default_field.html' with field=form.organisation label=label legend=org_legend show_required=False first=True %}
 		            </div>
 		            
 		            {% comment %} Toggles the Organisation text field on checkbox switch {% endcomment %}
