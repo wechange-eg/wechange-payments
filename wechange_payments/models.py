@@ -95,6 +95,7 @@ class Payment(models.Model):
     # billing address details, can be saved for some payment methods, but not necessary
     first_name = models.CharField(blank=True, null=True, max_length=255)
     last_name = models.CharField(blank=True, null=True, max_length=255)
+    organisation = models.CharField(blank=True, null=True, max_length=255)
     email = models.EmailField(blank=True, null=True)
     address = models.CharField(blank=True, null=True, max_length=255)
     city = models.CharField(blank=True, null=True, max_length=255)

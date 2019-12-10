@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-04 10:55+0100\n"
-"PO-Revision-Date: 2019-12-04 11:16+0100\n"
+"POT-Creation-Date: 2019-12-10 12:57+0100\n"
+"PO-Revision-Date: 2019-12-10 12:57+0100\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -29,9 +29,11 @@ msgid "Run/continue invoice in Invoice API (threaded)"
 msgstr "Run/continue invoice in Invoice API (threaded)"
 
 #, python-format
+#| msgctxt "Invoice PDF, important!"
+#| msgid "Freely chosen user fee for %(portal_name)s"
 msgctxt "Invoice PDF, important!"
-msgid "Freely chosen user fee for %(portal_name)s"
-msgstr "Frei gewählte Nutzungsgebühr für %(portal_name)s"
+msgid "User fee for %(portal_name)s"
+msgstr "Nutzungsgebühr für %(portal_name)s"
 
 #, python-format
 msgctxt "Invoice PDF, important!"
@@ -832,6 +834,22 @@ msgstr "Vorname"
 
 msgid "Last name"
 msgstr "Nachname"
+
+msgid "Payment shall be made on behalf of an organisation"
+msgstr "Die Zahlung erfolgt im Namen einer Organisation"
+
+#| msgid "Transaction Type"
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid ""
+"If the contribution is not paid by you as a private individual, but in the "
+"name and on behalf of an institution, organisation or company, please enter "
+"the name and billing address of the organisation."
+msgstr ""
+"Wenn der Beitrag nicht von dir als Privatperson gezahlt wird, sondern im "
+"Namen und Auftrag einer Institution, Organisation oder eines Unternehmens, "
+"gib bitte Namen und Rechnungsadresse der Organisation ein."
 
 msgctxt "(PF18)"
 msgid ""

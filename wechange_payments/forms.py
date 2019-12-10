@@ -16,7 +16,7 @@ PAYMENT_CHOICES = {
 
 
 class PaymentsForm(forms.Form):
-    """ This form is being used only for pre-filling values, and not for posting or validating.
+    """ This form is being used for pre-filling values, and for validation.
         All requests are sent straight to the API from frontend. """
     
     payment_type = forms.ChoiceField(choices=[(type, PAYMENT_CHOICES[type]) for type in settings.PAYMENTS_ACCEPTED_PAYMENT_METHODS])
@@ -29,6 +29,9 @@ class PaymentsForm(forms.Form):
     city = forms.CharField()
     postal_code = forms.CharField()
     country = CountryField().formfield()
+    
+    is_organisation = forms.BooleanField(required=False)
+    organisation = forms.CharField(required=False)
     
     tos_check = forms.BooleanField(required=True)
     privacy_policy_check = forms.BooleanField(required=True)

@@ -220,6 +220,29 @@
 		                </div>
 		            </div><!-- row -->
 		            
+		            {% trans "Payment shall be made on behalf of an organisation" as checkbox_label %}
+		            {% include 'cosinnus/fields/checkbox_field.html' with field=form.is_organisation label=None checkbox_label=checkbox_label %}
+		            
+		            <div id="organisation_frame">
+			            {% trans "Organisation" as label %}
+			            {% trans "If the contribution is not paid by you as a private individual, but in the name and on behalf of an institution, organisation or company, please enter the name and billing address of the organisation." as org_legend %}
+	                    {% include 'cosinnus/fields/default_field.html' with field=form.organisation label=label legend=org_legend show_required=False %}
+		            </div>
+		            
+		            {% comment %} Toggles the Organisation text field on checkbox switch {% endcomment %}
+		            <script type="text/javascript">
+		                $(function(){
+		                    $('#id_is_organisation').change(function(){
+		                        $('#organisation_frame .cosinnus-field').toggleClass('disabled', !this.checked);
+		                        if (this.checked) {
+		                            $('#id_organisation').removeAttr('disabled').attr('required', 'required');
+		                        } else {
+                                    $('#id_organisation').attr('disabled', 'disabled').removeAttr('required');
+		                        }
+		                    }).trigger('change');
+		                });
+		            </script>
+		            
 		            {% trans "Address" as label %}
 					{% include 'cosinnus/fields/default_field.html' with field=form.address label=label show_required=True %}
 		        	

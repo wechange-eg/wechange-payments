@@ -445,6 +445,7 @@ class BetterPaymentBackend(BaseBackend):
             country=params['country'],
             first_name=params['first_name'],
             last_name=params['last_name'],
+            organisation=params.get('organisation', None),
             email=params['email'],
             
             backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__),

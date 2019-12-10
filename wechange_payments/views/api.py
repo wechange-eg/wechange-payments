@@ -61,7 +61,10 @@ def make_payment(request, on_success_func=None, make_postponed=False):
                 form.fields[field_name].required = False
         if not form.is_valid():
             return JsonResponse({'error': _('Please correct the errors in the highlighted fields!'), 'field_errors': form.errors}, status=500)
-        
+        # remove `organisation` from params if `is_organisation` was not checked
+        if not params.get('is_organisation', False) and 'organisation' in params:
+            del params['organisation']
+            
         # check for complete parameter set
         missing_params = backend.check_missing_params(params, payment_type)
         if missing_params:

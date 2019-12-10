@@ -36,11 +36,15 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         """ Prepare all neccessary params for the invoice creation API for Lexoffice 
             from an invoices and its attached payment instance. """
         payment = invoice.payment
+        if payment.organisation:
+            recipient_name = payment.organisation
+        else:
+            recipient_name = payment.first_name + ' ' + payment.last_name 
         data = {
             'archived': False,
             'voucherDate': invoice.created.isoformat(timespec='milliseconds'),
             'address': {
-                'name': payment.first_name + ' ' + payment.last_name,
+                'name': recipient_name,
                 'street': payment.address,
                 'city': payment.city,
                 'zip': payment.postal_code,
@@ -49,7 +53,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             'lineItems': [
                 {
                     'type': 'custom',
-                    'name': force_text(pgettext_lazy('Invoice PDF, important!', 'Freely chosen user fee for %(portal_name)s') % {'portal_name': CosinnusPortal.get_current().name}),
+                    'name': force_text(pgettext_lazy('Invoice PDF, important!', 'User fee for %(portal_name)s') % {'portal_name': CosinnusPortal.get_current().name}),
                     'description': force_text(pgettext_lazy('Invoice PDF, important!', 'Electronic service - Ref-Nr. %(user_id)d') % {'user_id': invoice.user.id}),
                     'quantity': 1,
                     'unitName': 'Stück',
