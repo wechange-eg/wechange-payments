@@ -192,22 +192,6 @@ class PaymentProcessView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailV
 payment_process = PaymentProcessView.as_view()
 
 
-class WelcomePageView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
-    """ A welcome page that introduces the user to payments after registering. """
-    
-    template_name = 'wechange_payments/welcome_page.html'
-    
-    def get_context_data(self, *args, **kwargs):
-        context = super(WelcomePageView, self).get_context_data(*args, **kwargs)
-        context.update({
-            'next_url': redirect_next_or(self.request, get_non_cms_root_url())
-        })
-        return context
-        
-welcome_page = WelcomePageView.as_view()
-
-
-
 class OverviewView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, RedirectView):
     """ Redirects to the payment view if the user has no active subscriptions
         and to the my subscription view if there is an active subscription. """
