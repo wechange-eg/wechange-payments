@@ -117,7 +117,7 @@ def send_payment_event_payment_email(payment, event):
             'support_email': mail_html % (portal.support_email, portal.support_email),
             'sepa_mandate': sepa_mandate,
             'iban': iban,
-            'sepa_creditor': settings.PAYMENTS_PAYMENT_RECIPIENT_NAME,
+            'sepa_creditor': settings.PAYMENTS_SEPA_CREDITOR_ID,
         }
         # compose email parts
         data = {
