@@ -29,13 +29,14 @@ class ProcessDueSubscriptionPayments(CosinnusCronJobBase):
             from cosinnus.models.group import CosinnusPortal
             portal = CosinnusPortal.get_current()
             if not portal.slug in specific_portal_slugs:
-                return "Skipped subscription processing: current portal slug not in `PAYMENTS_CRON_ENABLED_FOR_SPECIFIC_PORTAL_SLUGS_ONLY`."
+                #return "Skipped subscription processing: current portal slug not in `PAYMENTS_CRON_ENABLED_FOR_SPECIFIC_PORTAL_SLUGS_ONLY`."
+                return
         
         # process subscriptions and return counts as log
         (ended_subscriptions, booked_subscriptions) = process_due_subscription_payments()
         logger.info('Cron-based daily subscription payment processing finished. Details in extra.',
                 extra={'ended_subscriptions': ended_subscriptions, 'booked_subscriptions': booked_subscriptions})
-        return "Ended expired subscriptions: %d. Processed payments for due subscriptions: %d" % (ended_subscriptions, booked_subscriptions)
+        return "End expired subs: %d. Payments for due subs: %d" % (ended_subscriptions, booked_subscriptions)
 
 
 class GenerateMissingInvoices(CosinnusCronJobBase):
@@ -59,7 +60,7 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
                 invoices_created += 1
                 
         still_missing = Payment.objects.filter(status=Payment.STATUS_PAID).filter(Q(invoice=None) | Q(invoice__is_ready=False)).count()
-        return "Payments with missing invoices processed: %d. Invoices generated: %d. Payments still missing invoices: %d"\
+        return "Missing: %d. Invoices generated: %d. Still missing: %d"\
              % (missing_before, invoices_created, still_missing)
 
         
