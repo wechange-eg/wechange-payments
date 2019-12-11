@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-10 14:23+0100\n"
+"POT-Creation-Date: 2019-12-11 14:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -620,6 +620,9 @@ msgstr ""
 msgid "Payment Method"
 msgstr ""
 
+msgid "Payment is currently only possible by SEPA direct debit. We are working on offering PayPal and credit card payments soon!"
+msgstr ""
+
 msgid "Select Payment Method"
 msgstr ""
 
@@ -974,30 +977,6 @@ msgstr ""
 
 msgctxt "(FC11)"
 msgid "Renew payment information"
-msgstr ""
-
-msgctxt "(WC1)"
-msgid "Support us "
-msgstr ""
-
-msgctxt "(WC2)"
-msgid "Your Contribution"
-msgstr ""
-
-msgctxt "(WC3)"
-msgid "WECHANGE is based on a solidary pricing model: You pay a voluntary monthly contribution and thus enable us to continuously develop the platform. Would you like to contribute something? Of course you can also have a look around first."
-msgstr ""
-
-msgctxt "(WC4)"
-msgid "Learn more"
-msgstr ""
-
-msgctxt "(WC5)"
-msgid "Choose amount"
-msgstr ""
-
-msgctxt "(WC6)"
-msgid "Remind me later"
 msgstr ""
 
 msgid "Please correct the errors in the highlighted fields!"

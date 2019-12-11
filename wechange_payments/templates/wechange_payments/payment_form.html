@@ -161,6 +161,7 @@
 					</h2>
 		            
 					{% trans "Payment Method" as label %}
+					{% captureas type_legend %}{% if SETTINGS.PAYMENTS_ACCEPTED_PAYMENT_METHODS|length <= 1 %}{% trans "Payment is currently only possible by SEPA direct debit. We are working on offering PayPal and credit card payments soon!" %}{% endif %}{% endcaptureas %}
 					{% captureas select_field_html %}
 						<style>
 							select:invalid { color: gray; }
@@ -172,7 +173,7 @@
 			                {% endfor %}
                         </select>
 					{% endcaptureas %}
-					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label first=True field_html=select_field_html show_required=True field_classes="conditional-select" %}
+					{% include 'cosinnus/fields/default_field.html' with field=form.payment_type label=label legend=type_legend first=True field_html=select_field_html show_required=True field_classes="conditional-select" %}
 					
 					
 		            <div class="conditional-select-container" data-select-name="payment_type" data-select-value="dd">
