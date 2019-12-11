@@ -12,7 +12,8 @@ from wechange_payments.mails import PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED,\
     PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED,\
     send_payment_event_payment_email, PAYMENT_EVENT_SUCCESSFUL_PAYMENT,\
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED,\
-    PAYMENT_EVENT_SUBSCRIPTION_TERMINATED, PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED
+    PAYMENT_EVENT_SUBSCRIPTION_TERMINATED, PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED,\
+    PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION
 from wechange_payments.utils.utils import send_admin_mail_notification
 from wechange_payments import signals
 
@@ -76,6 +77,8 @@ def create_subscription_for_payment(payment):
                 logger.critical('Payments: "Unreachable" case reached for subscription state situation for a user! Could not save the user\'s new subscription! This has to be checked out manually!.',
                     extra={'payment-id': payment.id, 'payment': payment, 'user': user})
             
+            # set the last pre-notification date to now, so for the next due payment we know it has not been sent
+            subscription.last_pre_notification_at = now()
             subscription.save()
             
             payment.subscription = subscription
@@ -126,8 +129,19 @@ def process_due_subscription_payments():
                 waiting_sub.save()
     
     booked_subscriptions = 0
-    # if an active subscription has its payment is due trigger a new payment on it
+    # check active subscriptions for due pre-notifications or payments
     for active_sub in Subscription.objects.filter(state=Subscription.STATE_2_ACTIVE):
+        # check if pre-notification should be sent for SEPA subscription
+        if active_sub.check_pre_notification_due() and active_sub.user.is_active:
+            try:
+                send_pre_notification_for_subscription_payment(active_sub)
+            except Exception as e:
+                logger.error('Payments: Exception while trying to send a pre-notification for a subscription that has its notification due!', 
+                         extra={'user': active_sub.user, 'subscription': active_sub, 'exception': e})
+                if settings.DEBUG:
+                    raise
+                
+        # if an active subscription has its payment is due trigger a new payment on it
         if active_sub.check_payment_due() and active_sub.user.is_active:
             try:
                 if active_sub.has_pending_payment():
@@ -145,7 +159,6 @@ def process_due_subscription_payments():
                          extra={'user': active_sub.user, 'subscription': active_sub, 'exception': e})
                 if settings.DEBUG:
                     raise
-                return (ended_subscriptions, booked_subscriptions)
     
     return (ended_subscriptions, booked_subscriptions)
 
@@ -215,6 +228,20 @@ def book_next_subscription_payment(subscription):
         extra={'user': subscription.user, 'subscription': subscription})
     return payment
 
+
+def send_pre_notification_for_subscription_payment(subscription):
+    """ Sends out a mail for a SEPA subscription that has its next payment
+        upcoming soon (required by law). """
+    # sanity check
+    if not subscription.check_pre_notification_due():
+        return False
+    # send mail
+    sent = send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION)
+    if sent is True:
+        # set subscription's pre-notification date to now
+        subscription.last_pre_notification_at = now()
+        subscription.save()
+        
 
 def handle_successful_payment(payment):
     """ Handles the actions after a successful payment was made,

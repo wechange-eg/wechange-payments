@@ -1,9 +1,16 @@
-{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token payment_recipient_name=SETTINGS.PAYMENTS_PAYMENT_RECIPIENT_NAME sepa_creditor=SETTINGS.PAYMENTS_SEPA_CREDITOR_ID %}
-You have successfully made a SEPA payment.
+{% load i18n %}{% blocktrans with amount=payment.amount|floatformat:2 sepa_mandate=payment.extra_data.sepa_mandate_token payment_recipient_name=SETTINGS.PAYMENTS_PAYMENT_RECIPIENT_NAME sepa_creditor=SETTINGS.PAYMENTS_SEPA_CREDITOR_ID payment_day=payment.subscription.next_due_date.day iban=payment.extra_data.iban account_holder=payment.extra_data.account_holder %}
+The SEPA payment will be debited from your account within the next few days. 
 
-Amount: {{ amount }}€
-SEPA-Mandate-ID: {{ sepa_mandate }}
+We will debit your subsequent monthly payments on the {{ payment_day }}. of each month. If the due date falls on a weekend or a holiday, the debit date will be postponed to the next working day. Please make sure you have sufficient funds to avoid return debit fees.
+
+Details of your SEPA Direct Debit Mandate at a glance:
+
+Amount: {{ amount }} EUR
+SEPA-Mandate-Reference: {{ sepa_mandate }}
 Creditor-ID: {{ sepa_creditor }}
 
-The contribution will be debited from your account within the next few days. Subsequent payments will be made monthly. Please make sure you have sufficient funds to avoid return debit fees. 
+Your Account: 
+Account Holder: {{ account_holder }}
+IBAN: {{ iban }}
+ 
 {% endblocktrans %}

@@ -59,6 +59,8 @@ class WechangePaymentsDefaultSettings(AppConf):
     POPUP_DELAY_FOR_NEW_USERS_DAYS = 5
     # how many seconds till the "processing payment" page shows a "we're taking long..." message
     LATE_PAYMENT_PROCESS_MESSAGE_SECONDS = 30
+    # how many days before a due recurring SEPA payment will a pre-notification be sent
+    PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS = 10
     
     # should SEPA payments be treated as instantly paid, or wait for a success postback from betterpayments?
     # all signs for betterpayment point to "yes"

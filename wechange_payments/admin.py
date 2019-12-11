@@ -62,7 +62,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     list_display = ('user', 'state', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
     list_filter = ('state', 'has_problems', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
-    readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring')
+    readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring', 'next_due_date',)
     raw_id_fields = ('user',)
     
     if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False):

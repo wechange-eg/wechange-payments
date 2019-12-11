@@ -14,6 +14,7 @@ from django_countries.fields import CountryField
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, PAYMENT_TYPE_PAYPAL
 from wechange_payments.utils.utils import _get_invoice_filename
+from datetime import timedelta
 
 
 logger = logging.getLogger('wechange-payments')
@@ -312,6 +313,8 @@ class Subscription(models.Model):
     
     next_due_date = models.DateField(verbose_name=_('Next due date'), null=True, blank=True,
         help_text='Set to the next date whenever a payment is processed successfully.')
+    last_pre_notification_at = models.DateTimeField(verbose_name=_('Last pre-notification at'), null=True, blank=True,
+        help_text='Determines whether a pre-notification for the next due payment should be or has been sent.')
     amount = models.FloatField(verbose_name=_('Amount'), default='0.0', editable=False,
         help_text='For security reasons, the amount can not be changed through the admin interface!')
     
@@ -399,7 +402,33 @@ class Subscription(models.Model):
     def check_termination_due(self):
         if self.state == self.STATE_1_CANCELLED_BUT_ACTIVE:
             return self.next_due_date <= now().date()
-        return False 
+        return False
+    
+    def check_pre_notification_due(self):
+        """ Returns True if the subscription is active, and the reference payment is a
+            SEPA payment, and the subscription has an upcoming due payment 
+            within `PAYMENTS_PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS` days or less, 
+            and its `last_pre_notification_at` datetime is older than 1 day before 
+            `PAYMENTS_PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS` days before the subscription's
+            `next_due_date` date. """
+        if not self.last_pre_notification_at:
+            return False
+        if self.state != self.STATE_2_ACTIVE:
+            logger.warn('REMOVEME: prenot: Sub %d out 1' % self.id)
+            return False
+        if self.reference_payment.type != PAYMENT_TYPE_DIRECT_DEBIT:
+            logger.warn('REMOVEME: prenot: Sub %d out 2' % self.id)
+            return False
+        # is the pre-notification not yet due?
+        if now().date() < self.next_due_date - timedelta(days=settings.PAYMENTS_PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS):
+            logger.warn('REMOVEME: prenot: Sub %d out 3' % self.id)
+            return False  
+        # has the pre-notification already been sent?
+        if self.last_pre_notification_at.date() > self.next_due_date - timedelta(days=settings.PAYMENTS_PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS + 1):
+            logger.warn('REMOVEME: prenot: Sub %d out 4' % self.id)
+            return False
+        logger.warn('REMOVEME: prenot: Sub %d True!' % self.id)
+        return True
     
     def set_next_due_date(self, last_target_date):
         """ Sets the `next_due_date` based on the date of the last target date.

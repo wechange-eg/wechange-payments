@@ -27,6 +27,7 @@ PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED = 'replaced_subscription'
 PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED = 'admount_changed'
 PAYMENT_EVENT_SUBSCRIPTION_TERMINATED = 'terminated_subscription'
 PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED = 'suspended_subscription'
+PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION = 'subscription_payment_pre_notification'
 
 PAYMENT_EVENTS = (
     PAYMENT_EVENT_SUCCESSFUL_PAYMENT,
@@ -35,6 +36,7 @@ PAYMENT_EVENTS = (
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED,
     PAYMENT_EVENT_SUBSCRIPTION_TERMINATED,
     PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED,
+    PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION,
 )
 
 """ For the i18n strings, see the given Translation Pad/Doc """
@@ -50,6 +52,7 @@ MAIL_BODY = {
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED: pgettext_lazy('(MAIL3)', '(MAIL3) with variables: %(contribution_amount)s %(next_debit_date)s'),
     PAYMENT_EVENT_SUBSCRIPTION_TERMINATED: pgettext_lazy('(MAIL4)', '(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s'),
     PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL5)', '(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s'),
+    PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION: pgettext_lazy('(MAIL6)', '(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s %(sepa_creditor)s %(next_debit_date)s %(contribution_amount)s %(support_email)s'),
 }
 MAIL_SUBJECT = {
     PAYMENT_EVENT_SUCCESSFUL_PAYMENT: pgettext_lazy('(MAIL2s)', '(MAIL2s) with variables: -'),
@@ -58,6 +61,7 @@ MAIL_SUBJECT = {
     PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED: pgettext_lazy('(MAIL3s)', '(MAIL3s) with variables: -'),
     PAYMENT_EVENT_SUBSCRIPTION_TERMINATED: pgettext_lazy('(MAIL4s)', '(MAIL4s) with variables: -'),
     PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL5s)', '(MAIL5s) with variables: -'),
+    PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION: pgettext_lazy('(MAIL6s)', '(MAIL6s) with variables: -'),
 }
 
 
@@ -67,6 +71,7 @@ def send_payment_event_payment_email(payment, event):
         @param payment: Always supply a payment for this function, the subscription will be taken from its
             `subscription` relation. If all you have is a subscription, supply the `subscription.last_payment`.
         @param event: one of the values of `PAYMENT_EVENTS`. 
+        @return: True if the mail was successfully relayed, False or raises otherwise. 
     """
     cur_language = translation.get_language()
     try:
@@ -91,6 +96,13 @@ def send_payment_event_payment_email(payment, event):
         mail_html = '[%s](mailto:%s)'
         
         # prepare all possible variables
+        sepa_mandate = None
+        iban = None
+        if payment.type == PAYMENT_TYPE_DIRECT_DEBIT:
+            reference_payment = payment.subscription.reference_payment
+            sepa_mandate = reference_payment.extra_data.get('sepa_mandate_token', None)
+            iban = reference_payment.extra_data.get('iban', None)
+            
         variables = {
             'payment': payment,
             'link_payment_info': link_html % reverse('wechange_payments:payment-infos'),
@@ -100,9 +112,12 @@ def send_payment_event_payment_email(payment, event):
             'portal_name': portal.name,
             'username': full_name(payment.user),
             'contribution_amount': str(int(payment.amount)),
-            'next_debit_date': localize(payment.subscription.get_next_payment_date())     ,
+            'next_debit_date': localize(payment.subscription.get_next_payment_date()),
             'payment_method': payment.get_type_string(),
             'support_email': mail_html % (portal.support_email, portal.support_email),
+            'sepa_mandate': sepa_mandate,
+            'iban': iban,
+            'sepa_creditor': settings.PAYMENTS_PAYMENT_RECIPIENT_NAME,
         }
         # compose email parts
         data = {
@@ -128,10 +143,12 @@ def send_payment_event_payment_email(payment, event):
             message = render_to_string(template, data)
             mail_func = resolve_class(settings.PAYMENTS_SEND_MAIL_FUNCTION)
             mail_func(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+        return True
     except Exception as e:
         logger.warning('Payments: Sending a payment status email to the user failed!', extra={'internal_transaction_id': payment.internal_transaction_id, 'vendor_transaction_id': payment.vendor_transaction_id, 'exception': e})
         if settings.DEBUG:
             raise
+        return False
         
     # switch language back to previous
     translation.activate(cur_language)
