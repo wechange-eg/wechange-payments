@@ -24,13 +24,9 @@ class ProcessDueSubscriptionPayments(CosinnusCronJobBase):
     
     def do(self):
         # check if a portal restriction applies for the cron
-        specific_portal_slugs = getattr(settings, 'PAYMENTS_CRON_ENABLED_FOR_SPECIFIC_PORTAL_SLUGS_ONLY', []) 
-        if specific_portal_slugs:
-            from cosinnus.models.group import CosinnusPortal
-            portal = CosinnusPortal.get_current()
-            if not portal.slug in specific_portal_slugs:
-                #return "Skipped subscription processing: current portal slug not in `PAYMENTS_CRON_ENABLED_FOR_SPECIFIC_PORTAL_SLUGS_ONLY`."
-                return
+        disabled_msg = _check_cron_disabled_on_portal()
+        if disabled_msg:
+            return disabled_msg
         
         # process subscriptions and return counts as log
         (ended_subscriptions, booked_subscriptions) = process_due_subscription_payments()
@@ -50,6 +46,11 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
     cosinnus_code = 'wechange_payments.generate_missing_invoices'
     
     def do(self):
+        # check if a portal restriction applies for the cron
+        disabled_msg = _check_cron_disabled_on_portal()
+        if disabled_msg:
+            return disabled_msg
+        
         invoice_backend = get_invoice_backend()
         missing_invoice_payments = Payment.objects.filter(status=Payment.STATUS_PAID).filter(Q(invoice=None) | Q(invoice__is_ready=False))
         missing_before = missing_invoice_payments.count()
@@ -63,4 +64,14 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
         return "Missing: %d. Invoices generated: %d. Still missing: %d"\
              % (missing_before, invoices_created, still_missing)
 
-        
+
+def _check_cron_disabled_on_portal():
+    """ If anything but False is returned, payment crons should not run on this portal """
+    # check if a portal restriction applies for the cron
+    specific_portal_slugs = getattr(settings, 'PAYMENTS_CRON_ENABLED_FOR_SPECIFIC_PORTAL_SLUGS_ONLY', []) 
+    if specific_portal_slugs:
+        from cosinnus.models.group import CosinnusPortal
+        portal = CosinnusPortal.get_current()
+        if not portal.slug in specific_portal_slugs:
+            return "Skipped cronjob: portal not enabled for payment cronjobs."
+    return False

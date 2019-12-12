@@ -414,20 +414,15 @@ class Subscription(models.Model):
         if not self.last_pre_notification_at:
             return False
         if self.state != self.STATE_2_ACTIVE:
-            logger.warn('REMOVEME: prenot: Sub %d out 1' % self.id)
             return False
         if self.reference_payment.type != PAYMENT_TYPE_DIRECT_DEBIT:
-            logger.warn('REMOVEME: prenot: Sub %d out 2' % self.id)
             return False
         # is the pre-notification not yet due?
         if now().date() < self.next_due_date - timedelta(days=settings.PAYMENTS_PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS):
-            logger.warn('REMOVEME: prenot: Sub %d out 3' % self.id)
             return False  
         # has the pre-notification already been sent?
         if self.last_pre_notification_at.date() > self.next_due_date - timedelta(days=settings.PAYMENTS_PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS + 1):
-            logger.warn('REMOVEME: prenot: Sub %d out 4' % self.id)
             return False
-        logger.warn('REMOVEME: prenot: Sub %d True!' % self.id)
         return True
     
     def set_next_due_date(self, last_target_date):
