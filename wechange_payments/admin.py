@@ -9,6 +9,7 @@ from wechange_payments.models import Payment, TransactionLog, Subscription, \
 from cosinnus.conf import settings
 from datetime import timedelta
 from wechange_payments.payment import process_due_subscription_payments
+from django.utils.timezone import now
 
 
 class PaymentAdmin(admin.ModelAdmin):
@@ -66,15 +67,24 @@ class SubscriptionAdmin(admin.ModelAdmin):
     raw_id_fields = ('user',)
     
     if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False):
-        actions = ['debug_timeshift_due_date', 'debug_process_subscriptions_now']
-    
+        actions = ['debug_timeshift_due_date', 'debug_process_subscriptions_now', 'debug_terminate_subscriptions']
+        
+        def debug_terminate_subscriptions(self, request, queryset):
+            for subscription in queryset:
+                subscription.state = Subscription.STATE_0_TERMINATED
+                subscription.cancelled = now()
+                subscription.save()
+            message = 'Terminated subscriptions.'
+            self.message_user(request, message)
+        debug_terminate_subscriptions.short_description = "DEBUG: Terminate selected subcriptions"
+        
         def debug_timeshift_due_date(self, request, queryset):
             for subscription in queryset:
                 subscription.next_due_date = subscription.next_due_date - timedelta(days=32)
                 subscription.save()
             message = 'Shifted subscription due date back 32 days.'
             self.message_user(request, message)
-        debug_timeshift_due_date.short_description = "DEBUG: Shift back due date 32 days"
+        debug_timeshift_due_date.short_description = "DEBUG: Shift back due date 32 days for selected"
         
         def debug_process_subscriptions_now(self, request, queryset):
             process_due_subscription_payments()
