@@ -20,10 +20,17 @@
     
     <h4>{% trans "Billing Address" %}</h4>
     <table>
-        <tr>
-            <td>{% trans "Name" %}</td>
-            <td>{{ payment.first_name }} {{ payment.last_name }}</td>
-        </tr>
+        {% if payment.organisation %}
+	        <tr>
+	            <td>{% trans "Organisation" %}</td>
+	            <td>{{ payment.organisation }}</td>
+	        </tr>
+	    {% else %}
+	        <tr>
+	            <td>{% trans "Name" %}</td>
+	            <td>{{ payment.first_name }} {{ payment.last_name }}</td>
+	        </tr>
+        {% endif %}
         <tr>
             <td>{% trans "Address" %}</td>
             <td>{{ payment.address }}</td>
