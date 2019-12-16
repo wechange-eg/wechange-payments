@@ -105,12 +105,16 @@ class BaseBackend(object):
             return True
         
         # 2. No existing successful payment in the last 14 days
-        seven_days = now() - timedelta(days=14)
-        paid_payments = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=seven_days)
-        if paid_payments.count() > 0:
-            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_recurring_payment_safety_checks` was prevented because of an existing successful Payment for this user in the last 7 days!', 
-                extra={'user': user})
-            return False
+        if False:
+            # this check is deactivated for now, because of the way payments work now
+            # when changing payment data (an immediate upfront payment is made)
+            seven_days = now() - timedelta(days=14)
+            paid_payments = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=seven_days)
+            if paid_payments.count() > 0:
+                logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_recurring_payment_safety_checks` was prevented because of an existing successful Payment for this user in the last 7 days!', 
+                    extra={'user': user})
+                return False
+        
         # 3. No payments for this user over the hardcapped payment amount in the last 27 days
         twenty_eight_days = now() - timedelta(days=27)
         paid_payments_month = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=twenty_eight_days)
