@@ -38,13 +38,16 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         payment = invoice.payment
         if payment.organisation:
             recipient_name = payment.organisation
+            supplement = payment.first_name + ' ' + payment.last_name
         else:
-            recipient_name = payment.first_name + ' ' + payment.last_name 
+            recipient_name = payment.first_name + ' ' + payment.last_name
+            supplement = None
         data = {
             'archived': False,
             'voucherDate': invoice.created.isoformat(timespec='milliseconds'),
             'address': {
                 'name': recipient_name,
+                'supplement': supplement,
                 'street': payment.address,
                 'city': payment.city,
                 'zip': payment.postal_code,
