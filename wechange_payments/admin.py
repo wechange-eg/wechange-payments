@@ -66,7 +66,8 @@ class SubscriptionAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring', 'next_due_date',)
     raw_id_fields = ('user',)
     
-    if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False):
+    if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) \
+        or getattr(settings, 'COSINNUS_PAYMENTS_ADMIN_DEBUG_FUNCTIONS_ENABLED', False):
         actions = ['debug_timeshift_due_date', 'debug_process_subscriptions_now', 'debug_terminate_subscriptions']
         
         def debug_terminate_subscriptions(self, request, queryset):
