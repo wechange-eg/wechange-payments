@@ -10,6 +10,8 @@ from cosinnus.conf import settings
 from datetime import timedelta
 from wechange_payments.payment import process_due_subscription_payments
 from django.utils.timezone import now
+from wechange_payments.mails import send_payment_event_payment_email,\
+    PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED, PAYMENT_EVENT_SUCCESSFUL_PAYMENT
 
 
 class PaymentAdmin(admin.ModelAdmin):
@@ -18,7 +20,18 @@ class PaymentAdmin(admin.ModelAdmin):
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
     readonly_fields = ('backend', 'vendor_transaction_id', 'internal_transaction_id', 'amount', 'is_reference_payment', 'completed_at', 'last_action_at', 'extra_data')
     raw_id_fields = ('user',)
-    actions = ['create_invoice',]
+    actions = ['create_invoice', 'resend_payment_email',]
+    
+    def resend_payment_email(self, request, queryset):
+        for payment in queryset:
+            if payment.status == Payment.STATUS_PAID:
+                send_payment_event_payment_email(payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
+                message = 'Sent email.'
+            else:
+                message = 'Payment not successful, no email sent'
+            self.message_user(request, message)
+    resend_payment_email.short_description = "Resend payment success email"
+    
     
     def create_invoice(self, request, queryset):
         invoice_backend = get_invoice_backend()
@@ -66,9 +79,32 @@ class SubscriptionAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring', 'next_due_date',)
     raw_id_fields = ('user',)
     
+    actions = ['resend_both_initial_emails', 'resend_subscription_email']
+    
+    def resend_both_initial_emails(self, request, queryset):
+        for subscription in queryset:
+            if subscription.state in Subscription.ACTIVE_STATES:
+                send_payment_event_payment_email(subscription.reference_payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
+                send_payment_event_payment_email(subscription.reference_payment, PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED)
+                message = 'Sent emails.'
+            else:
+                message = 'Subscription not active, no emails sent'
+        self.message_user(request, message)
+    resend_both_initial_emails.short_description = "Resend initial mails (payment & subscription)"
+    
+    def resend_subscription_email(self, request, queryset):
+        for subscription in queryset:
+            if subscription.state in Subscription.ACTIVE_STATES:
+                send_payment_event_payment_email(subscription.reference_payment, PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED)
+                message = 'Sent emails.'
+            else:
+                message = 'Subscription not active, no emails sent'
+        self.message_user(request, message)
+    resend_subscription_email.short_description = "Resend initial subscription mail"
+    
     if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) \
         or getattr(settings, 'COSINNUS_PAYMENTS_ADMIN_DEBUG_FUNCTIONS_ENABLED', False):
-        actions = ['debug_timeshift_due_date', 'debug_process_subscriptions_now', 'debug_terminate_subscriptions']
+        actions = actions + ['debug_timeshift_due_date', 'debug_process_subscriptions_now', 'debug_terminate_subscriptions']
         
         def debug_terminate_subscriptions(self, request, queryset):
             for subscription in queryset:
