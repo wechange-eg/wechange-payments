@@ -27,9 +27,10 @@ class PaymentAdmin(admin.ModelAdmin):
             if payment.status == Payment.STATUS_PAID:
                 send_payment_event_payment_email(payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
                 message = 'Sent email.'
+                self.message_user(request, message)
             else:
                 message = 'Payment not successful, no email sent'
-            self.message_user(request, message)
+                self.message_user(request, message)
     resend_payment_email.short_description = "Resend payment success email"
     
     
@@ -87,9 +88,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 send_payment_event_payment_email(subscription.reference_payment, PAYMENT_EVENT_SUCCESSFUL_PAYMENT)
                 send_payment_event_payment_email(subscription.reference_payment, PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED)
                 message = 'Sent emails.'
+                self.message_user(request, message)
             else:
                 message = 'Subscription not active, no emails sent'
-        self.message_user(request, message)
+                self.message_user(request, message)
     resend_both_initial_emails.short_description = "Resend initial mails (payment & subscription)"
     
     def resend_subscription_email(self, request, queryset):
@@ -97,9 +99,10 @@ class SubscriptionAdmin(admin.ModelAdmin):
             if subscription.state in Subscription.ACTIVE_STATES:
                 send_payment_event_payment_email(subscription.reference_payment, PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED)
                 message = 'Sent emails.'
+                self.message_user(request, message)
             else:
                 message = 'Subscription not active, no emails sent'
-        self.message_user(request, message)
+                self.message_user(request, message)
     resend_subscription_email.short_description = "Resend initial subscription mail"
     
     if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) \
