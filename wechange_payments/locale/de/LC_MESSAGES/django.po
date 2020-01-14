@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-11 17:44+0100\n"
-"PO-Revision-Date: 2019-12-11 17:58+0100\n"
+"POT-Creation-Date: 2020-01-14 16:22+0100\n"
+"PO-Revision-Date: 2020-01-14 16:30+0100\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -70,6 +70,14 @@ msgstr "Kreditkarte"
 
 msgid "Paypal"
 msgstr "Paypal"
+
+#| msgid "The amount submitted does not seem to be a number!"
+msgid "The IBAN you entered does not seem to be correct!"
+msgstr "Die eingegebene IBAN scheint nicht korrekt zu sein!"
+
+#| msgid "The amount submitted does not seem to be a number!"
+msgid "The BIC you entered does not seem to be correct!"
+msgstr "Die eingegebene BIC scheint nicht korrekt zu sein!"
 
 #, python-format
 msgctxt "(MAILPRE)"
@@ -180,10 +188,6 @@ msgstr ""
 "ausreichende Deckung verfügt! "
 
 #, python-format
-#| msgctxt "(MAIL6)"
-#| msgid ""
-#| "(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s "
-#| "%(sepa_creditor)s %(next_debit_date)s %(amount)s %(support_email)s"
 msgctxt "(MAIL6)"
 msgid ""
 "(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s "
@@ -796,6 +800,9 @@ msgstr "IBAN"
 msgid "Billing Address"
 msgstr "Rechnungsadresse"
 
+msgid "Organisation"
+msgstr "Organisation"
+
 msgid "Name"
 msgstr "Name"
 
@@ -897,9 +904,6 @@ msgstr "Nachname"
 
 msgid "Payment shall be made on behalf of an organisation"
 msgstr "Die Zahlung erfolgt im Namen einer Organisation"
-
-msgid "Organisation"
-msgstr "Organisation"
 
 msgid ""
 "If the contribution is not paid by you as a private individual, but in the "

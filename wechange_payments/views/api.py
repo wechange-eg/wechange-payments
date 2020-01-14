@@ -58,9 +58,16 @@ def make_payment(request, on_success_func=None, make_postponed=False):
         form = PaymentsForm(request.POST)
         if not payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
             for field_name in ['iban', 'bic', 'account_holder']:
-                form.fields[field_name].required = False
+                # remove the SEPA fields for any other payment method so validation won't interfere
+                del form.fields[field_name]
         if not form.is_valid():
             return JsonResponse({'error': _('Please correct the errors in the highlighted fields!'), 'field_errors': form.errors}, status=500)
+
+        # get cleaned compact IBAN and BIC out of custom form cleaning
+        if payment_type == PAYMENT_TYPE_DIRECT_DEBIT:
+            params['iban'] = form.cleaned_data['iban']
+            params['bic'] = form.cleaned_data['bic']
+                
         # remove `organisation` from params if `is_organisation` was not checked
         if not params.get('is_organisation', False) and 'organisation' in params:
             del params['organisation']

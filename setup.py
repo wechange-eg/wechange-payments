@@ -50,6 +50,7 @@ setup(
     package_data=get_package_data(package),
     install_requires=[
         'django-countries==5.3.3',
+        'schwifty==2018.9.1',
     ],
 )
 

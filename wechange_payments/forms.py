@@ -6,6 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from django_countries.fields import CountryField
 from wechange_payments.conf import settings, PAYMENT_TYPE_CREDIT_CARD,\
     PAYMENT_TYPE_PAYPAL, PAYMENT_TYPE_DIRECT_DEBIT
+    
+from schwifty import IBAN, BIC
 
 
 PAYMENT_CHOICES = {
@@ -41,6 +43,19 @@ class PaymentsForm(forms.Form):
     bic = forms.CharField()
     account_holder = forms.CharField()
     
+    def clean_iban(self):
+        input_iban = self.cleaned_data['iban']
+        try:
+            iban_obj = IBAN(input_iban)
+        except ValueError:
+            raise forms.ValidationError(_('The IBAN you entered does not seem to be correct!'))
+        return iban_obj.compact
     
-    
+    def clean_bic(self):
+        input_bic = self.cleaned_data['bic']
+        try:
+            bic_obj = BIC(input_bic)
+        except ValueError:
+            raise forms.ValidationError(_('The BIC you entered does not seem to be correct!'))
+        return bic_obj.compact
     

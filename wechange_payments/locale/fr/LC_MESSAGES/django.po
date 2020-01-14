@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-11 17:44+0100\n"
+"POT-Creation-Date: 2020-01-14 16:22+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,6 +65,12 @@ msgid "Credit Card"
 msgstr ""
 
 msgid "Paypal"
+msgstr ""
+
+msgid "The IBAN you entered does not seem to be correct!"
+msgstr ""
+
+msgid "The BIC you entered does not seem to be correct!"
 msgstr ""
 
 #, python-format
@@ -577,6 +583,9 @@ msgstr ""
 msgid "Billing Address"
 msgstr ""
 
+msgid "Organisation"
+msgstr ""
+
 msgid "Name"
 msgstr ""
 
@@ -662,9 +671,6 @@ msgid "Last name"
 msgstr ""
 
 msgid "Payment shall be made on behalf of an organisation"
-msgstr ""
-
-msgid "Organisation"
 msgstr ""
 
 msgid "If the contribution is not paid by you as a private individual, but in the name and on behalf of an institution, organisation or company, please enter the name and billing address of the organisation."
