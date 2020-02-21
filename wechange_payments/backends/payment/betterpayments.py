@@ -249,7 +249,7 @@ class BetterPaymentBackend(BaseBackend):
         # collect params from reference payment
         order_id = str(uuid.uuid4())
         params = {
-            'amount': reference_payment.amount,
+            'amount': reference_payment.subscription.amount, # use amount of subscription, not payment, as subscription amount can be changed!
             'address': reference_payment.address,
             'city': reference_payment.city,
             'postal_code': reference_payment.postal_code,

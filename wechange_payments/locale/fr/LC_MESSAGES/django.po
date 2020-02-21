@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-14 16:22+0100\n"
+"POT-Creation-Date: 2020-02-21 15:12+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,22 +90,22 @@ msgstr ""
 
 #, python-format
 msgctxt "(MAIL2)"
-msgid "(MAIL2) with variables: %(payment_method)s %(contribution_amount)s"
+msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s"
 msgstr ""
 
 #, python-format
 msgctxt "(MAIL1a)"
-msgid "(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s"
+msgid "(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s"
 msgstr ""
 
 #, python-format
 msgctxt "(MAIL1b)"
-msgid "(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(contribution_amount)s"
+msgid "(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s"
 msgstr ""
 
 #, python-format
 msgctxt "(MAIL3)"
-msgid "(MAIL3) with variables: %(contribution_amount)s %(next_debit_date)s"
+msgid "(MAIL3) with variables: %(subscription_amount)s %(next_debit_date)s"
 msgstr ""
 
 #, python-format
@@ -120,7 +120,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(MAIL6)"
-msgid "(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s %(sepa_creditor)s %(next_debit_date)s %(contribution_amount)s %(support_email)s"
+msgid "(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s %(sepa_creditor)s %(next_debit_date)s %(subscription_amount)s %(support_email)s"
 msgstr ""
 
 msgctxt "(MAIL2s)"
