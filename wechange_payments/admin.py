@@ -33,7 +33,6 @@ class PaymentAdmin(admin.ModelAdmin):
                 self.message_user(request, message)
     resend_payment_email.short_description = "Resend payment success email"
     
-    
     def create_invoice(self, request, queryset):
         invoice_backend = get_invoice_backend()
         for payment in queryset:
@@ -41,6 +40,14 @@ class PaymentAdmin(admin.ModelAdmin):
         message = _('Started invoice creation for %(number)d payment(s) in background.') % {'number':len(queryset)}
         self.message_user(request, message)
     create_invoice.short_description = _("Create invoice in Invoice API (threaded)")
+    
+    def has_delete_permission(self, request, obj=None):
+        """ Can't delete/add Payments """
+        return False
+    
+    def has_add_permission(self, request, obj=None):
+        """ Can't delete/add Payments """
+        return False
     
 admin.site.register(Payment, PaymentAdmin)
 
@@ -61,6 +68,14 @@ class InvoiceAdmin(admin.ModelAdmin):
         self.message_user(request, message)
     create_invoice.short_description = _("Run/continue invoice in Invoice API (threaded)")
     
+    def has_delete_permission(self, request, obj=None):
+        """ Can't delete/add Invoices """
+        return False
+    
+    def has_add_permission(self, request, obj=None):
+        """ Can't delete/add Invoices """
+        return False
+    
 admin.site.register(Invoice, InvoiceAdmin)
 
 
@@ -69,6 +84,14 @@ class TransactionLogAdmin(admin.ModelAdmin):
     list_filter = ('created', 'url', 'type',)
     search_fields = ('url', 'type', 'data',)
     readonly_fields = ('url', 'type', 'data', 'created',)
+    
+    def has_delete_permission(self, request, obj=None):
+        """ Can't delete/add Transaction Logs """
+        return False
+    
+    def has_add_permission(self, request, obj=None):
+        """ Can't delete/add Transaction Logs """
+        return False
 
 admin.site.register(TransactionLog, TransactionLogAdmin)
 
@@ -131,6 +154,14 @@ class SubscriptionAdmin(admin.ModelAdmin):
             message = 'Ran subscription processing!'
             self.message_user(request, message)
         debug_process_subscriptions_now.short_description = "DEBUG: Run subscription processing/expiry now!"
+    
+    def has_delete_permission(self, request, obj=None):
+        """ Can't delete/add Subscriptions """
+        return False
+    
+    def has_add_permission(self, request, obj=None):
+        """ Can't delete/add Subscriptions """
+        return False
         
 admin.site.register(Subscription, SubscriptionAdmin)
 
