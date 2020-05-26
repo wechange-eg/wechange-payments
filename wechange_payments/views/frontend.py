@@ -17,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 
-from cosinnus.core.signals import userprofile_ceated
+from cosinnus.core.signals import userprofile_created
 from cosinnus.models.group import CosinnusPortal
 from cosinnus.utils.permissions import check_user_superuser
 from cosinnus.utils.urls import get_non_cms_root_url, redirect_next_or
@@ -508,7 +508,7 @@ def debug_delete_subscription(request):
     return redirect('wechange-payments:overview')
 
 
-@receiver(userprofile_ceated)
+@receiver(userprofile_created)
 def delay_payment_popup_for_new_user(sender, profile, **kwargs):
     """ Delays the user's payment popup window by some time after a fresh registration """
     # setting it to now - PAYMENTS_POPUP_SHOW_AGAIN_DAYS would 
