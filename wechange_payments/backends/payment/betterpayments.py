@@ -257,6 +257,7 @@ class BetterPaymentBackend(BaseBackend):
             'first_name': reference_payment.first_name,
             'last_name': reference_payment.last_name,
             'email': reference_payment.email,    
+            'organisation': reference_payment.organisation,
         }
         payment, error = self._make_actual_payment(
             reference_payment.type,
