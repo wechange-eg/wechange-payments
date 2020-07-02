@@ -71,6 +71,9 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the user tries to access their unretrieved invoice, or with a gather-all-missing cronjob
     INVOICE_PROVIDER_RETRY_MINUTES = 5
     
+    # the default tax rate in percent to use with the invoice provider. change this for any MwSt changes!
+    INVOICE_PROVIDER_TAX_RATE_PERCENT = 19
+    
     # A lock for currently not-implemented behaviour, meant to make it clearer that the code
     # is not yet ready for WAITING, postponed payments that get cashed in later.
     # currently (and with the switch set to False), new subscriptions can only replace 
@@ -104,7 +107,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     LEXOFFICE_API_DOMAIN = 'https://api.lexoffice.io'
     LEXOFFICE_API_KEY = ''
-
+    
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.
