@@ -36,7 +36,9 @@ class PaymentsForm(forms.Form):
     organisation = forms.CharField(required=False)
     
     tos_check = forms.BooleanField(required=True)
-    privacy_policy_check = forms.BooleanField(required=True)
+    
+    if settings.COSINNUS_SIGNUP_REQUIRES_PRIVACY_POLICY_CHECK:
+        privacy_policy_check = forms.BooleanField(required=True)
     
     # payment-specific-fields
     iban = forms.CharField()
