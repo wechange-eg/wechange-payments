@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-21 15:12+0100\n"
+"POT-Creation-Date: 2020-08-24 14:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,7 +90,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(MAIL2)"
-msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s"
+msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s"
 msgstr ""
 
 #, python-format
@@ -506,7 +506,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(PF24)"
-msgid "Contribution amount includes 19%% VAT."
+msgid "Contribution amount includes %(vat_amount)s%% VAT."
 msgstr ""
 
 msgctxt "(MS5)"
@@ -622,7 +622,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(PF26)"
-msgid "Choose the amount you would like to contribute using the slider. The contribution amount includes 19%% VAT."
+msgid "Choose the amount you would like to contribute using the slider. The contribution amount includes %(vat_amount)s%% VAT."
 msgstr ""
 
 msgctxt "(PF24x)"
@@ -707,12 +707,12 @@ msgstr ""
 
 #, python-format
 msgctxt "(PF7)"
-msgid "By clicking on \"%(confirm_and_pay_button_text)s\" you grant Wechange eG permission to debit %(amount)s Euro per month (incl. 19%% VAT) from you via %(payment_method)s."
+msgid "By clicking on \"%(confirm_and_pay_button_text)s\" you grant Wechange eG permission to debit %(amount)s Euro per month (incl. %(vat_amount)s%% VAT) from you via %(payment_method)s."
 msgstr ""
 
 #, python-format
 msgctxt "(PF7a)"
-msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19%% VAT, which is shown on the invoice."
+msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. %(vat_amount)s%% VAT, which is shown on the invoice."
 msgstr ""
 
 msgctxt "(PF20a)"

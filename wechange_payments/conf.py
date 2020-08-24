@@ -4,6 +4,7 @@ from builtins import object
 from django.conf import settings  # noqa
 
 from appconf import AppConf
+from django.utils.translation import pgettext_lazy
 
 PAYMENT_TYPE_DIRECT_DEBIT = 'dd'
 PAYMENT_TYPE_CREDIT_CARD = 'cc'
@@ -73,6 +74,15 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     # the default tax rate in percent to use with the invoice provider. change this for any MwSt changes!
     INVOICE_PROVIDER_TAX_RATE_PERCENT = 19
+    
+    # paid-for-item title on the PDF invoice
+    INVOICE_LINE_ITEM_NAME = pgettext_lazy('Invoice PDF, important!', 'User fee for %(portal_name)s')
+    
+    # paid-for-item description on the PDF invoice
+    INVOICE_LINE_ITEM_DESCRIPTION = pgettext_lazy('Invoice PDF, important!', 'Electronic service - Ref-Nr. %(user_id)d')
+    
+    # a supplementary remark at the end of each invoice. left out if None.
+    INVOICE_REMARK = None
     
     # A lock for currently not-implemented behaviour, meant to make it clearer that the code
     # is not yet ready for WAITING, postponed payments that get cashed in later.

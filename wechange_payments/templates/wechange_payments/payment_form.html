@@ -92,7 +92,7 @@
         			
         			<div class="large-space">
         				<p>
-        					{% trans "Choose the amount you would like to contribute using the slider. The contribution amount includes 19% VAT." context "(PF26)" %}
+        					{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF26)" %}Choose the amount you would like to contribute using the slider. The contribution amount includes {{ vat_amount }}% VAT.{% endblocktrans %}
         				</p>
         				<p>
         					{% trans "You may also choose a higher amount by entering it directly in the text box!" context "(PF24x)" %}
@@ -358,8 +358,8 @@
 						{% trans "Confirm and pay" context "(PF9 - legally binding!)" as confirm_and_pay_button_text %}
 						
 						<p>
-							{% blocktrans with amount='<span data-summary-item="amount"></span>' payment_method=payment_type_html confirm_and_pay_button_text=confirm_and_pay_button_text context "(PF7)" %}By clicking on "{{ confirm_and_pay_button_text }}" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. 19% VAT) from you via {{ payment_method }}.{% endblocktrans %}
-							{% trans "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. 19% VAT, which is shown on the invoice." context "(PF7a)" %}
+							{% blocktrans with amount='<span data-summary-item="amount"></span>' vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT payment_method=payment_type_html confirm_and_pay_button_text=confirm_and_pay_button_text context "(PF7)" %}By clicking on "{{ confirm_and_pay_button_text }}" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. {{ vat_amount }}% VAT) from you via {{ payment_method }}.{% endblocktrans %}
+							{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF7a)" %}This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. {{ vat_amount }}% VAT, which is shown on the invoice.{% endblocktrans %}
 							<br/><br/>
 							{% if displayed_subscription and displayed_subscription.next_due_date %}
 								{% if displayed_subscription.state == 1 %}

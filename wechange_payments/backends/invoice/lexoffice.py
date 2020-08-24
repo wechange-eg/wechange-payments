@@ -56,8 +56,8 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             'lineItems': [
                 {
                     'type': 'custom',
-                    'name': force_text(pgettext_lazy('Invoice PDF, important!', 'User fee for %(portal_name)s') % {'portal_name': CosinnusPortal.get_current().name}),
-                    'description': force_text(pgettext_lazy('Invoice PDF, important!', 'Electronic service - Ref-Nr. %(user_id)d') % {'user_id': invoice.user.id}),
+                    'name': force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name}),
+                    'description': force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id}),
                     'quantity': 1,
                     'unitName': 'Stück',
                     'unitPrice': {
@@ -78,8 +78,11 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 'shippingType': 'service'
             },
             'introduction': force_text(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
-            #'remark': force_text(pgettext_lazy('Invoice PDF, important!', 'Thank you for your support!')),
         }
+        if getattr(settings, 'PAYMENTS_INVOICE_REMARK'):
+            data.update({
+                'remark': force_text(getattr(settings, 'PAYMENTS_INVOICE_REMARK')),
+            })
         return data
     
     def _create_invoice_at_provider(self, invoice):
