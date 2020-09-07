@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-24 14:13+0200\n"
-"PO-Revision-Date: 2020-08-24 14:14+0100\n"
+"POT-Creation-Date: 2020-09-07 16:21+0200\n"
+"PO-Revision-Date: 2020-09-07 16:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: en\n"
@@ -26,16 +26,6 @@ msgid "Create invoice in Invoice API (threaded)"
 msgstr ""
 
 msgid "Run/continue invoice in Invoice API (threaded)"
-msgstr ""
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "User fee for %(portal_name)s"
-msgstr ""
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "Electronic service - Ref-Nr. %(user_id)d"
 msgstr ""
 
 msgctxt "Invoice PDF, important!"
@@ -58,6 +48,16 @@ msgid "The payment provider could not be reached."
 msgstr ""
 
 msgid "Unexpected response from payment provider."
+msgstr ""
+
+#, python-format
+msgctxt "Invoice PDF, important!"
+msgid "User fee for %(portal_name)s"
+msgstr ""
+
+#, python-format
+msgctxt "Invoice PDF, important!"
+msgid "Electronic service - Ref-Nr. %(user_id)d"
 msgstr ""
 
 msgid "Direct Debit (SEPA)"
@@ -97,8 +97,6 @@ msgstr ""
 "Your %(portal_name)s Support Team"
 
 #, python-format
-#| msgctxt "(MAIL2)"
-#| msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s"
 msgctxt "(MAIL2)"
 msgid ""
 "(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s"
@@ -699,7 +697,7 @@ msgid ""
 "\n"
 "Here you can set your monthly contribution to support %(portal_name)s. We "
 "automatically collect the contribution once a month. You can choose between "
-"direct debit, credit card and PayPal.\n"
+"direct debit and credit card.\n"
 "\n"
 "You can change or terminate your monthly contribution at any time by "
 "clicking on \"Your Contribution\" in your user menu.\n"

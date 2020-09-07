@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-24 14:13+0200\n"
-"PO-Revision-Date: 2020-08-24 14:13+0100\n"
+"POT-Creation-Date: 2020-09-07 16:21+0200\n"
+"PO-Revision-Date: 2020-09-07 16:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: de\n"
@@ -27,16 +27,6 @@ msgstr "Create invoice in Invoice API (threaded)"
 
 msgid "Run/continue invoice in Invoice API (threaded)"
 msgstr "Run/continue invoice in Invoice API (threaded)"
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "User fee for %(portal_name)s"
-msgstr "Nutzungsgebühr für %(portal_name)s"
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "Electronic service - Ref-Nr. %(user_id)d"
-msgstr "Elektronische Dienstleistung - Ref-Nr. %(user_id)d"
 
 msgctxt "Invoice PDF, important!"
 msgid "We charge you for our services as follows:"
@@ -61,6 +51,16 @@ msgstr "Der Zahlungsdienstleister konnte ist nicht erreichbar."
 
 msgid "Unexpected response from payment provider."
 msgstr "Unbekanntes Ergebnis vom Zahlungsdienstleister."
+
+#, python-format
+msgctxt "Invoice PDF, important!"
+msgid "User fee for %(portal_name)s"
+msgstr "Nutzungsgebühr für %(portal_name)s"
+
+#, python-format
+msgctxt "Invoice PDF, important!"
+msgid "Electronic service - Ref-Nr. %(user_id)d"
+msgstr "Elektronische Dienstleistung - Ref-Nr. %(user_id)d"
 
 msgid "Direct Debit (SEPA)"
 msgstr "Bankeinzug (SEPA)"
@@ -99,8 +99,6 @@ msgstr ""
 "Dein %(portal_name)s Support Team"
 
 #, python-format
-#| msgctxt "(MAIL2)"
-#| msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s"
 msgctxt "(MAIL2)"
 msgid ""
 "(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s"
@@ -771,7 +769,7 @@ msgid ""
 "\n"
 "Here you can set your monthly contribution to support %(portal_name)s. We "
 "automatically collect the contribution once a month. You can choose between "
-"direct debit, credit card and PayPal.\n"
+"direct debit and credit card.\n"
 "\n"
 "You can change or terminate your monthly contribution at any time by "
 "clicking on \"Your Contribution\" in your user menu.\n"
@@ -786,8 +784,8 @@ msgstr ""
 "\n"
 "Du kannst hier Deinen monatlichen Beitrag festlegen, mit dem du "
 "%(portal_name)s unterstützt. Den Beitrag ziehen wir automatisch einmal im "
-"Monat ein. Du kannst zwischen den Zahlarten Bankeinzug, Kreditkarte und "
-"PayPal wählen.\n"
+"Monat ein. Du kannst zwischen den Zahlarten Bankeinzug und Kreditkarte "
+"wählen.\n"
 "\n"
 "Deinen monatlichen Beitrag kannst du jederzeit ändern oder kündigen, indem "
 "du auf \"Dein Beitrag\" in deinem Benutzermenü klickst.\n"
