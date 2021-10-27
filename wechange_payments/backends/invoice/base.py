@@ -63,6 +63,7 @@ class BaseInvoiceBackend(object):
             
         if invoice.is_ready or invoice.state == Invoice.STATE_3_DOWNLOADED:
             return invoice
+        exc = None
         try:
             if invoice.state == Invoice.STATE_0_NOT_CREATED:
                 self._create_invoice_at_provider(invoice)
@@ -73,10 +74,10 @@ class BaseInvoiceBackend(object):
             if invoice.state == Invoice.STATE_3_DOWNLOADED:
                 logger.info('Payments: Successfully created an invoice at the invoice provider!', extra={'invoice_id': invoice.id})
                 return invoice
-        except Exception as e:
+        except Exception as exc:
             if settings.DEBUG:
                 raise
-        logger.error('Payments: Error during invoice creation: Stopped at invoice state %d!' % invoice.state, extra={'state': invoice.state, 'exception': e, 'invoice_id': invoice.id, 'payment_internal_transaction_id': invoice.payment.internal_transaction_id})
+        logger.error('Payments: Error during invoice creation: Stopped at invoice state %d!' % invoice.state, extra={'state': invoice.state, 'exception': exc, 'invoice_id': invoice.id, 'payment_internal_transaction_id': invoice.payment.internal_transaction_id})
         # save the invoice to trigger updating its `last_action_at`, so we can delay repeated API calls.
         invoice.save()
         return None
