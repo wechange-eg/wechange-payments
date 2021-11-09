@@ -18,3 +18,20 @@ TEST_DATA_SEPA_PAYMENT_FORM = {
     'tos_check': True,
     'privacy_policy_check': True,
 }
+
+TEST_DATA_SEPA_PAYMENT_FORM_AUSTRIA = {
+    'payment_type': PAYMENT_TYPE_DIRECT_DEBIT,
+    'amount': 2.0,
+    'address':'Straße 73',
+    'city': 'Wien',
+    'postal_code': 1111,
+    'first_name': 'Hans',
+    'last_name': 'Mueller',
+    'email': 'test@mail.com',
+    'iban': 'DE34100500000710217340',
+    'bic': 'BELADEBEXXX',
+    'account_holder': 'Hans Mueller',
+    'country': 'AT',
+    'tos_check': True,
+    'privacy_policy_check': True,
+}

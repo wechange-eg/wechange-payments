@@ -20,6 +20,9 @@ logger = logging.getLogger('wechange-payments')
 LEXOFFICE_API_ENDPOINT_CREATE_INVOICE = '/v1/invoices?finalize=true'
 LEXOFFICE_API_ENDPOINT_RENDER_INVOICE = '/v1/invoices/%(id)s/document'
 LEXOFFICE_API_ENDPOINT_DOWNLOAD_INVOICE = '/v1/files/%(id)s'
+LEXOFFICE_API_ENDPOINT_CREATE_CONTACT = '/v1/contacts'
+
+EXTRA_DATA_CONTACT_ID = 'lexoffice-contact-id'
 
 
 class LexofficeInvoiceBackend(BaseInvoiceBackend):
@@ -79,13 +82,77 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             },
             'introduction': force_text(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
         }
+        # add LexOffice contact ID if one was created in reference payment
+        reference_payment = payment if payment.is_reference_payment else payment.subscription.reference_payment
+        contact_id = reference_payment.extra_data.get(EXTRA_DATA_CONTACT_ID, None)
+        if contact_id:
+            data['address']['contactId'] = contact_id
+        
         if getattr(settings, 'PAYMENTS_INVOICE_REMARK'):
             data.update({
                 'remark': force_text(getattr(settings, 'PAYMENTS_INVOICE_REMARK')),
             })
         return data
     
-    def _create_invoice_at_provider(self, invoice):
+    def _create_contact_for_payment(self, invoice, force=False):
+        """ Creates a LexOffice contact for the reference payment of this invoice.
+            LexOffice requires this for some (currently inner-EU, non-DE) customers.
+            @return: True if successful, False if otherwise """
+        payment = invoice.payment
+        reference_payment = payment if payment.is_reference_payment else payment.subscription.reference_payment
+        contact_id = reference_payment.extra_data.get(EXTRA_DATA_CONTACT_ID, None)
+        # sanity check, if the payment already has a contact ID, don't create a new one
+        if contact_id and not force:
+            logger.info('ContactId for payment already existed, not creating a new one.', extra={'invoice-id': invoice.id}) 
+            return False
+        contact_post_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + LEXOFFICE_API_ENDPOINT_CREATE_CONTACT
+        headers = {
+            'Authorization': 'Bearer %s' % settings.PAYMENTS_LEXOFFICE_API_KEY, 
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+        contact_id_data = {
+            'version': 0,
+            'roles': {
+                'customer': {}
+            },
+            'person': {
+                'firstName': reference_payment.first_name,
+                'lastName': reference_payment.last_name
+            },
+            'note': f'WECHANGE PAYL contact for subscription id: {reference_payment.subscription_id}, user id: {reference_payment.user_id}'
+        }
+        req = requests.post(contact_post_url, headers=headers, json=contact_id_data)
+        
+        if not req.status_code == 200:
+            extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content}
+            logger.error('Payments: Contact API creation failed, request did not return status=200.', extra=extra)
+            raise Exception('Payments: Non-201 request return status code (request has been logged as error).')
+            
+        result = req.json()
+        if not 'id' in result:
+            extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
+            logger.error('Payments: Contact API creation result did not contain field "id".', extra=extra)
+            raise Exception('Payments: Missing fields in contact creation request result (request has been logged as error).')
+        
+        """
+        Sample success response:
+        {
+          "id": "66196c43-baf3-4335-bfee-d610367059db",
+          "resourceUri": "https://api.lexoffice.io/v1/contacts/66196c43-bfee-baf3-4335-d610367059db",
+          "createdDate": "2016-06-29T15:15:09.447+02:00",
+          "updatedDate": "2016-06-29T15:15:09.447+02:00",
+          "version": 1
+        }
+        """
+        
+        contact_id = result.get('id')
+        reference_payment.extra_data[EXTRA_DATA_CONTACT_ID] = contact_id
+        reference_payment.save(update_fields=['extra_data'])
+        return True
+
+    
+    def _create_invoice_at_provider(self, invoice, retry_after_contact_create=False):
         """ Calls the action to render an invoice as PDF on the server. 
             This must set the `provider_id` field of the Invoice!
             @return: the same invoice instance if successful, raise Exception otherwise. """
@@ -101,6 +168,16 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         req = requests.post(post_url, headers=headers, json=data)
         
         if not req.status_code == 201:
+            return_data = req.json()
+            error_msg_requires_contact = 'Validation failed: [postingCategoryId: Legen Sie den Kontakt zunächst an.]'
+            
+            if return_data.get('status') == 406 and return_data.get('message') == error_msg_requires_contact \
+                     and not retry_after_contact_create:
+                # for some customers, we must create a contact first. if so we try to create a contact first
+                # and retry this same invoice creation *once*
+                self._create_contact_for_payment(invoice)
+                return self._create_invoice_at_provider(invoice, retry_after_contact_create=True)
+            
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API creation failed, request did not return status=201.', extra=extra)
             raise Exception('Payments: Non-201 request return status code (request has been logged as error).')

@@ -12,7 +12,8 @@ from wechange_payments.backends import get_backend, get_invoice_backend
 from wechange_payments.conf import PAYMENT_TYPE_DIRECT_DEBIT
 from wechange_payments.conf import settings
 from wechange_payments.models import Payment, Subscription, Invoice
-from wechange_payments.tests.example_data import TEST_DATA_SEPA_PAYMENT_FORM
+from wechange_payments.tests.example_data import TEST_DATA_SEPA_PAYMENT_FORM,\
+    TEST_DATA_SEPA_PAYMENT_FORM_AUSTRIA
 from django.utils.timezone import now
 from wechange_payments.payment import process_due_subscription_payments
 from datetime import timedelta
@@ -79,12 +80,12 @@ class PaymentsUnitTest(TestCase):
         # TODO
         pass
     
-    def test_1_full_sepa_payment_and_invoice(self):
+    def test_1_full_sepa_payment_and_invoice(self, user_data=TEST_DATA_SEPA_PAYMENT_FORM):
         # create a new user. this user will keep his subscription
         self.loyal_user = self._create_user(username='loyal_user')
         loyal_amount = 7.0
         self.client.force_login(self.loyal_user)
-        loyal_data = copy(TEST_DATA_SEPA_PAYMENT_FORM)
+        loyal_data = copy(user_data)
         loyal_data['amount'] = loyal_amount
         response = self._make_sepa_payment(loyal_data)
         self.assertEqual(response.status_code, 200, 'Payment response redirects')
@@ -123,7 +124,7 @@ class PaymentsUnitTest(TestCase):
         # for a new user, make a payment. this user will make a one-time payment and then cancel his subscription
         self.disloyal_user = self._create_user(username='disloyal_user')
         self.client.force_login(self.disloyal_user)
-        disloyal_data = copy(TEST_DATA_SEPA_PAYMENT_FORM)
+        disloyal_data = copy(user_data)
         disloyal_amount = 1.0
         disloyal_data['amount'] = disloyal_amount
         response = self._make_sepa_payment(disloyal_data)
@@ -208,6 +209,17 @@ class PaymentsUnitTest(TestCase):
         self.assertEqual(recurrent_payment.amount, loyal_amount, 'The amount for the monthly recurrent payment is correct')
         self.assertEqual(recurrent_payment.amount, loyal_subscription.amount, 'The amount for the monthly recurrent payment is the same as for its subscription')
         
+        # manually trigger the invoice generation for the recurred payment (it wasn't done automatically as hooks are disabled for testing)
+        invoice_backend = get_invoice_backend()
+        invoice_backend.create_invoice_for_payment(recurrent_payment, threaded=False)
+        invoice = get_object_or_None(Invoice, payment=recurrent_payment, user=self.loyal_user)
+        self.assertIsNotNone(invoice, 'Invoice created after recurrent_payment')
+        self.assertEqual(invoice.state, Invoice.STATE_3_DOWNLOADED, 'Invoice was completed')
+        self.assertTrue(invoice.is_ready, 'Invoice ready flag set')
+        self.assertIsNotNone(invoice.file, 'Invoice file downloaded and available')
+        self.assertEqual(invoice.payment, recurrent_payment, 'Invoice references recurrent_payment')
+        
+        
         # a user with an active subscription should not be able to make another one
         self.client.force_login(self.loyal_user)
         logger.warn('TODO: double-concurrent subscription making fail test!')
@@ -218,6 +230,9 @@ class PaymentsUnitTest(TestCase):
         
         # TODO: should all these consecutive tests go into a seperate test function?
         # if so, would we really want to re-create the API call all the time, or mock it?
+        
+    def test_1_b_full_sepa_payment_and_invoice_austria(self):
+        return self.test_1_full_sepa_payment_and_invoice(user_data=TEST_DATA_SEPA_PAYMENT_FORM_AUSTRIA)
     
     def test_2_anonymous_access_locked(self):
         pass
