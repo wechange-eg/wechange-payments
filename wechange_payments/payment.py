@@ -318,6 +318,18 @@ def cancel_subscription(user):
     subscription.save()
     send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_TERMINATED)
     return True
+
+
+def terminate_suspended_subscription(subscription):
+    """ Terminate the suspended subscription for a user """
+    if not subscription.state == Subscription.STATE_99_FAILED_PAYMENTS_SUSPENDED:
+        logger.warning('A subscription was attempted to be terminated that was not of suspended state!', extra={'subscription_id': subscription.id})
+        return False
+    subscription.state = Subscription.STATE_0_TERMINATED
+    subscription.cancelled = now()
+    subscription.save()
+    send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_TERMINATED)
+    return True
     
 
 def change_subscription_amount(subscription, amount):

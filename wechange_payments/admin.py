@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.translation import ugettext_lazy as _
 
 from wechange_payments.backends import get_invoice_backend
@@ -8,10 +8,12 @@ from wechange_payments.models import Payment, TransactionLog, Subscription, \
     Invoice
 from cosinnus.conf import settings
 from datetime import timedelta
-from wechange_payments.payment import process_due_subscription_payments
+from wechange_payments.payment import process_due_subscription_payments,\
+    terminate_suspended_subscription
 from django.utils.timezone import now
 from wechange_payments.mails import send_payment_event_payment_email,\
     PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED, PAYMENT_EVENT_SUCCESSFUL_PAYMENT
+from django.utils import translation
 
 
 class PaymentAdmin(admin.ModelAdmin):
@@ -103,7 +105,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring', 'next_due_date',)
     raw_id_fields = ('user',)
     
-    actions = ['resend_both_initial_emails', 'resend_subscription_email']
+    actions = ['resend_both_initial_emails', 'resend_subscription_email', 'terminate_suspended',]
     
     def resend_both_initial_emails(self, request, queryset):
         for subscription in queryset:
@@ -127,6 +129,25 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 message = 'Subscription not active, no emails sent'
                 self.message_user(request, message)
     resend_subscription_email.short_description = "Resend initial subscription mail"
+    
+    def terminate_suspended(self, request, queryset):
+        for subscription in queryset:
+            if subscription.state == Subscription.STATE_99_FAILED_PAYMENTS_SUSPENDED:
+                # switch language to user's preference language
+                cur_language = translation.get_language()
+                try:
+                    translation.activate(getattr(subscription.user.cosinnus_profile, 'language', settings.LANGUAGES[0][0]))
+                    # terminate subscription correctly
+                    terminate_suspended_subscription(subscription)
+                finally:
+                    translation.activate(cur_language)
+                message = f'Subscription {subscription.id} was suspended.'
+                level = messages.SUCCESS
+            else:
+                message = f'Subscription {subscription.id} could not be terminated because it is not in a SUSPENDED state!'
+                level = messages.ERROR
+            self.message_user(request, message, level=level)
+    terminate_suspended.short_description = "TERMINATE subscription (suspended subscriptions only!)"
     
     if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) \
         or getattr(settings, 'COSINNUS_PAYMENTS_ADMIN_DEBUG_FUNCTIONS_ENABLED', False):
