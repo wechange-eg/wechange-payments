@@ -207,7 +207,7 @@ class BetterPaymentBackend(BaseBackend):
                 payment.status = Payment.STATUS_COMPLETED_BUT_UNCONFIRMED
             payment.save()
         except Exception as e:
-            logger.warning('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e})
+            logger.critical('Payments: SEPA Payment successful, but Payment object could not be saved!', extra={'internal_transaction_id': payment.internal_transaction_id,  order_id: 'order_id', 'exception': e, 'payment_data': str(payment.__dict__)})
             
         if settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             handle_successful_payment(payment)
@@ -284,7 +284,7 @@ class BetterPaymentBackend(BaseBackend):
         try:
             payment.save()
         except Exception as e:
-            logger.warning('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
+            logger.critical('Payments: Payment object could not be saved for a recurring payment!', extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e, 'payment_data': str(payment.__dict__)})
         
         if reference_payment.type == PAYMENT_TYPE_DIRECT_DEBIT and settings.PAYMENTS_SEPA_IS_INSTANTLY_SUCCESSFUL:
             handle_successful_payment(payment)
@@ -296,7 +296,10 @@ class BetterPaymentBackend(BaseBackend):
             At this point, all parameters are assumed to be existent and valid.
             
             Warning: This function does no further risk/safety checks!
-            Warning: The returned `Payment` instance is not yet saved!
+            
+            Warning: The returned `Payment` instance is *not being saved* in this method!
+                It is the responsibility of the calling function to save it!
+            
             Note: Never save any payment information in our DB!
             
             @param params: Expected Params can be found in `REQUIRED_PARAMS`.
@@ -455,8 +458,9 @@ class BetterPaymentBackend(BaseBackend):
         logger.info('Payments: Successfully completed the first step of %s payment of type "%s"' \
                 % ('an initial' if payment.is_reference_payment else 'a recurring', payment_type),
             extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
-        payment.save()
         
+        # NOTE: the payment object is *not* being saved here! It is the responsibility of the calling
+        # function to save it!
         return (payment, None)
     
     def _make_redirected_payment(self, params, payment_type, user=None, make_postponed=False):
@@ -479,7 +483,7 @@ class BetterPaymentBackend(BaseBackend):
         try:
             payment.save()
         except Exception as e:
-            logger.warning('Payments: Payment object could not be saved for a transaction of type "%s"!' % payment_type, extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e})
+            logger.critical('Payments: Payment object could not be saved for a transaction of type "%s"!' % payment_type, extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e, 'payment_data': str(payment.__dict__)})
         return payment, None
             
     def handle_success_redirect(self, request, params):
@@ -548,8 +552,9 @@ class BetterPaymentBackend(BaseBackend):
                 if payment is None:
                     # sometimes, the returning postback for a transaction is actually faster than
                     # our DB can save the payment! we wait for 5 seconds and retry.
-                    time.sleep(5)
+                    time.sleep(10)
                     # find referenced payment again
+                    # TODO: why does this often still fail after 10 secs of sleeping?
                     payment = get_object_or_None(Payment, 
                         vendor_transaction_id=params['transaction_id'],
                         internal_transaction_id=params['order_id']
