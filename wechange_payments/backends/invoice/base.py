@@ -77,7 +77,7 @@ class BaseInvoiceBackend(object):
         except Exception as exc:
             if settings.DEBUG:
                 raise
-        logger.error('Payments: Error during invoice creation: Stopped at invoice state %d!' % invoice.state, extra={'state': invoice.state, 'exception': exc, 'invoice_id': invoice.id, 'payment_internal_transaction_id': invoice.payment.internal_transaction_id})
+            logger.error('Payments: Error during invoice creation: Stopped at invoice state %d!' % invoice.state, extra={'state': invoice.state, 'exception': exc, 'invoice_id': invoice.id, 'payment_internal_transaction_id': invoice.payment.internal_transaction_id})
         # save the invoice to trigger updating its `last_action_at`, so we can delay repeated API calls.
         invoice.save()
         return None
