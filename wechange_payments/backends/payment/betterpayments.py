@@ -610,18 +610,25 @@ class BetterPaymentBackend(BaseBackend):
                     # case 'error', 'declined': mark the payment as failed
                     payment.status = Payment.STATUS_FAILED
                     payment.save()
-                    logger.info('Payments: Received a status "error" or "declined" postback for a postback.',
+                    logger.info('Payments: Received a status "error" or "declined" postback for a payment.',
                         extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
                     # if the payment is a recurring one, we take the safe route and suspend the 
                     # subscription. we do NOT want to cause multiple failed booking attempts on a user's account
                     if not payment.is_reference_payment:
-                        suspend_failed_subscription(payment.subscription, payment=payment)
-                    else:
+                        if payment.subscription:
+                            suspend_failed_subscription(payment.subscription, payment=payment)
+                        else:
+                            logger.critical('Payments: Received a status "error" or "declined" postback for a non-reference payment without attached subscription! The subscription for this payment must be found manually and canceled!',
+                                    extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
+                    elif payment.subscription:
                         # if it was a first payment, set the subscription to state ended
                         # TODO: should we inform the user that the payment failed? 
                         # send_payment_event_payment_email(payment)
                         payment.subscription.state = Subscription.STATE_0_TERMINATED
                         payment.subscription.save()
+                    else:
+                        logger.info('Payments: Received a status "error" or "declined" postback for a payment without attached subscription, so just cancelling the payment.',
+                                    extra={'user': payment.user.id, 'order_id': payment.internal_transaction_id})
                     return True
                 elif status in [self.BETTERPAYMENT_STATUS_REFUNDED, self.BETTERPAYMENT_STATUS_CHARGEBACK]:
                     # on a chargeback, immediately suspend the subscription to stop any further transactions. 
