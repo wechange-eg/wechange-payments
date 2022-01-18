@@ -4,7 +4,6 @@ import logging
 
 from annoying.functions import get_object_or_None
 from dateutil import relativedelta
-from django.contrib.postgres.fields.jsonb import JSONField
 from django.db import models
 from django.urls.base import reverse
 from django.utils.timezone import now
@@ -104,7 +103,7 @@ class Payment(models.Model):
     country = CountryField(blank=True, null=True)
     
     backend = models.CharField(_('Backend class used'), max_length=255)
-    extra_data = JSONField(null=True, blank=True)
+    extra_data = models.JSONField(null=True, blank=True)
     
     class Meta(object):
         app_label = 'wechange_payments'
@@ -130,7 +129,7 @@ class TransactionLog(models.Model):
     url = models.CharField(_('API Endpoint URL'), max_length=150, null=True, blank=True)
     type = models.PositiveSmallIntegerField(_('Transaction Type'), blank=False,
         default=TYPE_REQUEST, choices=TYPE_CHOICES, editable=False)
-    data = JSONField()
+    data = models.JSONField()
     
     class Meta(object):
         app_label = 'wechange_payments'
@@ -511,7 +510,7 @@ class Invoice(models.Model):
     file = models.FileField(_('File'), blank=True, null=True, max_length=250, upload_to=_get_invoice_filename, editable=False)
     provider_id = models.CharField(_('Provider Invoice ID'), max_length=255, blank=True, null=True, editable=False)
     backend = models.CharField(_('Invoice Provider Backend class used'), max_length=255, editable=False)
-    extra_data = JSONField(null=True, blank=True,
+    extra_data = models.JSONField(null=True, blank=True,
         help_text='This may contain the download path or similar IDs to retrieve the file from the provider.')
     
     created = models.DateTimeField(verbose_name=_('Created'), editable=False, auto_now_add=True)
