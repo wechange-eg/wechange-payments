@@ -17,7 +17,7 @@ logger = logging.getLogger('wechange-payments')
 
 class ProcessDueSubscriptionPayments(CosinnusCronJobBase):
     
-    RUN_AT_TIMES = ['00:30',]
+    RUN_AT_TIMES = ['04:00',]
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     
     cosinnus_code = 'wechange_payments.process_due_subscription_payments'
