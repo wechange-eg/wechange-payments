@@ -40,7 +40,7 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
         the invoice might not have been generated yet. This cron checks
         all payments and generates any missing invoices. """
     
-    RUN_AT_TIMES = ['01:00',]
+    RUN_AT_TIMES = ['04:30',]
     schedule = Schedule(run_at_times=RUN_AT_TIMES)
     
     cosinnus_code = 'wechange_payments.generate_missing_invoices'
