@@ -1033,7 +1033,7 @@ msgctxt "(INF13)"
 msgid ""
 "All information about your past payments can be found in the invoice overview"
 msgstr ""
-"Sämtliche Informationen zu Deinen vergangen Zahlungen findest Du in der "
+"Sämtliche Informationen zu Deinen vergangenen Zahlungen findest Du in der "
 "Rechnungsübersicht"
 
 msgctxt "(INF14)"
