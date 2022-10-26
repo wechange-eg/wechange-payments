@@ -62,6 +62,8 @@ class WechangePaymentsDefaultSettings(AppConf):
     LATE_PAYMENT_PROCESS_MESSAGE_SECONDS = 30
     # how many days before a due recurring SEPA payment will a pre-notification be sent
     PRE_NOTIFICATION_BEFORE_PAYMENT_DAYS = 10
+    # should the payment popup show a "no thanks" button to dismiss it?
+    POPUP_SHOW_NO_THANKS_BUTTON = False
     
     # should SEPA payments be treated as instantly paid, or wait for a success postback from betterpayments?
     # all signs for betterpayment point to "yes"

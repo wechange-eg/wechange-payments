@@ -88,12 +88,22 @@ Correspondingly, we invite you to pay for the use of WECHANGE whatever feels rig
 		{% endcomment %}
 	
 	{% captureas buttons %}
-		<a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
-	        <span class="rounded-button-inner">
-	            {% trans "Learn more" context "(POP5)" %}
-	        </span>
-	    </a>
-	    <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted">
+	    {% if SETTINGS.PAYMENTS_POPUP_SHOW_NO_THANKS_BUTTON %}
+	        <a class="rounded-button button-color-secondary" onclick="$('#payments_popup button.close').click();">
+                <span class="rounded-button-inner">
+                    {% trans "No, maybe later" context "(POP7)" %}
+                </span>
+            </a>
+	    {% else %}
+	        {% comment %} This button appears twice in the code because the pull-right order is reversed {% endcomment %}
+	        <a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary">
+	            <span class="rounded-button-inner">
+	                {% trans "Learn more" context "(POP5)" %}
+	            </span>
+	        </a>
+	    {% endif %}
+		
+	    <a href="{% url 'wechange-payments:overview' %}" class="rounded-button button-color-primary-inverted {% if SETTINGS.PAYMENTS_POPUP_SHOW_NO_THANKS_BUTTON %}pull-right{% endif %}">
 	        <span class="rounded-button-inner">
 	        	{% if payment_popup_times_closed_before > 0 or request.GET.popup_type == 'repeat' %}
 	        		{% trans "Ok, choose amount now" context "(POP6-repeat)" %}
@@ -102,6 +112,14 @@ Correspondingly, we invite you to pay for the use of WECHANGE whatever feels rig
 	            {% endif %}
 	        </span>
 	    </a>
+	    {% if SETTINGS.PAYMENTS_POPUP_SHOW_NO_THANKS_BUTTON %}
+            {% comment %} This button appears twice in the code because the pull-right order is reversed {% endcomment %}
+            <a href="{% include 'wechange_payments/partials/url_learn_more.html' %}" class="rounded-button button-color-secondary pull-right">
+                <span class="rounded-button-inner">
+                    {% trans "Learn more" context "(POP5)" %}
+                </span>
+            </a>
+        {% endif %}
 	{% endcaptureas %}
 	
 	{% include "cosinnus/v2/elements/modal_box.html" with id="payments_popup" title=title body=body buttons=buttons %}
