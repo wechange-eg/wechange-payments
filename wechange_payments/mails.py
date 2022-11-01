@@ -133,6 +133,7 @@ def send_payment_event_payment_email(payment, event):
         if payment.type == PAYMENT_TYPE_DIRECT_DEBIT and event == PAYMENT_EVENT_SUCCESSFUL_PAYMENT:
             sepa_variables = {
                 'payment': payment.subscription.reference_payment,
+                'payment_amount': payment.amount, # the amount from the current payment, not the reference payment, in case it has changed since!
                 'SETTINGS': settings,
             }
             data['mail_body'] += '\n\n-\n\n' + render_to_string('wechange_payments/mail/sepa_mandate_partial.html', sepa_variables)
