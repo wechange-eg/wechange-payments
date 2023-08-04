@@ -120,6 +120,10 @@ class WechangePaymentsDefaultSettings(AppConf):
     LEXOFFICE_API_DOMAIN = 'https://api.lexoffice.io'
     LEXOFFICE_API_KEY = ''
     
+    """ Tryton settings, requires and extends Lexoffice settings """
+    
+    TRYTON_DB_NAME = None
+    
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.

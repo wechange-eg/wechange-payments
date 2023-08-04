@@ -27,6 +27,11 @@ EXTRA_DATA_CONTACT_ID = 'lexoffice-contact-id'
 
 class LexofficeInvoiceBackend(BaseInvoiceBackend):
     
+    API_ENDPOINT_CREATE_INVOICE = LEXOFFICE_API_ENDPOINT_CREATE_INVOICE
+    API_ENDPOINT_RENDER_INVOICE = LEXOFFICE_API_ENDPOINT_RENDER_INVOICE
+    API_ENDPOINT_DOWNLOAD_INVOICE = LEXOFFICE_API_ENDPOINT_DOWNLOAD_INVOICE
+    API_ENDPOINT_CREATE_CONTACT = LEXOFFICE_API_ENDPOINT_CREATE_CONTACT
+    
     required_setting_keys = [
         'PAYMENTS_LEXOFFICE_API_DOMAIN',
         'PAYMENTS_LEXOFFICE_API_KEY',
@@ -105,7 +110,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if contact_id and not force:
             logger.info('ContactId for payment already existed, not creating a new one.', extra={'invoice-id': invoice.id}) 
             return False
-        contact_post_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + LEXOFFICE_API_ENDPOINT_CREATE_CONTACT
+        contact_post_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_CREATE_CONTACT
         headers = {
             'Authorization': 'Bearer %s' % settings.PAYMENTS_LEXOFFICE_API_KEY, 
             'Accept': 'application/json',
@@ -157,7 +162,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             This must set the `provider_id` field of the Invoice!
             @return: the same invoice instance if successful, raise Exception otherwise. """
             
-        post_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + LEXOFFICE_API_ENDPOINT_CREATE_INVOICE
+        post_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_CREATE_INVOICE
         headers = {
             'Authorization': 'Bearer %s' % settings.PAYMENTS_LEXOFFICE_API_KEY, 
             'Accept': 'application/json',
@@ -168,10 +173,14 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         req = requests.post(post_url, headers=headers, json=data)
         
         if not req.status_code == 201:
-            return_data = req.json()
-            error_msg_requires_contact = 'Validation failed: [postingCategoryId: Legen Sie den Kontakt zunächst an.]'
+            return_json = None
+            try:
+                return_json = req.json()
+            except Exception as json_e:
+                pass
             
-            if return_data.get('status') == 406 and return_data.get('message') == error_msg_requires_contact \
+            error_msg_requires_contact = 'Validation failed: [postingCategoryId: Legen Sie den Kontakt zunächst an.]'
+            if return_json and  return_json.get('status') == 406 and return_json.get('message') == error_msg_requires_contact \
                      and not retry_after_contact_create:
                 # for some customers, we must create a contact first. if so we try to create a contact first
                 # and retry this same invoice creation *once*
@@ -218,7 +227,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not invoice.provider_id:
             raise Exception('`provider_id` not present in invoice!')
         
-        get_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + LEXOFFICE_API_ENDPOINT_RENDER_INVOICE % {
+        get_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_RENDER_INVOICE % {
             'id': invoice.provider_id
         }
         headers = {
@@ -266,7 +275,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'documentFileId' in invoice.extra_data:
             raise Exception('`documentFileId` not present in invoice `extra_data`!')
         
-        get_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + LEXOFFICE_API_ENDPOINT_DOWNLOAD_INVOICE % {
+        get_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_DOWNLOAD_INVOICE % {
             'id': invoice.extra_data['documentFileId']
         }
         headers = {
