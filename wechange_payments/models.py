@@ -113,6 +113,10 @@ class Payment(models.Model):
     
     def get_type_string(self):
         return dict(self.TYPE_CHOICES).get(self.type)
+    
+    def get_admin_change_url(self):
+        """ Returns the django admin edit page for this object. """
+        return reverse('admin:wechange_payments_payment_change', kwargs={'object_id': self.id})
 
 
 class TransactionLog(models.Model):
@@ -136,6 +140,10 @@ class TransactionLog(models.Model):
         app_label = 'wechange_payments'
         verbose_name = _('Payment Transaction Log')
         verbose_name_plural = _('Payment Transaction Logs')
+        
+    def get_admin_change_url(self):
+        """ Returns the django admin edit page for this object. """
+        return reverse('admin:wechange_payments_transactionlog_change', kwargs={'object_id': self.id})
 
 
 class Subscription(models.Model):
@@ -475,7 +483,11 @@ class Subscription(models.Model):
                 raise Exception('Payments: Fatal: Sanity check failed for subscription: \
                     Tried to save a subscription when another subscription with an exclusive state exists for the same user!')
         super(Subscription, self).save(*args, **kwargs)
-        
+    
+    def get_admin_change_url(self):
+        """ Returns the django admin edit page for this object. """
+        return reverse('admin:wechange_payments_subscription_change', kwargs={'object_id': self.id})
+
 
 class Invoice(models.Model):
     
@@ -528,3 +540,8 @@ class Invoice(models.Model):
 
     def get_download_url(self):
         return reverse('wechange-payments:invoice-download', kwargs={'pk': self.pk})
+
+    def get_admin_change_url(self):
+        """ Returns the django admin edit page for this object. """
+        return reverse('admin:wechange_payments_invoice_change', kwargs={'object_id': self.id})
+    
