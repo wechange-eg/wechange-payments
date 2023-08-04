@@ -71,7 +71,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                     'unitPrice': {
                         'currency': 'EUR',
                         'grossAmount': payment.amount,
-                        'taxRatePercentage': settings.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT,
+                        'taxRatePercentage': self._get_tax_rate_percent(),
                     },
                 },
             ],

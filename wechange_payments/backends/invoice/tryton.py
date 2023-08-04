@@ -33,3 +33,6 @@ class TrytonInvoiceBackend(LexofficeInvoiceBackend):
     API_ENDPOINT_DOWNLOAD_INVOICE = TRYTON_API_ENDPOINT_DOWNLOAD_INVOICE
     API_ENDPOINT_CREATE_CONTACT = TRYTON_API_ENDPOINT_CREATE_CONTACT
     
+    def _X_get_tax_rate_percent(self):
+        """ Returns the tax rate percent as datatype the backend requires. """
+        return "19"

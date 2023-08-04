@@ -86,6 +86,10 @@ class BaseInvoiceBackend(object):
         invoice.save()
         return None
     
+    def _get_tax_rate_percent(self):
+        """ Returns the tax rate percent as datatype the backend requires. """
+        return settings.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT
+    
     def _create_invoice_at_provider(self, invoice):
         """ Calls the action to render an invoice as PDF on the server. 
             This must set the `provider_id` field of the Invoice!
