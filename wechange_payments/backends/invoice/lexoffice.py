@@ -50,6 +50,10 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         else:
             recipient_name = payment.first_name + ' ' + payment.last_name
             supplement = None
+        
+        item_name = force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
+        item_description = force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
+        item_description += f' (transaction-id: {payment.internal_transaction_id}, type: {payment.type})'
         data = {
             'archived': False,
             'voucherDate': invoice.created.isoformat(timespec='milliseconds'),
@@ -64,8 +68,8 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             'lineItems': [
                 {
                     'type': 'custom',
-                    'name': force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name}),
-                    'description': force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id}),
+                    'name': item_name,
+                    'description': item_description,
                     'quantity': 1,
                     'unitName': 'Stück',
                     'unitPrice': {
