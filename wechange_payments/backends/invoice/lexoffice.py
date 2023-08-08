@@ -185,7 +185,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         print(data)
         req = requests.post(post_url, headers=headers, json=data)
         
-        if not req.status_code == 201:
+        if not req.status_code in [200, 201]:
             return_json = None
             try:
                 return_json = req.json()
@@ -233,6 +233,15 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         
         return invoice
     
+    def _parse_finalize_invoice_result(self, request):
+        """ Helper function for `_finalize_invoice_at_provider()`, parses the resulting
+            document id from the returned status 200 request or returns None if there was none.
+             LexOffice returns JSON here. """
+        result_json = request.json()
+        if not 'documentFileId' in result_json:
+            return None
+        return result_json['documentFileId']
+    
     def _finalize_invoice_at_provider(self, invoice):
         """ Calls the action to render an invoice as PDF on the server. 
             Expects the `provider_id` field of the Invoice set!
@@ -256,10 +265,10 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API render failed, request did not return status=200.', extra=extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
-            
-        result = req.json()
-        if not 'documentFileId' in result:
-            extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
+        
+        document_file_id = self._parse_finalize_invoice_result(req)
+        if not document_file_id:
+            extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API rendering result did not contain field "documentFileId".', extra=extra)
             raise Exception('Payments: Missing fields in rendering request result (request has been logged as error).')
         
@@ -272,7 +281,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         
         extra_data = invoice.extra_data or {}
         extra_data.update({
-            'documentFileId': result['documentFileId']
+            'documentFileId': document_file_id,
         })
         invoice.extra_data = extra_data
         invoice.state = Invoice.STATE_2_FINALIZED
