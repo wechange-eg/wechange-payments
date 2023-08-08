@@ -17,12 +17,18 @@ from django.utils import translation
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('internal_transaction_id', 'status', 'user', 'amount', 'type', 'completed_at', 'vendor_transaction_id', 'subscription')
+    list_display = ('internal_transaction_id', 'status', 'user_account_name', 'invoice_name', 'email', 'amount', 'type', 'completed_at', 'subscription')
     list_filter = ('type',)
-    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
+    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'email', 'first_name', 'last_name', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
     readonly_fields = ('backend', 'vendor_transaction_id', 'internal_transaction_id', 'amount', 'is_reference_payment', 'completed_at', 'last_action_at', 'extra_data', 'subscription')
     raw_id_fields = ('user',)
     actions = ['create_invoice', 'resend_payment_email',]
+    
+    def user_account_name(self, obj):
+        return obj.user.get_full_name()
+    
+    def invoice_name(self, obj):
+        return f'{obj.first_name} {obj.last_name}'
     
     def resend_payment_email(self, request, queryset):
         for payment in queryset:
@@ -55,12 +61,21 @@ admin.site.register(Payment, PaymentAdmin)
 
 
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_ready', 'state', 'payment', 'created', 'last_action_at')
+    list_display = ('user', 'is_ready', 'state', 'payment', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
     list_filter = ('is_ready', 'state', )
-    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'payment__vendor_transaction_id', 'payment__internal_transaction_id', 'created')
+    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'payment__vendor_transaction_id', 'payment__internal_transaction_id', 'payment__email', 'payment__first_name', 'payment__last_name', 'created')
     readonly_fields = ('state',)
     raw_id_fields = ('user',)
     actions = ['create_invoice',]
+    
+    def user_account_name(self, obj):
+        return obj.user.get_full_name()
+    
+    def payment_name(self, obj):
+        return f'{obj.payment.first_name} {obj.payment.last_name}'
+    
+    def payment_email(self, obj):
+        return obj.payment.email
     
     def create_invoice(self, request, queryset):
         invoice_backend = get_invoice_backend()
