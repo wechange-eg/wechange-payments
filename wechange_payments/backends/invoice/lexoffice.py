@@ -131,8 +131,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             },
             'note': f'WECHANGE PAYL contact for subscription id: {reference_payment.subscription_id}, user id: {reference_payment.user_id}'
         }
-        print('>>>> CONTACT API')
-        print(contact_id_data)
         req = requests.post(contact_post_url, headers=headers, json=contact_id_data)
         
         if not req.status_code == 200:
@@ -180,13 +178,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         }
         
         data = self._make_invoice_request_params(invoice)
-        print('>>>> INVOICE API')
-        print('url')
-        print(post_url)
-        print('header')
-        print(headers)
-        print('data')
-        print(data)
         req = requests.post(post_url, headers=headers, json=data)
         
         if not req.status_code in [200, 201]:
