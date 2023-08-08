@@ -48,4 +48,13 @@ class TrytonInvoiceBackend(LexofficeInvoiceBackend):
             Tryton returns only the ID as body text here. """
         document_id = request.text
         return document_id or None
-        
+    
+    def _make_invoice_request_params(self, invoice):
+        """ In Tryton, we can add the internal transaction ID from betterpayments so
+            accounting can connect invoices and payments. """
+        data = super()._make_invoice_request_params(invoice)
+        data.update({
+            'transaction_id': invoice.payment.internal_transaction_id,
+            'payment_type': invoice.payment.type,
+        })
+        return data
