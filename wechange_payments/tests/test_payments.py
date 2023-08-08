@@ -231,8 +231,8 @@ class PaymentsUnitTest(TestCase):
         # TODO: should all these consecutive tests go into a seperate test function?
         # if so, would we really want to re-create the API call all the time, or mock it?
         
-    #def test_1_b_full_sepa_payment_and_invoice_austria(self):
-    #    return self.test_1_full_sepa_payment_and_invoice(user_data=TEST_DATA_SEPA_PAYMENT_FORM_AUSTRIA)
+    def test_1_b_full_sepa_payment_and_invoice_austria(self):
+        return self.test_1_full_sepa_payment_and_invoice(user_data=TEST_DATA_SEPA_PAYMENT_FORM_AUSTRIA)
     
     def test_2_anonymous_access_locked(self):
         pass
