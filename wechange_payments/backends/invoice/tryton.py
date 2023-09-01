@@ -33,13 +33,6 @@ class TrytonInvoiceBackend(LexofficeInvoiceBackend):
     API_ENDPOINT_DOWNLOAD_INVOICE = TRYTON_API_ENDPOINT_DOWNLOAD_INVOICE
     API_ENDPOINT_CREATE_CONTACT = TRYTON_API_ENDPOINT_CREATE_CONTACT
     
-    def _parse_finalize_invoice_result(self, request):
-        """ Helper function for `_finalize_invoice_at_provider()`, parses the resulting
-            document id from the returned status 200 request or returns None if there was none.
-            Tryton returns only the ID as body text here. """
-        document_id = request.text
-        return document_id or None
-    
     def _make_invoice_request_params(self, invoice):
         """ In Tryton, we can add the internal transaction ID from betterpayments so
             accounting can connect invoices and payments. """
