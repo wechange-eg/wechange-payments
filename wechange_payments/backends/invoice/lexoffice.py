@@ -205,6 +205,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 return self._create_invoice_at_provider(invoice, retry_after_contact_create=True)
             
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content}
+            print(extra)
             logger.error('Payments: Invoice API creation failed, request did not return status=201.', extra=extra)
             if settings.DEBUG:
                 print(extra)
@@ -321,6 +322,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API download failed, request did not return status=200.', extra=extra)
+            print(extra)
             if settings.DEBUG:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
