@@ -25,6 +25,7 @@ class WechangePaymentsDefaultSettings(AppConf):
         
     BACKEND = 'wechange_payments.backends.payment.betterpayments.BetterPaymentBackend'
     INVOICE_BACKEND = 'wechange_payments.backends.invoice.lexoffice.LexofficeInvoiceBackend'
+    INVOICE_BACKEND = 'wechange_payments.backends.invoice.tryton.TrytonInvoiceBackend'
     
     ACCEPTED_PAYMENT_METHODS = [
         PAYMENT_TYPE_DIRECT_DEBIT,

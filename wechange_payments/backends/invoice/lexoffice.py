@@ -43,6 +43,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         auth_data = kwargs.get('auth_data')
+        print(f'>>>>XXXXX lexy called with auth {auth_data}')
         self.api_domain = auth_data.get('api_domain')
         self.api_key = auth_data.get('api_key')
     

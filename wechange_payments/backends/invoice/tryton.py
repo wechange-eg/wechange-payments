@@ -44,6 +44,7 @@ class TrytonInvoiceBackend(LexofficeInvoiceBackend):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         auth_data = kwargs.get('auth_data')
+        print(f'>>>>XXXXX tryton called with auth {auth_data}')
         self.db_name = auth_data.get('db_name')
         self.API_ENDPOINT_CREATE_INVOICE = self.API_ENDPOINT_CREATE_INVOICE.replace('__DB_NAME__', self.db_name)
         self.API_ENDPOINT_RENDER_INVOICE = self.API_ENDPOINT_CREATE_INVOICE.replace('__DB_NAME__', self.db_name)
