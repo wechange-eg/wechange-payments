@@ -18,8 +18,8 @@ def get_invoice_backend():
     global INVOICE_BACKEND
     if INVOICE_BACKEND is None:
         from wechange_payments.conf import settings
-        INVOICE_BACKEND = resolve_class(settings.PAYMENTS_INVOICE_BACKEND)
-        INVOICE_BACKEND = INVOICE_BACKEND()
+        Backend = resolve_class(settings.PAYMENTS_INVOICE_BACKEND)
+        INVOICE_BACKEND = Backend(auth_data=settings.PAYMENTS_INVOICE_BACKEND_AUTH_DATA)
     return INVOICE_BACKEND
 
 def get_additional_invoice_backends():
@@ -28,8 +28,8 @@ def get_additional_invoice_backends():
         ADDITIONAL_INVOICE_BACKENDS = []
         from wechange_payments.conf import settings
         for backend_dict in settings.PAYMENTS_ADDITIONAL_INVOICES_BACKENDS:
-            backend = resolve_class(backend_dict.get('PAYMENTS_INVOICE_BACKEND'))
-            ADDITIONAL_INVOICE_BACKENDS.append(backend())
+            Backend = resolve_class(backend_dict.get('backend'))
+            ADDITIONAL_INVOICE_BACKENDS.append(Backend(auth_data=backend_dict.get('auth_data')))
         print(f'>> generated add backends: {ADDITIONAL_INVOICE_BACKENDS}')
     return ADDITIONAL_INVOICE_BACKENDS
 

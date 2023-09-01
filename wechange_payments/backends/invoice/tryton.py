@@ -18,9 +18,9 @@ from wechange_payments.models import Invoice
 logger = logging.getLogger('wechange-payments')
 
 
-TRYTON_API_ENDPOINT_CREATE_INVOICE = f'/lexoffice/{settings.PAYMENTS_TRYTON_DB_NAME}/v1/invoices?finalize=true'
-TRYTON_API_ENDPOINT_RENDER_INVOICE = f'/lexoffice/{settings.PAYMENTS_TRYTON_DB_NAME}/v1/invoices/%(id)s/document'
-TRYTON_API_ENDPOINT_DOWNLOAD_INVOICE = f'/lexoffice/{settings.PAYMENTS_TRYTON_DB_NAME}/v1/files/%(id)s'
+TRYTON_API_ENDPOINT_CREATE_INVOICE = '/lexoffice/__DB_NAME__/v1/invoices?finalize=true'
+TRYTON_API_ENDPOINT_RENDER_INVOICE = '/lexoffice/__DB_NAME__/v1/invoices/%(id)s/document'
+TRYTON_API_ENDPOINT_DOWNLOAD_INVOICE = '/lexoffice/__DB_NAME__/v1/files/%(id)s'
 TRYTON_API_ENDPOINT_CREATE_CONTACT = None # endpoint does not exist in Tryton!
 
 EXTRA_DATA_CONTACT_ID = 'lexoffice-contact-id'
@@ -32,6 +32,22 @@ class TrytonInvoiceBackend(LexofficeInvoiceBackend):
     API_ENDPOINT_RENDER_INVOICE = TRYTON_API_ENDPOINT_RENDER_INVOICE
     API_ENDPOINT_DOWNLOAD_INVOICE = TRYTON_API_ENDPOINT_DOWNLOAD_INVOICE
     API_ENDPOINT_CREATE_CONTACT = TRYTON_API_ENDPOINT_CREATE_CONTACT
+    
+    db_name = None # initialized on init
+    
+    required_setting_keys = [
+        'api_domain',
+        'api_key',
+        'db_name',
+    ]
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        auth_data = kwargs.get('auth_data')
+        self.db_name = auth_data.get('db_name')
+        self.API_ENDPOINT_CREATE_INVOICE = self.API_ENDPOINT_CREATE_INVOICE.replace('__DB_NAME__', self.db_name)
+        self.API_ENDPOINT_RENDER_INVOICE = self.API_ENDPOINT_CREATE_INVOICE.replace('__DB_NAME__', self.db_name)
+        self.API_ENDPOINT_DOWNLOAD_INVOICE = self.API_ENDPOINT_CREATE_INVOICE.replace('__DB_NAME__', self.db_name)
     
     def _make_invoice_request_params(self, invoice):
         """ In Tryton, we can add the internal transaction ID from betterpayments so

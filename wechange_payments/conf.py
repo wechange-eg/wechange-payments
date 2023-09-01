@@ -115,14 +115,17 @@ class WechangePaymentsDefaultSettings(AppConf):
     BETTERPAYMENT_OUTGOING_KEY = ''
     BETTERPAYMENT_API_DOMAIN = ''
 
-    """ Lexoffice settings """
+    # the auth data parameters for the configured invoice backend
+    # should only be defined in .env
+    """
+    Example:
     
-    LEXOFFICE_API_DOMAIN = 'https://api.lexoffice.io'
-    LEXOFFICE_API_KEY = ''
-    
-    """ Tryton settings, requires and extends Lexoffice settings """
-    
-    TRYTON_DB_NAME = None
+    INVOICE_BACKEND_AUTH_DATA = {
+        'api_domain': 'https://wchg-testing.m-ds.de',
+        'api_key': '<key>',
+    }
+    """
+    INVOICE_BACKEND_AUTH_DATA = {}
     
     # list of dicts of additional invoice backends for extra invoice generation
     # should only be defined in .env
@@ -130,11 +133,12 @@ class WechangePaymentsDefaultSettings(AppConf):
     """
         Example:
         ADDITIONAL_INVOICES_BACKENDS = [{
-            'NAME': 'Tryton',
-            'PAYMENTS_INVOICE_BACKEND': 'wechange_payments.backends.invoice.tryton.TrytonInvoiceBackend',
-            'PAYMENTS_LEXOFFICE_API_DOMAIN': 'https://wchg-testing.m-ds.de',
-            'PAYMENTS_LEXOFFICE_API_KEY': '<key>',
-            'PAYMENTS_TRYTON_DB_NAME': 'wchgtesting',
+            'backend': 'wechange_payments.backends.invoice.tryton.TrytonInvoiceBackend',
+            'auth_data' {
+                'api_domain': 'https://wchg-testing.m-ds.de',
+                'api_key': '<key>',
+                'db_name': 'wchgtesting',
+            }
         }]
     """
 

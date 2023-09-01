@@ -17,10 +17,11 @@ class BaseInvoiceBackend(object):
     # define this in the implementing backend
     required_setting_keys = []
     
-    def __init__(self):
+    def __init__(self, auth_data):
+        print(f'>>>> we have auth data {auth_data}')
         for key in self.required_setting_keys:
-            if not getattr(settings, key, None):
-                raise ImproperlyConfigured('Setting "%s" is required for backend "%s"!' 
+            if not auth_data.get(key, None):
+                raise ImproperlyConfigured('Invoice backend auth data property "%s" is required for backend "%s"!'
                             % (key, self.__class__.__name__))
     
     def create_invoice_for_payment(self, payment, threaded=False, additional_invoice=False):
