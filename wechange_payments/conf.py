@@ -124,6 +124,19 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     TRYTON_DB_NAME = None
     
+    # list of dicts of additional invoice backends for extra invoice generation
+    # should only be defined in .env
+    ADDITIONAL_INVOICES_BACKENDS = []
+    """
+        Example:
+        ADDITIONAL_INVOICES_BACKENDS = [{
+            'NAME': 'Tryton',
+            'PAYMENTS_INVOICE_BACKEND': 'wechange_payments.backends.invoice.tryton.TrytonInvoiceBackend',
+            'PAYMENTS_LEXOFFICE_API_DOMAIN': 'https://wchg-testing.m-ds.de',
+            'PAYMENTS_LEXOFFICE_API_KEY': '<key>',
+            'PAYMENTS_TRYTON_DB_NAME': 'wchgtesting',
+        }]
+    """
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.
