@@ -8,7 +8,7 @@ from django.test import Client
 from django.test.testcases import TestCase, SimpleTestCase
 from django.urls.base import reverse
 
-from wechange_payments.backends import get_backend, get_invoice_backend
+from wechange_payments.backends import get_backend, get_invoice_backend, get_additional_invoice_backends
 from wechange_payments.conf import PAYMENT_TYPE_DIRECT_DEBIT
 from wechange_payments.conf import settings
 from wechange_payments.models import Payment, Subscription, Invoice
@@ -114,6 +114,8 @@ class PaymentsUnitTest(TestCase):
         # manually trigger the invoice generation (it wasn't done automatically as hooks are disabled for testing)
         invoice_backend = get_invoice_backend()
         invoice_backend.create_invoice_for_payment(payment, threaded=False)
+        for additional_invoice_backend in get_additional_invoice_backends():
+            additional_invoice_backend.create_invoice_for_payment(payment, threaded=False, additional_invoice=True)
         invoice = get_object_or_None(Invoice, user=self.loyal_user)
         self.assertIsNotNone(invoice, 'Invoice created after payment')
         self.assertEqual(invoice.state, Invoice.STATE_3_DOWNLOADED, 'Invoice was completed')
@@ -212,6 +214,8 @@ class PaymentsUnitTest(TestCase):
         # manually trigger the invoice generation for the recurred payment (it wasn't done automatically as hooks are disabled for testing)
         invoice_backend = get_invoice_backend()
         invoice_backend.create_invoice_for_payment(recurrent_payment, threaded=False)
+        for additional_invoice_backend in get_additional_invoice_backends():
+            additional_invoice_backend.create_invoice_for_payment(recurrent_payment, threaded=False, additional_invoice=True)
         invoice = get_object_or_None(Invoice, payment=recurrent_payment, user=self.loyal_user)
         self.assertIsNotNone(invoice, 'Invoice created after recurrent_payment')
         self.assertEqual(invoice.state, Invoice.STATE_3_DOWNLOADED, 'Invoice was completed')

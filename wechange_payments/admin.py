@@ -3,7 +3,7 @@
 from django.contrib import admin, messages
 from django.utils.translation import ugettext_lazy as _
 
-from wechange_payments.backends import get_invoice_backend
+from wechange_payments.backends import get_invoice_backend, get_additional_invoice_backends
 from wechange_payments.models import Payment, TransactionLog, Subscription, \
     Invoice
 from cosinnus.conf import settings
@@ -17,18 +17,21 @@ from django.utils import translation
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('internal_transaction_id', 'status', 'user_account_name', 'invoice_name', 'email', 'amount', 'type', 'completed_at', 'subscription')
+    list_display = ('internal_transaction_id', 'status', 'user_account_name', 'invoice_name', 'email', 'amount', 'type', 'completed_at', 'subscription', 'additional_invoices')
     list_filter = ('type',)
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'email', 'first_name', 'last_name', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
     readonly_fields = ('backend', 'vendor_transaction_id', 'internal_transaction_id', 'amount', 'is_reference_payment', 'completed_at', 'last_action_at', 'extra_data', 'subscription')
     raw_id_fields = ('user',)
-    actions = ['create_invoice', 'resend_payment_email',]
+    actions = ['create_invoice', 'create_additional_invoices', 'resend_payment_email',]
     
     def user_account_name(self, obj):
         return obj.user.get_full_name()
     
     def invoice_name(self, obj):
         return f'{obj.first_name} {obj.last_name}'
+    
+    def additional_invoices(self, obj):
+        return obj.additional_invoices.count()
     
     def resend_payment_email(self, request, queryset):
         for payment in queryset:
@@ -45,9 +48,19 @@ class PaymentAdmin(admin.ModelAdmin):
         invoice_backend = get_invoice_backend()
         for payment in queryset:
             invoice_backend.create_invoice_for_payment(payment, threaded=True)
-        message = _('Started invoice creation for %(number)d payment(s) in background.') % {'number':len(queryset)}
+        
+        message = _('Started invoice creation for %(number)d payment(s) in background.') % {'number': len(queryset)}
         self.message_user(request, message)
     create_invoice.short_description = _("Create invoice in Invoice API (threaded)")
+    
+    def create_additional_invoices(self, request, queryset):
+        for payment in queryset:
+            for additional_invoice_backend in get_additional_invoice_backends():
+                additional_invoice_backend.create_invoice_for_payment(payment, threaded=True, additional_invoice=True)
+        
+        message = _('Started additional invoice creation for %(number)d payment(s) in background.') % {'number': len(queryset)}
+        self.message_user(request, message)
+    create_invoice.short_description = _("Create additional invoices in Invoice API (threaded)")
     
     def has_delete_permission(self, request, obj=None):
         """ Can't delete/add Payments """
