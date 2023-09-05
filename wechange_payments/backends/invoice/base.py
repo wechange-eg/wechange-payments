@@ -60,7 +60,7 @@ class BaseInvoiceBackend(object):
             logger.error('Payments: Critical: Error during (our) invoice creation: Could not create an `Invoice` instance for a Payment! This must be manually repeated!', extra={'exception': e, 'payment_internal_transaction_id': payment.internal_transaction_id})
             if settings.DEBUG:
                 raise
-            raise
+            raise # TODO remove!
         
     def create_invoice(self, invoice, threaded=False):
         """ Tries to create, finalize and download an invoice at the invoice provider 
@@ -88,8 +88,8 @@ class BaseInvoiceBackend(object):
         except Exception as exc:
             if settings.DEBUG:
                 raise
-            print(exc)
-            raise
+            print(exc)  # TODO remove!
+            raise # TODO remove!
             logger.error('Payments: Error during invoice creation with exception: Stopped at invoice state %d!' % invoice.state, extra={'state': invoice.state, 'exception': exc, 'invoice_id': invoice.id, 'payment_internal_transaction_id': invoice.payment.internal_transaction_id})
             # save the invoice to trigger updating its `last_action_at`, so we can delay repeated API calls.
             invoice.save()
