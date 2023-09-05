@@ -115,15 +115,32 @@ class WechangePaymentsDefaultSettings(AppConf):
     BETTERPAYMENT_OUTGOING_KEY = ''
     BETTERPAYMENT_API_DOMAIN = ''
 
-    """ Lexoffice settings """
+    # the auth data parameters for the configured invoice backend
+    # should only be defined in .env
+    """
+    Example:
     
-    LEXOFFICE_API_DOMAIN = 'https://api.lexoffice.io'
-    LEXOFFICE_API_KEY = ''
+    INVOICE_BACKEND_AUTH_DATA = {
+        'api_domain': 'https://wchg-testing.m-ds.de',
+        'api_key': '<key>',
+    }
+    """
+    INVOICE_BACKEND_AUTH_DATA = {}
     
-    """ Tryton settings, requires and extends Lexoffice settings """
-    
-    TRYTON_DB_NAME = None
-    
+    # list of dicts of additional invoice backends for extra invoice generation
+    # should only be defined in .env
+    ADDITIONAL_INVOICES_BACKENDS = []
+    """
+        Example:
+        ADDITIONAL_INVOICES_BACKENDS = [{
+            'backend': 'wechange_payments.backends.invoice.tryton.TrytonInvoiceBackend',
+            'auth_data' {
+                'api_domain': 'https://wchg-testing.m-ds.de',
+                'api_key': '<key>',
+                'db_name': 'wchgtesting',
+            }
+        }]
+    """
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.

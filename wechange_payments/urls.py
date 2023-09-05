@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^account/invoices/$', frontend.invoices, name='invoices'),
     url(r'^account/invoices/(?P<pk>\d+)/$', frontend.invoice_detail, name='invoice-detail'),
     url(r'^account/invoices/(?P<pk>\d+)/download/$', frontend.invoice_download, name='invoice-download'),
+    url(r'^account/additional_invoices/(?P<pk>\d+)/download/$', frontend.additional_invoice_download, name='additional-invoice-download'),
     
     #url(r'^payments/api/payment/$', api.make_payment, name='api-make-payment'),
     url(r'^payments/api/subscription-payment/$', api.make_subscription_payment, name='api-make-subscription-payment'),

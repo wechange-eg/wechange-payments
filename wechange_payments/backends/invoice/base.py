@@ -7,8 +7,7 @@ from annoying.functions import get_object_or_None
 from django.core.exceptions import ImproperlyConfigured
 
 from wechange_payments.conf import settings
-from wechange_payments.models import Invoice, Payment
-
+from wechange_payments.models import Invoice, Payment, AdditionalInvoice
 
 logger = logging.getLogger('wechange-payments')
 
@@ -18,17 +17,18 @@ class BaseInvoiceBackend(object):
     # define this in the implementing backend
     required_setting_keys = []
     
-    def __init__(self):
+    def __init__(self, auth_data):
         for key in self.required_setting_keys:
-            if not getattr(settings, key, None):
-                raise ImproperlyConfigured('Setting "%s" is required for backend "%s"!' 
+            if not auth_data.get(key, None):
+                raise ImproperlyConfigured('Invoice backend auth data property "%s" is required for backend "%s"!'
                             % (key, self.__class__.__name__))
     
-    def create_invoice_for_payment(self, payment, threaded=False):
+    def create_invoice_for_payment(self, payment, threaded=False, additional_invoice=False):
         """ Tries to create a finalized invoice in Lexoffice with all required data for a given payment.
+            @param: additional_invoice: if True, the invoice is being created as instance of `AdditionalInvoice`
             @return: An Invoice instance if the invoice was created in Lexoffice, raise Exception otherwise """
         if threaded:
-            thread = threading.Thread(target=self.create_invoice_for_payment, args=(payment, False))
+            thread = threading.Thread(target=self.create_invoice_for_payment, args=(payment, False, additional_invoice))
             thread.start()
             return
         
@@ -37,13 +37,22 @@ class BaseInvoiceBackend(object):
             if payment.status != Payment.STATUS_PAID:
                 return
             
-            invoice = get_object_or_None(Invoice, payment=payment)
-            if not invoice:
-                invoice = Invoice.objects.create(
-                    payment=payment,
-                    user=payment.user,
-                    backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__)
-                )
+            if additional_invoice:
+                invoice = get_object_or_None(AdditionalInvoice, payment=payment, backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__))
+                if not invoice:
+                    invoice = AdditionalInvoice.objects.create(
+                        payment=payment,
+                        user=payment.user,
+                        backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__)
+                    )
+            else:
+                invoice = get_object_or_None(Invoice, payment=payment)
+                if not invoice:
+                    invoice = Invoice.objects.create(
+                        payment=payment,
+                        user=payment.user,
+                        backend='%s.%s' %(self.__class__.__module__, self.__class__.__name__)
+                    )
             self.create_invoice(invoice, threaded=False)
         except Exception as e:
             logger.error('Payments: Critical: Error during (our) invoice creation: Could not create an `Invoice` instance for a Payment! This must be manually repeated!', extra={'exception': e, 'payment_internal_transaction_id': payment.internal_transaction_id})

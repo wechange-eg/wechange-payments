@@ -32,14 +32,20 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
     API_ENDPOINT_DOWNLOAD_INVOICE = LEXOFFICE_API_ENDPOINT_DOWNLOAD_INVOICE
     API_ENDPOINT_CREATE_CONTACT = LEXOFFICE_API_ENDPOINT_CREATE_CONTACT
     
+    api_domain = None # initialized on init
+    api_key = None # initialized on init
+    
     required_setting_keys = [
-        'PAYMENTS_LEXOFFICE_API_DOMAIN',
-        'PAYMENTS_LEXOFFICE_API_KEY',
+        'api_domain',
+        'api_key',
     ]
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+        auth_data = kwargs.get('auth_data')
+        self.api_domain = auth_data.get('api_domain')
+        self.api_key = auth_data.get('api_key')
+    
     def _make_invoice_request_params(self, invoice):
         """ Prepare all neccessary params for the invoice creation API for Lexoffice 
             from an invoices and its attached payment instance. """
@@ -91,16 +97,20 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             },
             'introduction': force_text(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
         }
-        # add LexOffice contact ID if one was created in reference payment
-        reference_payment = payment if payment.is_reference_payment else payment.subscription.reference_payment
-        contact_id = reference_payment.extra_data.get(EXTRA_DATA_CONTACT_ID, None)
-        if contact_id:
-            data['address']['contactId'] = contact_id
+        data = self._add_contact_invoice_request_params(payment, data)
         
         if getattr(settings, 'PAYMENTS_INVOICE_REMARK'):
             data.update({
                 'remark': force_text(getattr(settings, 'PAYMENTS_INVOICE_REMARK')),
             })
+        return data
+    
+    def _add_contact_invoice_request_params(self, payment, data):
+        # add LexOffice contact ID if one was created in reference payment
+        reference_payment = payment if payment.is_reference_payment else payment.subscription.reference_payment
+        contact_id = reference_payment.extra_data.get(EXTRA_DATA_CONTACT_ID, None)
+        if contact_id:
+            data['address']['contactId'] = contact_id
         return data
     
     def _create_contact_for_payment(self, invoice, force=False):
@@ -114,9 +124,9 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if contact_id and not force:
             logger.info('ContactId for payment already existed, not creating a new one.', extra={'invoice-id': invoice.id}) 
             return False
-        contact_post_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_CREATE_CONTACT
+        contact_post_url = self.api_domain + self.API_ENDPOINT_CREATE_CONTACT
         headers = {
-            'Authorization': 'Bearer %s' % settings.PAYMENTS_LEXOFFICE_API_KEY, 
+            'Authorization': 'Bearer %s' % self.api_key,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         }
@@ -170,9 +180,9 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             This must set the `provider_id` field of the Invoice!
             @return: the same invoice instance if successful, raise Exception otherwise. """
             
-        post_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_CREATE_INVOICE
+        post_url = self.api_domain + self.API_ENDPOINT_CREATE_INVOICE
         headers = {
-            'Authorization': 'Bearer %s' % settings.PAYMENTS_LEXOFFICE_API_KEY, 
+            'Authorization': 'Bearer %s' % self.api_key,
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         }
@@ -239,7 +249,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         return result_json['documentFileId']
     
     def _finalize_invoice_at_provider(self, invoice):
-        """ Calls the action to render an invoice as PDF on the server. 
+        """ Calls the action to render an invoice as PDF on the server.
             Expects the `provider_id` field of the Invoice set!
             This must set in `extra_data` such attributes, that are needed to download the rendered invoice
             document by `self._download_invoice_from_provider()`
@@ -248,11 +258,11 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not invoice.provider_id:
             raise Exception('`provider_id` not present in invoice!')
         
-        get_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_RENDER_INVOICE % {
+        get_url = self.api_domain + self.API_ENDPOINT_RENDER_INVOICE % {
             'id': invoice.provider_id
         }
         headers = {
-            'Authorization': 'Bearer %s' % settings.PAYMENTS_LEXOFFICE_API_KEY, 
+            'Authorization': 'Bearer %s' % self.api_key,
             'Accept': 'application/json',
         }
         req = requests.get(get_url, headers=headers)
@@ -260,7 +270,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API render failed, request did not return status=200.', extra=extra)
-            print(extra)
             if settings.DEBUG:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
@@ -301,11 +310,11 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'documentFileId' in invoice.extra_data:
             raise Exception('`documentFileId` not present in invoice `extra_data`!')
         
-        get_url = settings.PAYMENTS_LEXOFFICE_API_DOMAIN + self.API_ENDPOINT_DOWNLOAD_INVOICE % {
+        get_url = self.api_domain + self.API_ENDPOINT_DOWNLOAD_INVOICE % {
             'id': invoice.extra_data['documentFileId']
         }
         headers = {
-            'Authorization': 'Bearer %s' % settings.PAYMENTS_LEXOFFICE_API_KEY, 
+            'Authorization': 'Bearer %s' % self.api_key,
         }
         req = requests.get(get_url, headers=headers)
         

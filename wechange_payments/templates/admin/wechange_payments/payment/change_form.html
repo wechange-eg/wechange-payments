@@ -2,7 +2,7 @@
 {% load i18n admin_urls %}
 
 {% block object-tools-items %}
-    {% with subscription=original.subscription invoice=original.invoice %}
+    {% with subscription=original.subscription invoice=original.invoice additional_invoices=original.additional_invoices.all %}
         <li>
             <a href="#" style="font-size:1.3em; font-weight: bold;">
                 {% trans "Related to" %}
@@ -28,6 +28,16 @@
                     <i class="icon-eye-open icon-alpha75"></i>
                     {% trans "Invoice" %}: {{ invoice.id }}  ({{ invoice.created|date:"d.m.Y" }})
                 </a>
+            </li>
+        {% endif %}
+        {% if additional_invoices %}
+            <li>
+                {% for additional_invoice in additional_invoices %}
+                    <a href="{{ additional_invoice.get_admin_change_url }}">
+                        <i class="icon-eye-open icon-alpha75"></i>
+                        {% trans "Additional Invoice" %}: {{ additional_invoice.id }}  ({{ additional_invoice.created|date:"d.m.Y" }})
+                    </a>
+                {% endfor %}
             </li>
         {% endif %}
     {% endwith %}

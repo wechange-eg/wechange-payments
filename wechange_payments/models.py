@@ -489,7 +489,7 @@ class Subscription(models.Model):
         return reverse('admin:wechange_payments_subscription_change', kwargs={'object_id': self.id})
 
 
-class Invoice(models.Model):
+class BaseInvoice(models.Model):
     
     # not created yet at the provider. if an invoice is stuck at this state, the api might not be available
     STATE_0_NOT_CREATED = 0
@@ -508,12 +508,6 @@ class Invoice(models.Model):
         (STATE_3_DOWNLOADED, _('Downloaded and ready')),
     )
     
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'), 
-        editable=False, related_name='invoices', on_delete=models.CASCADE, null=False)
-    payment = models.OneToOneField('wechange_payments.Payment', verbose_name=_('Payment'), 
-        on_delete=models.PROTECT, related_name='invoice', null=False, editable=False, unique=True,
-        help_text='The first payment for this subscription, which is also used to book any future payments.')
-    
     state = models.PositiveSmallIntegerField(_('Invoice State'), blank=False,
         default=STATE_0_NOT_CREATED, choices=STATES, editable=False,
         help_text='An invoice\'s state can only ever increase.')
@@ -531,9 +525,8 @@ class Invoice(models.Model):
         help_text='Used to indicate when the last attempt to retrieve the invoice from the provider was made, so not to spam them in case their API is down.')
     
     class Meta(object):
+        abstract = True
         ordering = ('-created',)
-        verbose_name = _('Invoice')
-        verbose_name_plural = _('Invoices')
     
     def get_absolute_url(self):
         return reverse('wechange-payments:invoice-detail', kwargs={'pk': self.pk})
@@ -544,4 +537,42 @@ class Invoice(models.Model):
     def get_admin_change_url(self):
         """ Returns the django admin edit page for this object. """
         return reverse('admin:wechange_payments_invoice_change', kwargs={'object_id': self.id})
+
+
+class Invoice(BaseInvoice):
     
+    class Meta(BaseInvoice.Meta):
+        verbose_name = _('Invoice')
+        verbose_name_plural = _('Invoices')
+        
+    payment = models.OneToOneField('wechange_payments.Payment', verbose_name=_('Payment'),
+        on_delete=models.PROTECT, related_name='invoice', null=False, editable=False, unique=True,
+        help_text='The payment for which this main invoice is created.')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'),
+        editable=False, related_name='invoices', on_delete=models.CASCADE, null=False)
+        
+
+class AdditionalInvoice(BaseInvoice):
+    
+    """ TODO: explanation of the difference to Invoice """
+    
+    class Meta(BaseInvoice.Meta):
+        verbose_name = _('Additional Invoice')
+        verbose_name_plural = _('Additional Invoices')
+    
+    payment = models.ForeignKey('wechange_payments.Payment', verbose_name=_('Payment'),
+        on_delete=models.PROTECT, related_name='additional_invoices', null=True, blank=True, editable=False,
+        help_text='The payment of this additional invoice.')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'),
+        editable=False, related_name='additional_invoices', on_delete=models.CASCADE, null=False)
+    
+    def get_absolute_url(self):
+        # Additional invoices do not have a detail, only a download URL.
+        return self.get_download_url()
+
+    def get_download_url(self):
+        return reverse('wechange-payments:additional-invoice-download', kwargs={'pk': self.pk})
+
+    def get_admin_change_url(self):
+        """ Returns the django admin edit page for this object. """
+        return reverse('admin:wechange_payments_additionalinvoice_change', kwargs={'object_id': self.id})
