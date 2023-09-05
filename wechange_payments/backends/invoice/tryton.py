@@ -59,3 +59,7 @@ class TrytonInvoiceBackend(LexofficeInvoiceBackend):
             'payment_type': invoice.payment.type,
         })
         return data
+    
+    def _add_contact_invoice_request_params(self, payment, data):
+        """ Overriden from LexOffice logic, we do not use contacts for Tryton """
+        return data

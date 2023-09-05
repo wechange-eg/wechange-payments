@@ -98,16 +98,20 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             },
             'introduction': force_text(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
         }
-        # add LexOffice contact ID if one was created in reference payment
-        reference_payment = payment if payment.is_reference_payment else payment.subscription.reference_payment
-        contact_id = reference_payment.extra_data.get(EXTRA_DATA_CONTACT_ID, None)
-        if contact_id:
-            data['address']['contactId'] = contact_id
+        data = self._add_contact_invoice_request_params(payment, data)
         
         if getattr(settings, 'PAYMENTS_INVOICE_REMARK'):
             data.update({
                 'remark': force_text(getattr(settings, 'PAYMENTS_INVOICE_REMARK')),
             })
+        return data
+    
+    def _add_contact_invoice_request_params(self, payment, data):
+        # add LexOffice contact ID if one was created in reference payment
+        reference_payment = payment if payment.is_reference_payment else payment.subscription.reference_payment
+        contact_id = reference_payment.extra_data.get(EXTRA_DATA_CONTACT_ID, None)
+        if contact_id:
+            data['address']['contactId'] = contact_id
         return data
     
     def _create_contact_for_payment(self, invoice, force=False):
