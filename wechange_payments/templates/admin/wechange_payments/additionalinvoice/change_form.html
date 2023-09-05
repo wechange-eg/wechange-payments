@@ -1,0 +1,35 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    {% with subscription=original.payment.subscription payment=original.payment %}
+        <li>
+            <a href="#" style="font-size:1.3em; font-weight: bold;">
+                {% trans "Related to" %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'admin:auth_user_change' object_id=original.user.id %}">
+                <i class="icon-eye-open icon-alpha75"></i>
+                {% trans "User" %}: {{ original.user.get_full_name }}
+            </a>
+        </li>
+        {% if payment %}
+            <li>
+                <a href="{{ payment.get_admin_change_url }}">
+                    <i class="icon-eye-open icon-alpha75"></i>
+                    {% trans "Payment" %}: {{ payment.id }} ({{ payment.completed_at|date:"d.m.Y" }})
+                </a>
+            </li>
+        {% endif %}
+        {% if subscription %}
+            <li>
+                <a href="{{ subscription.get_admin_change_url }}">
+                    <i class="icon-eye-open icon-alpha75"></i>
+                    {% trans "Subscription" %}: {{ subscription.id }}
+                </a>
+            </li>
+        {% endif %}
+    {% endwith %}
+    {{ block.super }}
+{% endblock %}

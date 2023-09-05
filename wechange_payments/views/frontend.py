@@ -26,7 +26,7 @@ from wechange_payments.backends import get_invoice_backend
 from wechange_payments.conf import settings
 from wechange_payments.forms import PaymentsForm
 from wechange_payments.models import Subscription, Payment, \
-    USERPROFILE_SETTING_POPUP_CLOSED, Invoice, USERPROFILE_SETTING_POPUP_USER_IS_NEW
+    USERPROFILE_SETTING_POPUP_CLOSED, Invoice, USERPROFILE_SETTING_POPUP_USER_IS_NEW, AdditionalInvoice
 from wechange_payments.payment import cancel_subscription as do_cancel_subscription
 from wechange_payments.tests.example_data import TEST_DATA_SEPA_PAYMENT_FORM
 
@@ -453,6 +453,13 @@ class InvoiceDownloadView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, Detail
         return response
     
 invoice_download = InvoiceDownloadView.as_view()
+
+
+class AdditionalInvoiceDownloadView(InvoiceDownloadView):
+    
+    model = AdditionalInvoice
+
+additional_invoice_download = AdditionalInvoiceDownloadView.as_view()
 
 
 class CancelSubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):

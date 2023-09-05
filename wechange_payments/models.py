@@ -565,3 +565,14 @@ class AdditionalInvoice(BaseInvoice):
         help_text='The payment of this additional invoice.')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('User'),
         editable=False, related_name='additional_invoices', on_delete=models.CASCADE, null=False)
+    
+    def get_absolute_url(self):
+        # Additional invoices do not have a detail, only a download URL.
+        return self.get_download_url()
+
+    def get_download_url(self):
+        return reverse('wechange-payments:additional-invoice-download', kwargs={'pk': self.pk})
+
+    def get_admin_change_url(self):
+        """ Returns the django admin edit page for this object. """
+        return reverse('admin:wechange_payments_additionalinvoice_change', kwargs={'object_id': self.id})
