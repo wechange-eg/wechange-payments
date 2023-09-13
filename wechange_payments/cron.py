@@ -8,8 +8,8 @@ from django_cron import CronJobBase, Schedule
 from cosinnus.cron import CosinnusCronJobBase
 from wechange_payments.payment import process_due_subscription_payments
 from wechange_payments.conf import settings
-from wechange_payments.backends import get_invoice_backend
-from wechange_payments.models import Payment
+from wechange_payments.backends import get_invoice_backend, get_additional_invoice_backends
+from wechange_payments.models import Payment, AdditionalInvoice
 from django.db.models import Q
 
 logger = logging.getLogger('wechange-payments')
@@ -52,14 +52,15 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
             return disabled_msg
         
         invoice_backend = get_invoice_backend()
-        missing_invoice_payments = Payment.objects.filter(status=Payment.STATUS_PAID).filter(Q(invoice=None) | Q(invoice__is_ready=False))
+        missing_invoice_payments = Payment.objects.filter(status=Payment.STATUS_PAID).filter(
+            Q(invoice=None) | Q(invoice__is_ready=False))
         missing_before = missing_invoice_payments.count()
         invoices_created = 0
         for payment in missing_invoice_payments:
             invoice_backend.create_invoice_for_payment(payment, threaded=False)
             if payment.invoice is not None:
                 invoices_created += 1
-                
+        
         still_missing = Payment.objects.filter(status=Payment.STATUS_PAID).filter(Q(invoice=None) | Q(invoice__is_ready=False)).count()
         return "Missing: %d. Invoices generated: %d. Still missing: %d"\
              % (missing_before, invoices_created, still_missing)

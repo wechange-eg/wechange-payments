@@ -3,9 +3,9 @@
 from django.contrib import admin, messages
 from django.utils.translation import ugettext_lazy as _
 
-from wechange_payments.backends import get_invoice_backend
+from wechange_payments.backends import get_invoice_backend, get_additional_invoice_backends
 from wechange_payments.models import Payment, TransactionLog, Subscription, \
-    Invoice
+    Invoice, AdditionalInvoice
 from cosinnus.conf import settings
 from datetime import timedelta
 from wechange_payments.payment import process_due_subscription_payments,\
@@ -14,15 +14,25 @@ from django.utils.timezone import now
 from wechange_payments.mails import send_payment_event_payment_email,\
     PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED, PAYMENT_EVENT_SUCCESSFUL_PAYMENT
 from django.utils import translation
+from django.contrib.admin import DateFieldListFilter
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('internal_transaction_id', 'status', 'user', 'amount', 'type', 'completed_at', 'vendor_transaction_id', 'subscription')
-    list_filter = ('type',)
-    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
+    list_display = ('internal_transaction_id', 'status', 'user_account_name', 'invoice_name', 'email', 'amount', 'type', 'completed_at', 'subscription', 'additional_invoices')
+    list_filter = ('type', ('completed_at', DateFieldListFilter),)
+    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'email', 'first_name', 'last_name', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
     readonly_fields = ('backend', 'vendor_transaction_id', 'internal_transaction_id', 'amount', 'is_reference_payment', 'completed_at', 'last_action_at', 'extra_data', 'subscription')
     raw_id_fields = ('user',)
-    actions = ['create_invoice', 'resend_payment_email',]
+    actions = ['create_invoice', 'create_additional_invoices', 'resend_payment_email',]
+    
+    def user_account_name(self, obj):
+        return obj.user.get_full_name()
+    
+    def invoice_name(self, obj):
+        return f'{obj.first_name} {obj.last_name}'
+    
+    def additional_invoices(self, obj):
+        return obj.additional_invoices.count()
     
     def resend_payment_email(self, request, queryset):
         for payment in queryset:
@@ -39,9 +49,19 @@ class PaymentAdmin(admin.ModelAdmin):
         invoice_backend = get_invoice_backend()
         for payment in queryset:
             invoice_backend.create_invoice_for_payment(payment, threaded=True)
-        message = _('Started invoice creation for %(number)d payment(s) in background.') % {'number':len(queryset)}
+        
+        message = _('Started invoice creation for %(number)d payment(s) in background.') % {'number': len(queryset)}
         self.message_user(request, message)
     create_invoice.short_description = _("Create invoice in Invoice API (threaded)")
+    
+    def create_additional_invoices(self, request, queryset):
+        for payment in queryset:
+            for additional_invoice_backend in get_additional_invoice_backends():
+                additional_invoice_backend.create_invoice_for_payment(payment, threaded=True, additional_invoice=True)
+        
+        message = _('Started additional invoice creation for %(number)d payment(s) in background.') % {'number': len(queryset)}
+        self.message_user(request, message)
+    create_additional_invoices.short_description = _("Create additional invoices in Invoice API (threaded)")
     
     def has_delete_permission(self, request, obj=None):
         """ Can't delete/add Payments """
@@ -55,12 +75,21 @@ admin.site.register(Payment, PaymentAdmin)
 
 
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_ready', 'state', 'payment', 'created', 'last_action_at')
+    list_display = ('user', 'is_ready', 'state', 'payment', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
     list_filter = ('is_ready', 'state', )
-    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'payment__vendor_transaction_id', 'payment__internal_transaction_id', 'created')
-    readonly_fields = ('state',)
+    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'payment__vendor_transaction_id', 'payment__internal_transaction_id', 'payment__email', 'payment__first_name', 'payment__last_name', 'created')
+    readonly_fields = ('state', 'backend')
     raw_id_fields = ('user',)
     actions = ['create_invoice',]
+    
+    def user_account_name(self, obj):
+        return obj.user.get_full_name()
+    
+    def payment_name(self, obj):
+        return f'{obj.payment.first_name} {obj.payment.last_name}'
+    
+    def payment_email(self, obj):
+        return obj.payment.email
     
     def create_invoice(self, request, queryset):
         invoice_backend = get_invoice_backend()
@@ -79,6 +108,23 @@ class InvoiceAdmin(admin.ModelAdmin):
         return False
     
 admin.site.register(Invoice, InvoiceAdmin)
+
+
+class AdditionalInvoiceAdmin(InvoiceAdmin):
+    
+    def create_invoice(self, request, queryset):
+        count = 0
+        for additional_invoice_backend in get_additional_invoice_backends():
+            for invoice in queryset:
+                if invoice.backend == '%s.%s' %(additional_invoice_backend.__class__.__module__, additional_invoice_backend.__class__.__name__):
+                    additional_invoice_backend.create_invoice(invoice, threaded=True)
+                    count +=1
+        message = _('Started additional invoice creation for %(count)d of %(total)d selected payment(s) in background.') % {'count': count, 'total': len(queryset)}
+        self.message_user(request, message)
+    
+    create_invoice.short_description = _("Run/continue additional invoice in Invoice API (threaded)")
+
+admin.site.register(AdditionalInvoice, AdditionalInvoiceAdmin)
 
 
 class TransactionLogAdmin(admin.ModelAdmin):

@@ -8,10 +8,10 @@ from django.test import Client
 from django.test.testcases import TestCase, SimpleTestCase
 from django.urls.base import reverse
 
-from wechange_payments.backends import get_backend, get_invoice_backend
+from wechange_payments.backends import get_backend, get_invoice_backend, get_additional_invoice_backends
 from wechange_payments.conf import PAYMENT_TYPE_DIRECT_DEBIT
 from wechange_payments.conf import settings
-from wechange_payments.models import Payment, Subscription, Invoice
+from wechange_payments.models import Payment, Subscription, Invoice, AdditionalInvoice
 from wechange_payments.tests.example_data import TEST_DATA_SEPA_PAYMENT_FORM,\
     TEST_DATA_SEPA_PAYMENT_FORM_AUSTRIA
 from django.utils.timezone import now
@@ -114,13 +114,24 @@ class PaymentsUnitTest(TestCase):
         # manually trigger the invoice generation (it wasn't done automatically as hooks are disabled for testing)
         invoice_backend = get_invoice_backend()
         invoice_backend.create_invoice_for_payment(payment, threaded=False)
-        invoice = get_object_or_None(Invoice, user=self.loyal_user)
+        invoice = get_object_or_None(Invoice, payment=payment, user=self.loyal_user)
         self.assertIsNotNone(invoice, 'Invoice created after payment')
         self.assertEqual(invoice.state, Invoice.STATE_3_DOWNLOADED, 'Invoice was completed')
         self.assertTrue(invoice.is_ready, 'Invoice ready flag set')
         self.assertIsNotNone(invoice.file, 'Invoice file downloaded and available')
         self.assertEqual(invoice.payment, payment, 'Invoice references payment')
         
+        # test additional invoices (additional backend needs to be configured in local settings!)
+        for additional_invoice_backend in get_additional_invoice_backends():
+            additional_invoice_backend.create_invoice_for_payment(payment, threaded=False, additional_invoice=True)
+            additional_invoice = get_object_or_None(AdditionalInvoice, payment=payment, user=self.loyal_user, backend='%s.%s' %(additional_invoice_backend.__class__.__module__, additional_invoice_backend.__class__.__name__))
+            self.assertIsNotNone(additional_invoice, 'Invoice created after payment')
+            self.assertEqual(additional_invoice.state, Invoice.STATE_3_DOWNLOADED, 'Invoice was completed')
+            self.assertTrue(additional_invoice.is_ready, 'Invoice ready flag set')
+            self.assertIsNotNone(additional_invoice.file, 'Invoice file downloaded and available')
+            self.assertEqual(additional_invoice.payment, payment, 'Invoice references payment')
+            print(f'>>> additional invoice tested fine!')
+            
         # for a new user, make a payment. this user will make a one-time payment and then cancel his subscription
         self.disloyal_user = self._create_user(username='disloyal_user')
         self.client.force_login(self.disloyal_user)
@@ -219,6 +230,16 @@ class PaymentsUnitTest(TestCase):
         self.assertIsNotNone(invoice.file, 'Invoice file downloaded and available')
         self.assertEqual(invoice.payment, recurrent_payment, 'Invoice references recurrent_payment')
         
+        # test additional invoices (additional backend needs to be configured in local settings!)
+        for additional_invoice_backend in get_additional_invoice_backends():
+            additional_invoice_backend.create_invoice_for_payment(recurrent_payment, threaded=False, additional_invoice=True)
+            additional_invoice = get_object_or_None(AdditionalInvoice, payment=recurrent_payment, user=self.loyal_user, backend='%s.%s' % (additional_invoice_backend.__class__.__module__, additional_invoice_backend.__class__.__name__))
+            self.assertIsNotNone(additional_invoice, 'Invoice created after recurrent_payment')
+            self.assertEqual(additional_invoice.state, Invoice.STATE_3_DOWNLOADED, 'Invoice was completed')
+            self.assertTrue(additional_invoice.is_ready, 'Invoice ready flag set')
+            self.assertIsNotNone(additional_invoice.file, 'Invoice file downloaded and available')
+            self.assertEqual(additional_invoice.payment, recurrent_payment, 'Invoice references recurrent_payment')
+            print(f'>>> additional invoice tested fine!')
         
         # a user with an active subscription should not be able to make another one
         self.client.force_login(self.loyal_user)
