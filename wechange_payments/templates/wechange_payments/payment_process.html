@@ -28,7 +28,7 @@
 				{% trans "Please complete your payment with the payment provider, or restart the payment process." context "(PRC2)" %}
 			</p>
 		{% elif payment.status == 2 %}
-			<meta http-equiv="refresh" content="5" />
+			<meta http-equiv="refresh" content="5">
 			<p>
 				{% trans "Please wait while your payment is being processed..." context "(PRC3)" %}
 				<i class="fa fa-spinner fa-spin"></i>
