@@ -5,7 +5,7 @@ import logging
 import traceback
 
 from django.core.management.base import BaseCommand
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cosinnus.conf import settings
 from cosinnus.core.middleware.cosinnus_middleware import initialize_cosinnus_after_startup
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             logger.info('Manual subscription payment processing finished.',
                 extra={'ended_subscriptions': ended_subscriptions, 'booked_subscriptions': booked_subscriptions})
         except Exception as e:
-            logger.error('A critical error occured during daily subscription payment processing and bubbled up completely! Exception was: %s' % force_text(e), 
+            logger.error('A critical error occured during daily subscription payment processing and bubbled up completely! Exception was: %s' % force_str(e),
                          extra={'exception': e, 'trace': traceback.format_exc()})
             if settings.DEBUG:
                 raise

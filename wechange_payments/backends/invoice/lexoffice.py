@@ -4,7 +4,7 @@ import logging
 from uuid import uuid1
 
 from django.core.files.base import ContentFile
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import pgettext_lazy
 import requests
 
@@ -57,8 +57,8 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             recipient_name = payment.first_name + ' ' + payment.last_name
             supplement = None
         
-        item_name = force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
-        item_description = force_text(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
+        item_name = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
+        item_description = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
         item_description += f' (transaction-id: {payment.internal_transaction_id}, type: {payment.type})'
         data = {
             'archived': False,
@@ -95,13 +95,13 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 'shippingDate': invoice.created.isoformat(timespec='milliseconds'),
                 'shippingType': 'service'
             },
-            'introduction': force_text(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
+            'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
         }
         data = self._add_contact_invoice_request_params(payment, data)
         
         if getattr(settings, 'PAYMENTS_INVOICE_REMARK'):
             data.update({
-                'remark': force_text(getattr(settings, 'PAYMENTS_INVOICE_REMARK')),
+                'remark': force_str(getattr(settings, 'PAYMENTS_INVOICE_REMARK')),
             })
         return data
     

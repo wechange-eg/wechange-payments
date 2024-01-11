@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib import admin, messages
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from wechange_payments.backends import get_invoice_backend, get_additional_invoice_backends
 from wechange_payments.models import Payment, TransactionLog, Subscription, \
