@@ -10,10 +10,10 @@ from django.dispatch.dispatcher import receiver
 from django.http.response import HttpResponseForbidden, HttpResponseNotFound, FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.formats import date_format
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.detail import DetailView
 
@@ -438,7 +438,7 @@ class InvoiceDownloadView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, Detail
     
         response = FileResponse(open(path, 'rb'), content_type='application/pdf')
         short_date = date_format(invoice.created, format='SHORT_DATE_FORMAT', use_l10n=True)
-        filename = '%s-%s-%s.pdf' % (CosinnusPortal.get_current().name, force_text(_('Invoice')), short_date)
+        filename = '%s-%s-%s.pdf' % (CosinnusPortal.get_current().name, force_str(_('Invoice')), short_date)
         # To inspect details for the below code, see http://greenbytes.de/tech/tc2231/
         user_agent = self.request.META.get('HTTP_USER_AGENT', [])
         if u'WebKit' in user_agent:
@@ -483,7 +483,7 @@ class CancelSubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, Tem
                 messages.success(request, _('(MSG1) Your current Subscription was terminated.'))
                 return redirect('wechange-payments:overview')
         except Exception as e:
-            logger.error('Critical: Could not terminate a subscription!', extra={'exc': force_text(e)})
+            logger.error('Critical: Could not terminate a subscription!', extra={'exc': force_str(e)})
             messages.error(request, _('(MSG2) There was an error terminating your subscription! Please contact the customer support!'))
             if settings.DEBUG:
                 raise

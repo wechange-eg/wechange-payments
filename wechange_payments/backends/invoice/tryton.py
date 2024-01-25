@@ -4,7 +4,7 @@ import logging
 from uuid import uuid1
 
 from django.core.files.base import ContentFile
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import pgettext_lazy
 import requests
 

@@ -8,7 +8,7 @@ from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls.base import reverse
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \

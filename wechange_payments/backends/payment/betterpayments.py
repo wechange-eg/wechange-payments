@@ -9,7 +9,7 @@ from annoying.functions import get_object_or_None
 from django.core.exceptions import PermissionDenied
 from django.urls.base import reverse
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import requests
 import six
 
