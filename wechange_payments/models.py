@@ -5,6 +5,7 @@ import logging
 from annoying.functions import get_object_or_None
 from dateutil import relativedelta
 from django.db import models
+from django.contrib import admin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.urls.base import reverse
 from django.utils.timezone import now
@@ -63,6 +64,7 @@ class DebitPeriodMixin:
         ) % {'months': self.debit_period_months}
 
     @property
+    @admin.display(description=_('Debiting Amount'))
     def debit_amount(self):
         """Actual payment amount computed from the monthly amount and the debit_period."""
         return self.amount * self.debit_period_months
