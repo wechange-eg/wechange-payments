@@ -10,7 +10,7 @@
                 <span class="annotation">
                     <span class="moment-data-date" data-date="{{ object.created|date:'c' }}"></span>
                 </span>
-            	{% blocktrans with date=object.created.date|localize amount=object.payment.amount|intify %}Invoice for {{ amount }}€ from {{ date }}{% endblocktrans %}
+            	{% blocktrans with date=object.created.date|localize amount=object.payment.debit_amount|intify %}Invoice for {{ amount }}€ from {{ date }}{% endblocktrans %}
             </div>
         </li>
     </ul>

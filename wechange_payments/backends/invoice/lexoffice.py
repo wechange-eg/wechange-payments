@@ -80,7 +80,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                     'unitName': 'Stück',
                     'unitPrice': {
                         'currency': 'EUR',
-                        'grossAmount': payment.amount,
+                        'grossAmount': payment.debit_amount,
                         'taxRatePercentage': self._get_tax_rate_percent(),
                     },
                 },

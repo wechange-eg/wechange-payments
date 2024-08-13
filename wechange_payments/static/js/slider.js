@@ -1,9 +1,19 @@
 $(function() {
-	
-	var update_slider = function (event, ui) {
+
+	var update_debit_amount = function (event) {
+		var amount = $(".payment-slider #value").val();
+		var debit_period = $(".period-slider #value").val();
+		var debit_months = PAYMENTS_DEBIT_PERIOD_MONTHS[debit_period];
+		var debit_sum = amount * debit_months;
+		var debit_period_display = PAYMENTS_DEBIT_PERIODS[debit_period];
+		var display = debit_sum + " € " + debit_period_display;
+		$(".period-slider #display").text(display);
+	};
+
+	var update_amount_slider = function (event, ui) {
 		var selectAll = false;
 		console.log(ui.value)
-		
+
 		// for invalid values, jump back to default value and select input box
 		if (!$.isNumeric(ui.value)) {
 			ui.value = PAYMENTS_SLIDER_INITIAL_MONTHLY_AMOUNT;
@@ -16,7 +26,7 @@ $(function() {
 		// set the values on slide
 		$(".payment-slider #value").val(ui.value);
 		$('.payment-slider #slider').slider('value', ui.value)
-		
+
 		if (selectAll) {
 			$(".payment-slider #value").focus().select();
 		}
@@ -59,6 +69,9 @@ $(function() {
 				$submitButton.attr('disabled', 'disabled').addClass('disabled');
 			}
 		}
+
+		// update the debit amount to the changed monthly amount value
+		update_debit_amount();
 	};
 
 	$slider = $('.payment-slider #slider');
@@ -108,3 +121,18 @@ $(function() {
 		].join(';');
 		$('.period-slider #slider').attr('style', style);
 
+		// update the debit amount to the changed debit period
+		update_debit_amount();
+	};
+
+	$period_slider = $('.period-slider #slider');
+	$period_slider.slider({
+		value: PAYMENTS_DEBIT_PERIOD_SLIDER_VALUES.indexOf(PAYMENTS_DEBIT_PERIOD_INITIAL),
+		min: 0,
+		max: PAYMENTS_DEBIT_PERIOD_SLIDER_VALUES.length - 1,
+		step: 1,
+		slide: update_period_slider,
+	});
+	// on initial, trigger slide event to update visuals
+	$period_slider.slider('option', 'slide')(null, {value: $period_slider.slider('value'), initial: true});
+});

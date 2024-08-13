@@ -43,6 +43,7 @@ def create_subscription_for_payment(payment):
             user=payment.user,
             reference_payment=payment,
             amount=payment.amount,
+            debit_period=payment.debit_period,
             last_payment=payment,
         )
         
@@ -332,13 +333,23 @@ def terminate_suspended_subscription(subscription):
     return True
     
 
-def change_subscription_amount(subscription, amount):
-    """ Ends the currently active or waiting subscription for a user """
+def change_subscription_amount(subscription, amount, debit_period):
+    """ Changes the amount and/or debit_period of a subscription for a user """
     # check min/max payment amounts
     if amount > settings.PAYMENTS_MAXIMUM_ALLOWED_MONTHLY_AMOUNT or \
             amount < settings.PAYMENTS_MINIMUM_ALLOWED_MONTHLY_AMOUNT:
         return False
+
+    # set amount and debit period
     subscription.amount = amount
+    subscription.debit_period = debit_period
+
+    # safety check the debit amount
+    if subscription.debit_amount > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT or \
+            subscription.debit_amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
+        return False
+
+    # save subscription and send email
     subscription.save()
     send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED)
     return True
