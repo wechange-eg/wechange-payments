@@ -120,7 +120,7 @@ class BaseBackend(object):
         paid_payments_month = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=twenty_eight_days)
         payment_sum = paid_payments_month.aggregate(Sum('amount')).get('amount__sum', None)
         payment_sum = 0.0 if payment_sum is None else payment_sum
-        if payment_sum > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT:
+        if payment_sum > settings.PAYMENTS_MAXIMUM_ALLOWED_MONTHLY_AMOUNT:
             logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_recurring_payment_safety_checks` was prevented because the sum of Payment amounts for this user in the last 28 days exceeds the maximum hardcap payment amount!', 
                 extra={'user': user, 'payment_sum': payment_sum})
             return False
