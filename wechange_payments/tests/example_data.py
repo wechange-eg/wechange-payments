@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from wechange_payments.conf import PAYMENT_TYPE_DIRECT_DEBIT
+from wechange_payments.models import DebitPeriodMixin
 
 TEST_DATA_SEPA_PAYMENT_FORM = {
     'payment_type': PAYMENT_TYPE_DIRECT_DEBIT,
     'amount': 2.0,
+    'debit_period': DebitPeriodMixin.DEBIT_PERIOD_MONTHLY,
     'address':'Straße 73',
     'city': 'Berlin',
     'postal_code': 11111,
@@ -22,6 +24,7 @@ TEST_DATA_SEPA_PAYMENT_FORM = {
 TEST_DATA_SEPA_PAYMENT_FORM_AUSTRIA = {
     'payment_type': PAYMENT_TYPE_DIRECT_DEBIT,
     'amount': 2.0,
+    'debit_period': DebitPeriodMixin.DEBIT_PERIOD_MONTHLY,
     'address':'Straße 73',
     'city': 'Wien',
     'postal_code': 1111,
