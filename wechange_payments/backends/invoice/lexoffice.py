@@ -5,6 +5,7 @@ from uuid import uuid1
 
 from django.core.files.base import ContentFile
 from django.utils.encoding import force_str
+from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 import requests
 
@@ -62,7 +63,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         item_description += f' (transaction-id: {payment.internal_transaction_id}, type: {payment.type})'
         data = {
             'archived': False,
-            'voucherDate': invoice.created.isoformat(timespec='milliseconds'),
+            'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
             'address': {
                 'name': recipient_name,
                 'supplement': supplement,
@@ -92,7 +93,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 'taxType': 'gross',
             },
             'shippingConditions': {
-                'shippingDate': invoice.created.isoformat(timespec='milliseconds'),
+                'shippingDate': invoice.created.isoformat(timespec='milliseconds'), # the actual date of the booking
                 'shippingType': 'service'
             },
             'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
