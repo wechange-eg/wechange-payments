@@ -51,6 +51,7 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
         if disabled_msg:
             return disabled_msg
         
+        successful_invoices = ''
         invoice_backend = get_invoice_backend()
         missing_invoice_payments = Payment.objects.filter(status=Payment.STATUS_PAID).filter(
             Q(invoice=None) | Q(invoice__is_ready=False))
@@ -59,11 +60,17 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
         for payment in missing_invoice_payments:
             invoice_backend.create_invoice_for_payment(payment, threaded=False)
             if payment.invoice is not None:
+                invoice = payment.invoice
                 invoices_created += 1
+                if invoice.state > invoice.STATE_0_NOT_CREATED:
+                    successful_invoices += 'Changed state of Invoice id "%s" (internal id "%s") to "%s".\n' % (invoice.id, invoice.provider_id, invoice.state)
         
         still_missing = Payment.objects.filter(status=Payment.STATUS_PAID).filter(Q(invoice=None) | Q(invoice__is_ready=False)).count()
-        return "Missing: %d. Invoices generated: %d. Still missing: %d"\
+        ret_msg = "Missing: %d. Invoices generated: %d. Still missing: %d"\
              % (missing_before, invoices_created, still_missing)
+        if successful_invoices:
+            ret_msg += '\n\n-----------\n' + successful_invoices
+        return ret_msg
 
 
 def _check_cron_disabled_on_portal():
