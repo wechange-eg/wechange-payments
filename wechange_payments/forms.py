@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from wechange_payments.conf import settings, PAYMENT_TYPE_CREDIT_CARD,\
     PAYMENT_TYPE_PAYPAL, PAYMENT_TYPE_DIRECT_DEBIT
+from wechange_payments.models import DebitPeriodMixin
     
 from schwifty import IBAN, BIC
 
@@ -23,6 +24,7 @@ class PaymentsForm(forms.Form):
     
     payment_type = forms.ChoiceField(choices=[(type, PAYMENT_CHOICES[type]) for type in settings.PAYMENTS_ACCEPTED_PAYMENT_METHODS])
     amount = forms.FloatField()
+    debit_period = forms.ChoiceField(choices=DebitPeriodMixin.DEBIT_PERIOD_CHOICES)
     
     first_name = forms.CharField()
     last_name = forms.CharField()

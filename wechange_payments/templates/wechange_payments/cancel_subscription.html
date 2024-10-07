@@ -25,7 +25,7 @@
     	<h3>{% trans "What happens when you terminate your subscription" context "(TS3)" %}</h3>
     	<p>
 			{% if current_subscription.state == 3 %}
-				{% trans "No payments have been made yet. Your monthly Contribution will be cancelled." context "(TS4) (explanation)" %}
+				{% trans "No payments have been made yet. Your Contribution will be cancelled." context "(TS4) (explanation)" %}
 			{% elif current_subscription.state == 2 %}
 				{% blocktrans with date=current_subscription.next_due_date|localize context "(TS5)" %}Your subscription will be terminated and no future payments will be made. Your current payment status will remain active until {{ date }}. You can reset the payments at any time.{% endblocktrans %}
 			{% endif %}
@@ -53,7 +53,7 @@
 		</div>
     	
 	    {% captureas label %}{% trans "Do you really want to terminate your subscriptions? You can create a new contribution at any time." context "(TS7)" %}{% endcaptureas %}
-	    {% captureas title %}{% trans "You don't want to pay monthly contributions anymore?" context "(TS8)" %}{% endcaptureas %}
+	    {% captureas title %}{% trans "You don't want to pay contributions anymore?" context "(TS8)" %}{% endcaptureas %}
 	    {% include "cosinnus/modal_box.html" with id="cancel_confirm_modal" label=label title=title title_icon="fa-close" form_action="." %}
     </div>
     

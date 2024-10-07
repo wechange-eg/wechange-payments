@@ -148,6 +148,15 @@ window.PaymentForm = {
 		var payment_type = $form.find('select[name="payment_type"]').val();
 		summaryContainer.find('[data-summary-payment-type]').hide();
 		summaryContainer.find('[data-summary-payment-type="' + payment_type + '"]').show();
+		// show debit period
+		var debit_period = $form.find('input[name="debit_period"]').val();
+		var debit_period_display = PAYMENTS_DEBIT_PERIODS[debit_period];
+		summaryContainer.find('[data-summary-item="debit_period"]').text(debit_period_display);
+		// compute and show debit amount
+		var amount = $form.find('input[name="amount"]').val();
+		var debit_months = PAYMENTS_DEBIT_PERIOD_MONTHS[debit_period];
+		var debit_amount = amount * debit_months;
+		summaryContainer.find('[data-summary-item="debit_amount"]').text(debit_amount);
 	},
 }
 

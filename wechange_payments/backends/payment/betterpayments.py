@@ -250,6 +250,8 @@ class BetterPaymentBackend(BaseBackend):
         order_id = str(uuid.uuid4())
         params = {
             'amount': reference_payment.subscription.amount, # use amount of subscription, not payment, as subscription amount can be changed!
+            'debit_period': reference_payment.subscription.debit_period,
+            'debit_amount': reference_payment.subscription.debit_amount,
             'address': reference_payment.address,
             'city': reference_payment.city,
             'postal_code': reference_payment.postal_code,
@@ -319,7 +321,7 @@ class BetterPaymentBackend(BaseBackend):
             'recurring': 1,
             'postback_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-postback-endpoint'),
             
-            'amount': params['amount'],
+            'amount': params['debit_amount'],
             'address': params['address'],
             'city': params['city'],
             'postal_code': params['postal_code'],
@@ -438,6 +440,7 @@ class BetterPaymentBackend(BaseBackend):
             vendor_transaction_id=result.get('transaction_id'),
             internal_transaction_id=result.get('order_id'),
             amount=float(params['amount']),
+            debit_period=params['debit_period'],
             type=payment_type,
             status=Payment.STATUS_STARTED,
             is_reference_payment=(not is_recurring),

@@ -1,0 +1,29 @@
+{% load i18n cosinnus_tags %}
+
+<div class="slider-container">
+    <div class="slider-row">
+        <div class="slider-col text-center period-slider">
+                
+            <div class="">
+            	<div class="value-frame">
+                    <div class="amount-container">
+                        <span id="display" class="period-value"></span>
+                        <input id="value" type="hidden" name="{{ field_name }}">
+                    </div>
+                </div>
+                <div id="slider">
+                	<div class="background"></div>
+                </div>
+
+                <div class="period-range">
+                    {% for period in debit_periods.values %}
+                    <div class="period-label">
+                        {{ period }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

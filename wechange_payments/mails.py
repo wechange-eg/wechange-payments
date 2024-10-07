@@ -111,7 +111,8 @@ def send_payment_event_payment_email(payment, event):
             'link_payment_issues': link_html % reverse('wechange_payments:suspended-subscription'),
             'portal_name': portal.name,
             'username': full_name(payment.user),
-            'payment_amount': str(int(payment.amount)),
+            'payment_amount': str(int(payment.debit_amount)),
+            'debit_period': payment.debit_period,
             'vat_amount': str(int(settings.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT)),
             'subscription_amount': str(int(payment.subscription.amount)),
             'next_debit_date': localize(payment.subscription.get_next_payment_date()),
@@ -133,7 +134,7 @@ def send_payment_event_payment_email(payment, event):
         if payment.type == PAYMENT_TYPE_DIRECT_DEBIT and event == PAYMENT_EVENT_SUCCESSFUL_PAYMENT:
             sepa_variables = {
                 'payment': payment.subscription.reference_payment,
-                'payment_amount': payment.amount, # the amount from the current payment, not the reference payment, in case it has changed since!
+                'payment_amount': payment.debit_amount,  # the amount from the current payment, not the reference payment, in case it has changed since!
                 'SETTINGS': settings,
             }
             data['mail_body'] += '\n\n-\n\n' + render_to_string('wechange_payments/mail/sepa_mandate_partial.html', sepa_variables)

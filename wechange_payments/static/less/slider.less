@@ -35,7 +35,7 @@
 		  		border: 1px solid @slider-background-color;
 		  		background-color: @amount-background-color;
 		  	}
-		  	.amount-frame, .amount-currency {
+		  	.amount-frame, .amount-currency, .period-value {
 		  		color: @slider-main-color;
 				font-size: 20px;
 				font-weight: bold;
@@ -181,7 +181,19 @@
 	.under-40 {
 		display: block;
 	}
-	
-	
-  
+
+	.period-range {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		flex-direction: row;
+		white-space: nowrap;
+		margin-top: 14px;
+		color: #333;
+
+		.period-label {
+			font-weight: bold;
+			line-height: 42px;
+		}
+	}
 }
