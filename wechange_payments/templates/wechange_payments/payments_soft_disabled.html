@@ -1,0 +1,41 @@
+{% extends "wechange_payments/base.html" %}
+{% load l10n i18n cosinnus_tags static widget_tweaks %}
+
+{% block page_title %}{% trans "New payments are currently disabled!" %}{% endblock %}
+
+{% block leftnav %}
+	{% include 'wechange_payments/leftnav.html' %}
+{% endblock leftnav %}
+
+
+{% block content %}
+ 
+	<div class="alert alert-warning alert-dismissable">
+		<i class="fa fa-warning fa-3x"></i>
+		<h4>{% trans "New payments are currently disabled!" %}</h4>
+		<div class="v-offset-s">
+			<p>
+				{% trans "Changing and making new payments is temporarily disabled while we are performing maintenance on our payment system. The service will be back soon. Please apologize the inconveniences!" %}
+			</p>
+			<p>
+				{% trans "You can view infos about your payments here" %}:
+				<a href="{% url "wechange-payments:payment-infos" %}">{% trans "Your payment details" context "(INF1)" %}</a>
+			</p>
+			
+			<p>
+				{% trans "You can cancel your current subscription here" %}:
+				<a class="active" href="{% url 'wechange-payments:cancel-subscription' %}">{% trans "Stop payments" context "(TS1)" %}</a>
+			</p>
+		</div>
+	</div>
+	
+	<div class="v2-content">
+		{% if displayed_subscription %}
+			{% include 'wechange_payments/partials/conditional_payment_header.html' with subscription=displayed_subscription %}
+		{% else %}
+			{% include 'wechange_payments/partials/conditional_payment_header.html' with subscription=subscription %}
+		{% endif %}
+	</div>
+ 
+{% endblock %}
+

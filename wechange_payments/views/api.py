@@ -41,6 +41,8 @@ def make_payment(request, on_success_func=None, make_postponed=False):
     
     if not request.method=='POST':
         return HttpResponseNotAllowed(['POST'])
+    if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS:
+        return HttpResponseForbidden('Making payments is currently disabled!')
     
     backend = get_backend()
     params = request.POST.copy()
@@ -121,6 +123,8 @@ def make_subscription_payment(request):
         return HttpResponseNotAllowed(['POST'])
     if not request.user.is_authenticated:
         return HttpResponseForbidden('You must be logged in to do that!')
+    if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS:
+        return HttpResponseForbidden('Making payments is currently disabled!')
     
     update_payment = request.POST.get('update_payment', '0')
     update_payment = update_payment == '1'
@@ -183,6 +187,8 @@ def subscription_change_amount(request):
         return HttpResponseNotAllowed(['POST'])
     if not request.user.is_authenticated:
         return HttpResponseForbidden('You must be logged in to do that!')
+    if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS:
+        return HttpResponseForbidden('Making payments is currently disabled!')
     
     # if the user has no active or waiting sub, we cannot change the amount of it
     active_sub = Subscription.get_active_for_user(request.user)

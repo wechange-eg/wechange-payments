@@ -3,7 +3,7 @@ import os
 
 name = 'wechange-payments'
 package = 'wechange_payments'
-version = '0.1.2'
+version = '0.1.3'
 
 url = 'https://github.com/wechange-eg/wechange-payments'
 author = 'Sascha Narr'

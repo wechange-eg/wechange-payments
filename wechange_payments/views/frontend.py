@@ -44,7 +44,23 @@ class CheckAdminOnlyPhaseMixin(object):
         return super(CheckAdminOnlyPhaseMixin, self).dispatch(request, *args, **kwargs)
 
 
-class PaymentView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
+class BlockViewIfSoftDisabledMixin(object):
+    """ Checks if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS is True and if so,
+        accepts no POST requests and shows an empty template with only a warning saying
+        that making or changing payments is not possible right now. """
+    
+    def dispatch(self, request, *args, **kwargs):
+        if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS and request.method != 'GET':
+            raise PermissionDenied('Making payments is currently disabled!')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_template_names(self, *args, **kwargs):
+        if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS:
+            return ['wechange_payments/payments_soft_disabled.html']
+        return super().get_template_names(*args, **kwargs)
+
+
+class PaymentView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     
     template_name = 'wechange_payments/payment_form.html'
     
@@ -119,7 +135,7 @@ class PaymentUpdateView(PaymentView):
 payment_update = PaymentUpdateView.as_view()
 
 
-class PaymentSuccessView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
+class PaymentSuccessView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
     """ This view shows the "thank-you" screen once the Payment+Subscription is complete. """
     
     model = Payment
@@ -151,7 +167,7 @@ class PaymentSuccessView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailV
 payment_success = PaymentSuccessView.as_view()
 
 
-class PaymentProcessView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
+class PaymentProcessView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, DetailView):
     """ A view that will be redirected to while a payment is still being processed.
         It will automatically refresh itself, wait for the Payment to be set to STATUS_PAID
         (in the background, initiated by a postback request from Better Payment) and
@@ -218,7 +234,7 @@ class OverviewView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, RedirectView)
 overview = OverviewView.as_view()
 
 
-class MySubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
+class MySubscriptionView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ Shows informations about the active or queued subscription and lets the user
         adjust the payment amount. """
     
@@ -258,7 +274,7 @@ class MySubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, Templat
 my_subscription = MySubscriptionView.as_view()
 
 
-class SuspendedSubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
+class SuspendedSubscriptionView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
     """ Shows informations about the currently suspended subscription. """
     
     template_name = 'wechange_payments/suspended_subscription.html'

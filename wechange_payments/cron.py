@@ -75,6 +75,10 @@ class GenerateMissingInvoices(CosinnusCronJobBase):
 
 def _check_cron_disabled_on_portal():
     """ If anything but False is returned, payment crons should not run on this portal """
+    # check if payments are soft disabled currently
+    if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS:
+        return "Skipped cronjob: PAYMENTS_SOFT_DISABLE_PAYMENTS is currently set!"
+    
     # check if a portal restriction applies for the cron
     specific_portal_slugs = getattr(settings, 'PAYMENTS_CRON_ENABLED_FOR_SPECIFIC_PORTAL_SLUGS_ONLY', []) 
     if specific_portal_slugs:

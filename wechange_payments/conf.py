@@ -38,7 +38,13 @@ class WechangePaymentsDefaultSettings(AppConf):
     """ Payment Source Infos """
     
     PAYMENT_RECIPIENT_NAME = 'Die WECHANGE Genossenschaft'
-    SEPA_CREDITOR_ID = None # 
+    SEPA_CREDITOR_ID = None #
+    
+    """ Payments app settings """
+    
+    # if set to True, prevent new payments from being made, cronjobs from running, and prevent any changes
+    # to users' payments except for cancelling their subscription
+    SOFT_DISABLE_PAYMENTS = False
     
     """ Payment Form settings """
     
