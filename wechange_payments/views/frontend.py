@@ -19,6 +19,7 @@ from django.views.generic.detail import DetailView
 
 from cosinnus.core.signals import userprofile_created
 from cosinnus.models.group import CosinnusPortal
+from cosinnus.utils.http import make_csv_response
 from cosinnus.utils.permissions import check_user_superuser
 from cosinnus.utils.urls import get_non_cms_root_url, redirect_next_or
 from cosinnus.views.mixins.group import RequireLoggedInMixin
@@ -506,6 +507,20 @@ class CancelSubscriptionView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, Tem
         return redirect('wechange-payments:overview')
 
 cancel_subscription = CancelSubscriptionView.as_view()
+
+
+def admin_stats(request):
+    """ Prints out a simple csv of successful payments with format
+        "payment-date,payment-amount" for admins only as stats """
+    if request and not request.user.is_superuser:
+        return HttpResponseForbidden('Not authenticated')
+    
+    header = ['payment-date', 'payment-amount']
+    payments = []
+    for payment in Payment.objects.filter(status=Payment.STATUS_PAID, revoked=False, completed_at__isnull=False).order_by('-completed_at'):
+        payments.append([payment.completed_at.date(), payment.amount])
+    
+    return make_csv_response(payments, row_names=header, file_name='payl-stats.csv')
 
 
 def debug_delete_subscription(request):

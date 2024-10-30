@@ -23,6 +23,7 @@ urlpatterns = [
     path('account/invoices/<int:pk>/', frontend.invoice_detail, name='invoice-detail'),
     path('account/invoices/<int:pk>/download/', frontend.invoice_download, name='invoice-download'),
     path('account/additional_invoices/<int:pk>/download/', frontend.additional_invoice_download, name='additional-invoice-download'),
+    path('account/payl_stats/', frontend.admin_stats, name='admin-stats'),
     
     #path('payments/api/payment/', api.make_payment, name='api-make-payment'),
     path('payments/api/subscription-payment/', api.make_subscription_payment, name='api-make-subscription-payment'),
