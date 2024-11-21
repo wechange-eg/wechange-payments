@@ -33,7 +33,7 @@
 				</tr>
 				<tr>
 					<td>{% trans "Amount" context "(INF11)" %}</td>
-					<td>{{ last_payment.amount|intify }} €</td>
+					<td>{{ last_payment.debit_amount|intify }} €</td>
 				</tr>
 			</table>
 		</div>
@@ -80,9 +80,9 @@
 				</tr>
 				{% if subscription.state > 1 %}
 					<tr>
-						<td>{% trans "Your current monthly contribution" context "(INF6)" %}</td>
+						<td>{% trans "Your current contribution" context "(INF6)" %}</td>
 						<td>
-							<span>{{ subscription.amount|intify }} €</span>
+							<span>{{ subscription.debit_amount|intify }} € {{ subscription.get_debit_period_display }}</span>
 						</td>
 					</tr>
 				{% endif %}
@@ -94,7 +94,7 @@
 		        	{% if subscription.state == 1 %}
 		        		{% trans "Set up new Contribution" context "(INF8.2)" %}
 		        	{% else %}
-						{% trans "Adjust contribution amount or terminate your Contribution" context "(INF8.1)" %}
+						{% trans "Adjust or terminate your Contribution" context "(INF8.1)" %}
 					{% endif %}
 		        </span>
 		    </a>

@@ -49,17 +49,22 @@ class WechangePaymentsDefaultSettings(AppConf):
     """ Payment Form settings """
     
     # the displayed slider min amount
-    MINIMUM_PAYMENT_AMOUNT = 1.0
+    MINIMUM_MONTHLY_AMOUNT = 1.0
     # the displayed slider max amount
-    MAXIMUM_PAYMENT_AMOUNT = 20.0
+    MAXIMUM_MONTHLY_AMOUNT = 20.0
     # the displayed slider default amount
-    DEFAULT_PAYMENT_AMOUNT = 10.0
+    DEFAULT_MONTHLY_AMOUNT = 10.0
     
+    # the lowest allowed amount for a monthly payment
+    MINIMUM_ALLOWED_MONTHLY_AMOUNT = 1.0
+    # the highest allowed amount for a monthly payment
+    MAXIMUM_ALLOWED_MONTHLY_AMOUNT = 100.0
+
     # the lowest allowed amount for a payment transaction
-    MINIMUM_ALLOWED_PAYMENT_AMOUNT = 1.0 
-    # the highest allowed amount for a payment transaction
-    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = 100.0 
-    
+    MINIMUM_ALLOWED_PAYMENT_AMOUNT = MINIMUM_MONTHLY_AMOUNT
+    # the highest allowed amount for payment transaction
+    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = MAXIMUM_MONTHLY_AMOUNT * 12
+
     # how many days until the payment popup is shown again for non-subscribers, after clicking it away
     POPUP_SHOW_AGAIN_DAYS = 30
     # how many days after a new user registered to show the popup, instead of immediately
