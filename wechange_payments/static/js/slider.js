@@ -12,7 +12,6 @@ $(function() {
 
 	var update_amount_slider = function (event, ui) {
 		var selectAll = false;
-		console.log(ui.value)
 
 		// for invalid values, jump back to default value and select input box
 		if (!$.isNumeric(ui.value)) {
