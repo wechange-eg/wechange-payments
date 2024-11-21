@@ -1,18 +1,4 @@
-{% load l10n static %}
-
-{% localize off %}
-<script type="text/javascript">
-	var PAYMENTS_MINIMUM_MONTHLY_AMOUNT = {{ SETTINGS.PAYMENTS_MINIMUM_MONTHLY_AMOUNT }};
-	var PAYMENTS_MAXIMUM_MONTHLY_AMOUNT = {{ SETTINGS.PAYMENTS_MAXIMUM_MONTHLY_AMOUNT }};
-	var PAYMENTS_MAXIMUM_ALLOWED_MONTHLY_AMOUNT = {{ SETTINGS.PAYMENTS_MAXIMUM_ALLOWED_MONTHLY_AMOUNT }};
-	var PAYMENTS_SLIDER_INITIAL_MONTHLY_AMOUNT = {% if slider_initial_amount %}{{ slider_initial_amount }}{% else %}{{ SETTINGS.PAYMENTS_DEFAULT_MONTHLY_AMOUNT }}{% endif %};
-
-    var PAYMENTS_DEBIT_PERIODS = {{ debit_periods|safe }};
-    var PAYMENTS_DEBIT_PERIOD_MONTHS = {{ debit_period_months|safe }};
-    var PAYMENTS_DEBIT_PERIOD_SLIDER_VALUES = {{ debit_period_values|safe }};
-    var PAYMENTS_DEBIT_PERIOD_INITIAL = {% if debit_period_initial %}"{{ debit_period_initial }}"{% else %}"{{ debit_period_values|first }}"{% endif %};
-</script>
-{% endlocalize %}
+{% load static %}
 
 <script src="{% static "js/vendor/jquery-ui.slider.min.js" %}"></script>
 <script src="{% static "js/slider.js" %}"></script>

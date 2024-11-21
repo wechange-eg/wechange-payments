@@ -1,16 +1,21 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
-{% block extrahead %}
+{% block cosinnus_jshead %}
 	{{ block.super }}
 	
 	{% if not displayed_subscription or displayed_subscription.state == 1 %}
-		{% include 'wechange_payments/partials/slider_dependencies.html' %}
+		{% include 'wechange_payments/partials/slider_constants.html' %}
 	{% else %}
-		{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=displayed_subscription.amount %}
-	{% endif %}		
+		{% include 'wechange_payments/partials/slider_constants.html' with slider_initial_amount=displayed_subscription.amount %}
+	{% endif %}
 {% endblock %}
 
+{% block extrahead %}
+	{{ block.super }}
+	
+	{% include 'wechange_payments/partials/slider_dependencies.html' %}
+{% endblock %}
 
 {% block page_title %}
 	{% if is_update_form %}

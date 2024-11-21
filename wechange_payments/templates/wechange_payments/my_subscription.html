@@ -1,10 +1,16 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
+{% block cosinnus_jshead %}
+	{{ block.super }}
+	
+	{% include 'wechange_payments/partials/slider_constants.html' with slider_initial_amount=subscription.amount  debit_period_initial=subscription.debit_period %}
+{% endblock %}
+
 {% block extrahead %}
 	{{ block.super }}
 	
-	{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=subscription.amount  debit_period_initial=subscription.debit_period %}
+	{% include 'wechange_payments/partials/slider_dependencies.html' %}
 {% endblock %}
 
 {% block page_title %}{% trans "Your Contribution" context "(MS1)" %}{% endblock %}
