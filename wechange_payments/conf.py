@@ -152,6 +152,12 @@ class WechangePaymentsDefaultSettings(AppConf):
             }
         }]
     """
+    
+    # if set, will add a "portalID" attribute to the invoice creation payload, to identify the portal
+    # that the invoice came from. e.g. setting 'INVOICE_PORTAL_ID = "WE' would result in the attribute
+    # {'Portal-ID': 'WE-0000003'} (for user-id 3)
+    INVOICE_PORTAL_ID = None
+    
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.
