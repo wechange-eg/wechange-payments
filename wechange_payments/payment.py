@@ -201,13 +201,13 @@ def book_next_subscription_payment(subscription):
         # to do with the actual payment. so we retry this 3 different times
         if subscription.num_attempts_recurring < 3:
             # we haven't retried 3 times, count up tries in the subscription  
-            logger.error('Payments: (will retry) Trying to make the next subscription payment returned an error (from our backend or provider backend). Retrying next day.', 
+            logger.warning('Payments: (will retry) Trying to make the next subscription payment returned an error (often an actual payment method issue). Retrying next day.',
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             subscription.has_problems = True
             subscription.save()
         else:
             # we have retried 3 times. appearently the problem is with the payment itself
-            logger.error('Payments: (giving up) Trying to make the next subscription payment returned an error (from our backend or provider backend). Failed 3 times for this subscription and giving up.', 
+            logger.warning('Payments: (giving up) Trying to make the next subscription payment returned an error (often an actual payment method issue). Failed 3 times for this subscription and giving up.',
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             # set the subscription to failed and email the user
             suspend_failed_subscription(subscription)
