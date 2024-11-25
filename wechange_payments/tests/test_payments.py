@@ -19,6 +19,7 @@ from django.utils.timezone import now
 from wechange_payments.payment import process_due_subscription_payments
 from datetime import timedelta, datetime, date
 from copy import copy
+from freezegun import freeze_time
 
 
 logger = logging.getLogger('wechange-payments')
@@ -269,14 +270,6 @@ class PaymentsUnitTest(TestCase):
         self.assertEqual(response.status_code, 200, 'Payment response redirects')
         return user
 
-    def _turn_back_subscription_due_date(self, n_months, subscriptions):
-        for sub in subscriptions:
-            sub.created = sub.created - timedelta(days=(32 * n_months))
-            sub.set_next_due_date(sub.created.date())
-            sub.save()
-        for subscription in subscriptions:
-            subscription.refresh_from_db()
-
     def _process_due_subscriptions(self, subscriptions):
         process_due_subscription_payments()
         for subscription in subscriptions:
@@ -364,99 +357,95 @@ class PaymentsUnitTest(TestCase):
         self.assertEqual(yearly_subscription.next_due_date, next_year)
 
         # test monthly subscription (for completion’s sake)
-        self._turn_back_subscription_due_date(1, subscriptions)
-
-        self.assertTrue(monthly_subscription.check_payment_due())
-        self.assertFalse(quarterly_subscription.check_payment_due())
-        self.assertFalse(half_yearly_subscription.check_payment_due())
-        self.assertFalse(yearly_subscription.check_payment_due())
-
-        # process due payments
-        self._process_due_subscriptions(subscriptions)
-
-        # check payment was made
-        monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
-        quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
-        half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
-        yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
-
-        self.assertEqual(monthly_payments.count(), 2)
-        self.assertEqual(quarterly_payments.count(), 1)
-        self.assertEqual(half_yearly_payments.count(), 1)
-        self.assertEqual(yearly_payments.count(), 1)
+        with freeze_time(now()+timedelta(days=30)):
+            self.assertTrue(monthly_subscription.check_payment_due())
+            self.assertFalse(quarterly_subscription.check_payment_due())
+            self.assertFalse(half_yearly_subscription.check_payment_due())
+            self.assertFalse(yearly_subscription.check_payment_due())
+    
+            # process due payments
+            self._process_due_subscriptions(subscriptions)
+    
+            # check payment was made
+            monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
+            quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
+            half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
+            yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
+    
+            self.assertEqual(monthly_payments.count(), 2)
+            self.assertEqual(quarterly_payments.count(), 1)
+            self.assertEqual(half_yearly_payments.count(), 1)
+            self.assertEqual(yearly_payments.count(), 1)
 
         # test quarterly subscription
-        self._turn_back_subscription_due_date(3, subscriptions)
-
-        self.assertTrue(monthly_subscription.check_payment_due())
-        self.assertTrue(quarterly_subscription.check_payment_due())
-        self.assertFalse(half_yearly_subscription.check_payment_due())
-        self.assertFalse(yearly_subscription.check_payment_due())
-
-        # process due payments
-        self._process_due_subscriptions(subscriptions)
-
-        # check payments were made
-        monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
-        quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
-        half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
-        yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
-        self.assertEqual(monthly_payments.count(), 3)
-        self.assertEqual(quarterly_payments.count(), 2)
-        self.assertEqual(half_yearly_payments.count(), 1)
-        self.assertEqual(yearly_payments.count(), 1)
+        with freeze_time(now() + timedelta(days=31 * 3)):
+            self.assertTrue(monthly_subscription.check_payment_due())
+            self.assertTrue(quarterly_subscription.check_payment_due())
+            self.assertFalse(half_yearly_subscription.check_payment_due())
+            self.assertFalse(yearly_subscription.check_payment_due())
+    
+            # process due payments
+            self._process_due_subscriptions(subscriptions)
+    
+            # check payments were made
+            monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
+            quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
+            half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
+            yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
+            self.assertEqual(monthly_payments.count(), 3)
+            self.assertEqual(quarterly_payments.count(), 2)
+            self.assertEqual(half_yearly_payments.count(), 1)
+            self.assertEqual(yearly_payments.count(), 1)
 
         # test half-yearly subscription
-        self._turn_back_subscription_due_date(6, subscriptions)
-
-        self.assertTrue(monthly_subscription.check_payment_due())
-        self.assertTrue(quarterly_subscription.check_payment_due())
-        self.assertTrue(half_yearly_subscription.check_payment_due())
-        self.assertFalse(yearly_subscription.check_payment_due())
-
-        # process due payments
-        self._process_due_subscriptions(subscriptions)
-
-        # check payments were made
-        monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
-        quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
-        half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
-        yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
-        self.assertEqual(monthly_payments.count(), 4)
-        self.assertEqual(quarterly_payments.count(), 3)
-        self.assertEqual(half_yearly_payments.count(), 2)
-        self.assertEqual(yearly_payments.count(), 1)
+        with freeze_time(now() + timedelta(days=31 * 6)):
+            self.assertTrue(monthly_subscription.check_payment_due())
+            self.assertTrue(quarterly_subscription.check_payment_due())
+            self.assertTrue(half_yearly_subscription.check_payment_due())
+            self.assertFalse(yearly_subscription.check_payment_due())
+    
+            # process due payments
+            self._process_due_subscriptions(subscriptions)
+    
+            # check payments were made
+            monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
+            quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
+            half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
+            yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
+            self.assertEqual(monthly_payments.count(), 4)
+            self.assertEqual(quarterly_payments.count(), 3)
+            self.assertEqual(half_yearly_payments.count(), 2)
+            self.assertEqual(yearly_payments.count(), 1)
 
         # test yearly subscription
-        self._turn_back_subscription_due_date(12, subscriptions)
-
-        self.assertTrue(monthly_subscription.check_payment_due())
-        self.assertTrue(quarterly_subscription.check_payment_due())
-        self.assertTrue(half_yearly_subscription.check_payment_due())
-        self.assertTrue(yearly_subscription.check_payment_due())
-
-        # process due payments
-        self._process_due_subscriptions(subscriptions)
-
-        # check payments were made
-        monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
-        quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
-        half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
-        yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
-        self.assertEqual(monthly_payments.count(), 5)
-        self.assertEqual(quarterly_payments.count(), 4)
-        self.assertEqual(half_yearly_payments.count(), 3)
-        self.assertEqual(yearly_payments.count(), 2)
-
-        # check debit amounts
-        monthly_payment = monthly_payments.first()
-        quarterly_payment = quarterly_payments.first()
-        half_yearly_payment = half_yearly_payments.first()
-        yearly_payment = yearly_payments.first()
-        self.assertEqual(monthly_payment.debit_amount, monthly_amount)
-        self.assertEqual(quarterly_payment.debit_amount, monthly_amount * 3)
-        self.assertEqual(half_yearly_payment.debit_amount, monthly_amount * 6)
-        self.assertEqual(yearly_payment.debit_amount, monthly_amount * 12)
+        with freeze_time(now() + timedelta(days=31 * 12)):
+            self.assertTrue(monthly_subscription.check_payment_due())
+            self.assertTrue(quarterly_subscription.check_payment_due())
+            self.assertTrue(half_yearly_subscription.check_payment_due())
+            self.assertTrue(yearly_subscription.check_payment_due())
+    
+            # process due payments
+            self._process_due_subscriptions(subscriptions)
+    
+            # check payments were made
+            monthly_payments = Payment.objects.filter(user=self.monthly_paying_user).order_by('-last_action_at')
+            quarterly_payments = Payment.objects.filter(user=self.quarterly_paying_user).order_by('-last_action_at')
+            half_yearly_payments = Payment.objects.filter(user=self.half_yearly_paying_user).order_by('-last_action_at')
+            yearly_payments = Payment.objects.filter(user=self.yearly_paying_user).order_by('-last_action_at')
+            self.assertEqual(monthly_payments.count(), 5)
+            self.assertEqual(quarterly_payments.count(), 4)
+            self.assertEqual(half_yearly_payments.count(), 3)
+            self.assertEqual(yearly_payments.count(), 2)
+    
+            # check debit amounts
+            monthly_payment = monthly_payments.first()
+            quarterly_payment = quarterly_payments.first()
+            half_yearly_payment = half_yearly_payments.first()
+            yearly_payment = yearly_payments.first()
+            self.assertEqual(monthly_payment.debit_amount, monthly_amount)
+            self.assertEqual(quarterly_payment.debit_amount, monthly_amount * 3)
+            self.assertEqual(half_yearly_payment.debit_amount, monthly_amount * 6)
+            self.assertEqual(yearly_payment.debit_amount, monthly_amount * 12)
 
     def test_2_anonymous_access_locked(self):
         pass

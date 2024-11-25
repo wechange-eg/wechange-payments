@@ -63,7 +63,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the lowest allowed amount for a payment transaction
     MINIMUM_ALLOWED_PAYMENT_AMOUNT = MINIMUM_MONTHLY_AMOUNT
     # the highest allowed amount for payment transaction
-    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = MAXIMUM_MONTHLY_AMOUNT * 12
+    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = MAXIMUM_ALLOWED_MONTHLY_AMOUNT * 12
 
     # how many days until the payment popup is shown again for non-subscribers, after clicking it away
     POPUP_SHOW_AGAIN_DAYS = 30

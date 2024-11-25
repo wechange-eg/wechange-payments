@@ -237,6 +237,8 @@ def subscription_change_amount(request):
     else:
         success = change_subscription_amount(subscription, amount, debit_period)
         if not success:
+            logger.warning('Payments: `change_subscription_amount` failed to apply.',
+                           extra={'user': request.user, 'subscription': subscription, 'amount': amount, 'amount': debit_period})
             return JsonResponse({'error': _('Your subscription amount or debit poriod could not be changed because of an unexpected error. Please contact our support!')}, status=500)
         change_message = _('Your changes have been saved! ')
         if amount_changed and debit_period_changed:

@@ -98,11 +98,11 @@ class BaseBackend(object):
         # --------- Pre-Payment Safety checks ----------
         # 0. Currently not accepting user-less payments
         if not user:
-            logger.warn('Payments: user_pre_recurring_payment_safety_checks was prevented because a userless payment was attempted.')
+            logger.warning('Payments: user_pre_recurring_payment_safety_checks was prevented because a userless payment was attempted.')
             return False
         # 1. User is active
         if not user.is_active:
-            logger.warn('Payments: user_pre_recurring_payment_safety_checks was prevented for an inactive user.', 
+            logger.warning('Payments: user_pre_recurring_payment_safety_checks was prevented for an inactive user.',
                 extra={'user': user})
             return False
         
@@ -110,20 +110,17 @@ class BaseBackend(object):
         if getattr(settings, 'PAYMENTS_OVERRIDE_SAFETY_CHECKS', False):
             return True
         
-        # 2. No existing successful payment in the last 14 days
-        if False:
-            # this check is deactivated for now, because of the way payments work now
-            # when changing payment data (an immediate upfront payment is made)
-            seven_days = now() - timedelta(days=14)
-            paid_payments = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=seven_days)
-            if paid_payments.count() > 0:
-                logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_recurring_payment_safety_checks` was prevented because of an existing successful Payment for this user in the last 7 days!', 
-                    extra={'user': user})
-                return False
+        # 2. No existing successful payment in the last 7 days
+        seven_days = now() - timedelta(days=7)
+        paid_payments = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=seven_days)
+        if paid_payments.count() > 0:
+            logger.critical('Payments: NEED TO INVESTIGATE! `user_pre_recurring_payment_safety_checks` was prevented because of an existing successful Payment for this user in the last 7 days!',
+                extra={'user': user})
+            return False
         
-        # 3. No payments for this user over the hardcapped payment amount in the last 27 days
+        # 3. No payments for this user over the hardcapped payment amount in the last (almost) year
         # FIXME: discuss with Sascha
-        twenty_eight_days = now() - timedelta(days=27)
+        twenty_eight_days = now() - timedelta(days=360)
         paid_payments_month = Payment.objects.filter(user=user, status=Payment.STATUS_PAID, completed_at__gt=twenty_eight_days)
         payment_sum = paid_payments_month.aggregate(Sum('amount')).get('amount__sum', None)
         payment_sum = 0.0 if payment_sum is None else payment_sum
