@@ -7,7 +7,7 @@
 	{% if not displayed_subscription or displayed_subscription.state == 1 %}
 		{% include 'wechange_payments/partials/slider_constants.html' %}
 	{% else %}
-		{% include 'wechange_payments/partials/slider_constants.html' with slider_initial_amount=displayed_subscription.amount %}
+		{% include 'wechange_payments/partials/slider_constants.html' with slider_initial_amount=displayed_subscription.amount debit_period_initial=displayed_subscription.debit_period %}
 	{% endif %}
 {% endblock %}
 
