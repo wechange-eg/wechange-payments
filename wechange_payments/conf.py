@@ -6,6 +6,9 @@ from django.conf import settings  # noqa
 from appconf import AppConf
 from django.utils.translation import pgettext_lazy
 
+from wechange_payments import VERSION as PAYMENTS_VERSION
+
+
 PAYMENT_TYPE_DIRECT_DEBIT = 'dd'
 PAYMENT_TYPE_CREDIT_CARD = 'cc'
 PAYMENT_TYPE_PAYPAL = 'paypal'
@@ -22,6 +25,8 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     class Meta(object):
         prefix = 'PAYMENTS'
+        
+    VERSION = PAYMENTS_VERSION
         
     BACKEND = 'wechange_payments.backends.payment.betterpayments.BetterPaymentBackend'
     INVOICE_BACKEND = 'wechange_payments.backends.invoice.lexoffice.LexofficeInvoiceBackend'
