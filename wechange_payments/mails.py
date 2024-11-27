@@ -46,12 +46,12 @@ MAIL_LINKS = pgettext_lazy('(MAILLINKS)', '(MAILLINKS) %(link_payment_info)s %(l
 MAIL_POST = pgettext_lazy('(MAILPOST)', '(MAILPOST) with variables: %(portal_name)s')
 
 MAIL_BODY = {
-    PAYMENT_EVENT_SUCCESSFUL_PAYMENT: pgettext_lazy('(MAIL2)', '(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s'),
-    PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1a)', '(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s'),
-    PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1b)', '(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s'),
-    PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED: pgettext_lazy('(MAIL3)', '(MAIL3) with variables: %(subscription_amount)s %(next_debit_date)s'),
+    PAYMENT_EVENT_SUCCESSFUL_PAYMENT: pgettext_lazy('(MAIL2)', '(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s %(payment_debit_period)s'),
+    PAYMENT_EVENT_NEW_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1a)', '(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s %(payment_debit_period)s'),
+    PAYMENT_EVENT_NEW_REPLACEMENT_SUBSCRIPTION_CREATED: pgettext_lazy('(MAIL1b)', '(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s %(payment_debit_period)s'),
+    PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED: pgettext_lazy('(MAIL3)', '(MAIL3) with variables: %(subscription_amount)s %(next_debit_date)s %(subscription_debit_period)s'),
     PAYMENT_EVENT_SUBSCRIPTION_TERMINATED: pgettext_lazy('(MAIL4)', '(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s'),
-    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL5)', '(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s'),
+    PAYMENT_EVENT_SUBSCRIPTION_SUSPENDED: pgettext_lazy('(MAIL5)', '(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s %(debit_period)s'),
     PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION: pgettext_lazy('(MAIL6)', '(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s %(sepa_creditor)s %(next_debit_date)s %(subscription_amount)s %(support_email)s'),
 }
 MAIL_SUBJECT = {
@@ -112,9 +112,10 @@ def send_payment_event_payment_email(payment, event):
             'portal_name': portal.name,
             'username': full_name(payment.user),
             'payment_amount': str(int(payment.debit_amount)),
-            'debit_period': payment.debit_period,
+            'payment_debit_period': payment.get_debit_period_display(),
             'vat_amount': str(int(settings.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT)),
-            'subscription_amount': str(int(payment.subscription.amount)),
+            'subscription_amount': str(int(payment.subscription.debit_amount)),
+            'subscription_debit_period': payment.subscription.get_debit_period_display(),
             'next_debit_date': localize(payment.subscription.get_next_payment_date()),
             'payment_method': payment.get_type_string(),
             'support_email': mail_html % (portal.support_email, portal.support_email),
