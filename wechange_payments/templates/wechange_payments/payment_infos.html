@@ -33,7 +33,7 @@
 				</tr>
 				<tr>
 					<td>{% trans "Amount" context "(INF11)" %}</td>
-					<td>{{ last_payment.debit_amount|intify }} €</td>
+					<td>{{ last_payment.debit_amount|intify }} € {{ last_payment.get_debit_period_display }}</td>
 				</tr>
 			</table>
 		</div>
