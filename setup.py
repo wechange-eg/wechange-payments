@@ -1,9 +1,10 @@
 from setuptools import setup
 import os
 
+from wechange_payments import VERSION as PAYMENTS_VERSION
+
 name = 'wechange-payments'
 package = 'wechange_payments'
-version = '0.1.3'
 
 url = 'https://github.com/wechange-eg/wechange-payments'
 author = 'Sascha Narr'
@@ -39,7 +40,7 @@ def get_package_data(package):
 
 setup(
     name=name,
-    version=version,
+    version=PAYMENTS_VERSION,
     url=url,
     license=license_,
     description=description,

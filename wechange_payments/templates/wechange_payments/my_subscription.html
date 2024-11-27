@@ -1,10 +1,16 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
+{% block cosinnus_jshead %}
+	{{ block.super }}
+	
+	{% include 'wechange_payments/partials/slider_constants.html' with slider_initial_amount=subscription.amount  debit_period_initial=subscription.debit_period %}
+{% endblock %}
+
 {% block extrahead %}
 	{{ block.super }}
 	
-	{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=subscription.amount %}
+	{% include 'wechange_payments/partials/slider_dependencies.html' %}
 {% endblock %}
 
 {% block page_title %}{% trans "Your Contribution" context "(MS1)" %}{% endblock %}
@@ -31,7 +37,12 @@
 		        <p class="error-message"></p>
 		    </div>
 		    
-		    <h2>{% blocktrans with amount=subscription.amount|intify context "(MS2)" %}Your current Contribution is {{ amount }} Euro per month{% endblocktrans %}</h2>
+		    <h2>
+                {% blocktrans with amount=subscription.debit_amount|intify debit_period=subscription.get_debit_period_display context "(MS2)" %}Your current Contribution is {{ amount }} Euro {{ debit_period }}{% endblocktrans %}
+                {% if not subscription.is_monthly %}
+                    {% blocktrans with amount=subscription.amount|intify context "(MS9)" %}({{ amount }} Euro per month){% endblocktrans %}
+                {% endif %}
+            </h2>
 			<p>
                 {% captureas desc_text %}{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(MS3)" %}We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.
 
@@ -55,10 +66,13 @@ If you can contribute less or nothing at all, we're sure you have good reasons. 
 					{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF24)" %}Contribution amount includes {{ vat_amount }}% VAT.{% endblocktrans %}
 				</span>
 			</div>
-			
-			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
-        	
-			
+
+            {% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
+
+            <h3>{% trans "Change your debit period" context "(MS8)" %}:</h3>
+
+            {% include 'wechange_payments/fields/period_slider.html' with field_name='debit_period' %}
+
 			<div class="button-section clearfix">
 				{% comment %} Add this to the button to make it initially disabled until the amount is changed:
 	                class="enabled-on-change disabled" disabled="disabled">

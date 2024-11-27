@@ -6,6 +6,9 @@ from django.conf import settings  # noqa
 from appconf import AppConf
 from django.utils.translation import pgettext_lazy
 
+from wechange_payments import VERSION as PAYMENTS_VERSION
+
+
 PAYMENT_TYPE_DIRECT_DEBIT = 'dd'
 PAYMENT_TYPE_CREDIT_CARD = 'cc'
 PAYMENT_TYPE_PAYPAL = 'paypal'
@@ -22,6 +25,8 @@ class WechangePaymentsDefaultSettings(AppConf):
     
     class Meta(object):
         prefix = 'PAYMENTS'
+        
+    VERSION = PAYMENTS_VERSION
         
     BACKEND = 'wechange_payments.backends.payment.betterpayments.BetterPaymentBackend'
     INVOICE_BACKEND = 'wechange_payments.backends.invoice.lexoffice.LexofficeInvoiceBackend'
@@ -49,17 +54,22 @@ class WechangePaymentsDefaultSettings(AppConf):
     """ Payment Form settings """
     
     # the displayed slider min amount
-    MINIMUM_PAYMENT_AMOUNT = 1.0
+    MINIMUM_MONTHLY_AMOUNT = 1.0
     # the displayed slider max amount
-    MAXIMUM_PAYMENT_AMOUNT = 20.0
+    MAXIMUM_MONTHLY_AMOUNT = 20.0
     # the displayed slider default amount
-    DEFAULT_PAYMENT_AMOUNT = 10.0
+    DEFAULT_MONTHLY_AMOUNT = 10.0
     
+    # the lowest allowed amount for a monthly payment
+    MINIMUM_ALLOWED_MONTHLY_AMOUNT = 1.0
+    # the highest allowed amount for a monthly payment
+    MAXIMUM_ALLOWED_MONTHLY_AMOUNT = 100.0
+
     # the lowest allowed amount for a payment transaction
-    MINIMUM_ALLOWED_PAYMENT_AMOUNT = 1.0 
-    # the highest allowed amount for a payment transaction
-    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = 100.0 
-    
+    MINIMUM_ALLOWED_PAYMENT_AMOUNT = MINIMUM_MONTHLY_AMOUNT
+    # the highest allowed amount for payment transaction
+    MAXIMUM_ALLOWED_PAYMENT_AMOUNT = MAXIMUM_ALLOWED_MONTHLY_AMOUNT * 12
+
     # how many days until the payment popup is shown again for non-subscribers, after clicking it away
     POPUP_SHOW_AGAIN_DAYS = 30
     # how many days after a new user registered to show the popup, instead of immediately
@@ -147,6 +157,12 @@ class WechangePaymentsDefaultSettings(AppConf):
             }
         }]
     """
+    
+    # if set, will add a "portalID" attribute to the invoice creation payload, to identify the portal
+    # that the invoice came from. e.g. setting 'INVOICE_PORTAL_ID = "WE' would result in the attribute
+    # {'Portal-ID': 'WE-0000003'} (for user-id 3)
+    INVOICE_PORTAL_ID = None
+    
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.

@@ -52,7 +52,20 @@ def make_payment(request, on_success_func=None, make_postponed=False):
     amount_or_error_response = _get_validated_amount(params['amount'])
     if isinstance(amount_or_error_response, JsonResponse):
         return amount_or_error_response
-    
+    amount = amount_or_error_response
+
+    # validate debit period
+    debit_period_or_error_response = _get_validated_debit_period(params['debit_period'])
+    if isinstance(debit_period_or_error_response, JsonResponse):
+        return debit_period_or_error_response
+    debit_period = debit_period_or_error_response
+
+    # compute debit amount from monthly amount and debit_period and validate
+    debit_amount_or_error_response = _get_validated_debit_amount(amount, debit_period)
+    if isinstance(debit_amount_or_error_response, JsonResponse):
+        return debit_amount_or_error_response
+    params['debit_amount'] = debit_amount_or_error_response
+
     payment_type = params.get('payment_type', None)
     error = 'Payment Type "%s" is not supported!' % payment_type 
     if payment_type in settings.PAYMENTS_ACCEPTED_PAYMENT_METHODS:
@@ -206,15 +219,36 @@ def subscription_change_amount(request):
     if isinstance(amount_or_error_response, JsonResponse):
         return amount_or_error_response
     amount = amount_or_error_response
-    
+
+    # validate debit period
+    debit_period_or_error_response = _get_validated_debit_period(request.POST.get('debit_period', None))
+    if isinstance(debit_period_or_error_response, JsonResponse):
+        return debit_period_or_error_response
+    debit_period = debit_period_or_error_response
+
     subscription = active_sub or waiting_sub
-    if subscription.amount == amount:
-        messages.success(request, _('The amount you selected was the same amount as before, so we did not change anything!'))
+    amount_changed = subscription.amount != amount
+    debit_period_changed = subscription.debit_period != debit_period
+    if not amount_changed and not debit_period_changed:
+        messages.success(
+            request,
+            _('The amount and debiting period you selected were the same as before, so we did not change anything!')
+        )
     else:
-        success = change_subscription_amount(subscription, amount)
+        success = change_subscription_amount(subscription, amount, debit_period)
         if not success:
-            return JsonResponse({'error': _('Your subscription amount could not be changed because of an unexpected error. Please contact our support!')}, status=500)
-        messages.success(request, _('Your changes have been saved! From now on your new chosen contribution amount will be paid. Thank you very much for your support!'))
+            logger.warning('Payments: `change_subscription_amount` failed to apply.',
+                           extra={'user': request.user, 'subscription': subscription, 'amount': amount, 'amount': debit_period})
+            return JsonResponse({'error': _('Your subscription amount or debit poriod could not be changed because of an unexpected error. Please contact our support!')}, status=500)
+        change_message = _('Your changes have been saved! ')
+        if amount_changed and debit_period_changed:
+            change_message += _('Starting with the next payment your new debiting period and new amount will be used. ')
+        elif amount_changed:
+            change_message += _('From now on your new chosen contribution amount will be paid. ')
+        else:  # debit_period_changed
+            change_message += _('Starting with the next payment your new debiting period will be used. ')
+        change_message += _('Thank you very much for your support!')
+        messages.success(request, change_message)
     
     redirect_url = reverse('wechange_payments:my-subscription')
     data = {
@@ -231,12 +265,34 @@ def _get_validated_amount(amount):
         return JsonResponse({'error': _('The amount submitted does not seem to be a number!')}, status=500)
     amount = float(amount)
     
-    # check min/max payment amounts
-    if amount > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT:
-        return JsonResponse({'error': _('The payment amount is higher than the allowed maximum amount!')}, status=500)
-    if amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
-        return JsonResponse({'error': _('The payment amount is lower than the allowed minimum amount!')}, status=500)
+    # check min/max of monthly payment amounts
+    if amount > settings.PAYMENTS_MAXIMUM_ALLOWED_MONTHLY_AMOUNT:
+        return JsonResponse({'error': _('The monthly amount is higher than the allowed maximum amount!')}, status=500)
+    if amount < settings.PAYMENTS_MINIMUM_ALLOWED_MONTHLY_AMOUNT:
+        return JsonResponse({'error': _('The monthly amount is lower than the allowed minimum amount!')}, status=500)
     return amount
+
+
+def _get_validated_debit_period(debit_period):
+    """ Validates if a given debit_period is a valid choice.
+        @return: The debit_period choice if valid, a JsonResponse with an error otherwise. """
+    if not debit_period:
+        return JsonResponse({'error': 'The debiting period is not set!'}, status=500)
+    if debit_period not in Subscription.DEBIT_PERIODS:
+        return JsonResponse({'error': 'The debiting period choice is not valid!'}, status=500)
+    return debit_period
+
+def _get_validated_debit_amount(amount, debit_period):
+    """ Validates the payment amount computed from the monthly amount and debit period.
+        @return: The debit_amount if valid, a JsonResponse with an error otherwise. """
+    debit_amount = amount * Subscription.DEBIT_PERIOD_MONTHS[debit_period]
+
+    # check min/max payment amounts
+    if debit_amount > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT:
+        return JsonResponse({'error': _('The payment amount is higher than the allowed maximum amount!')}, status=500)
+    if debit_amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
+        return JsonResponse({'error': _('The payment amount is lower than the allowed minimum amount!')}, status=500)
+    return debit_amount
 
 
 def success_endpoint(request):

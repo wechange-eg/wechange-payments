@@ -18,10 +18,10 @@ from django.contrib.admin import DateFieldListFilter
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('internal_transaction_id', 'status', 'user_account_name', 'invoice_name', 'email', 'amount', 'type', 'completed_at', 'subscription', 'additional_invoices')
+    list_display = ('internal_transaction_id', 'status', 'user_account_name', 'invoice_name', 'email', 'debit_amount', 'amount', 'type', 'completed_at', 'subscription', 'additional_invoices')
     list_filter = ('type', ('completed_at', DateFieldListFilter),)
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'email', 'first_name', 'last_name', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
-    readonly_fields = ('backend', 'vendor_transaction_id', 'internal_transaction_id', 'amount', 'is_reference_payment', 'completed_at', 'last_action_at', 'extra_data', 'subscription')
+    readonly_fields = ('backend', 'vendor_transaction_id', 'internal_transaction_id', 'amount', 'debit_period', 'debit_amount', 'is_reference_payment', 'completed_at', 'last_action_at', 'extra_data', 'subscription')
     raw_id_fields = ('user',)
     actions = ['create_invoice', 'create_additional_invoices', 'resend_payment_email',]
     
@@ -145,10 +145,10 @@ admin.site.register(TransactionLog, TransactionLogAdmin)
 
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'state', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
+    list_display = ('user', 'state', 'debit_amount', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
     list_filter = ('state', 'has_problems', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
-    readonly_fields = ('user', 'state', 'amount', 'num_attempts_recurring', 'next_due_date',)
+    readonly_fields = ('user', 'state', 'amount', 'debit_period', 'debit_amount', 'num_attempts_recurring', 'next_due_date',)
     raw_id_fields = ('user',)
     
     actions = ['resend_both_initial_emails', 'resend_subscription_email', 'terminate_suspended',]

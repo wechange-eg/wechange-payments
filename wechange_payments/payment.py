@@ -43,6 +43,7 @@ def create_subscription_for_payment(payment):
             user=payment.user,
             reference_payment=payment,
             amount=payment.amount,
+            debit_period=payment.debit_period,
             last_payment=payment,
         )
         
@@ -201,13 +202,13 @@ def book_next_subscription_payment(subscription):
         # to do with the actual payment. so we retry this 3 different times
         if subscription.num_attempts_recurring < 3:
             # we haven't retried 3 times, count up tries in the subscription  
-            logger.error('Payments: (will retry) Trying to make the next subscription payment returned an error (from our backend or provider backend). Retrying next day.', 
+            logger.warning('Payments: (will retry) Trying to make the next subscription payment returned an error (often an actual payment method issue). Retrying next day.',
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             subscription.has_problems = True
             subscription.save()
         else:
             # we have retried 3 times. appearently the problem is with the payment itself
-            logger.error('Payments: (giving up) Trying to make the next subscription payment returned an error (from our backend or provider backend). Failed 3 times for this subscription and giving up.', 
+            logger.warning('Payments: (giving up) Trying to make the next subscription payment returned an error (often an actual payment method issue). Failed 3 times for this subscription and giving up.',
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             # set the subscription to failed and email the user
             suspend_failed_subscription(subscription)
@@ -332,13 +333,23 @@ def terminate_suspended_subscription(subscription):
     return True
     
 
-def change_subscription_amount(subscription, amount):
-    """ Ends the currently active or waiting subscription for a user """
+def change_subscription_amount(subscription, amount, debit_period):
+    """ Changes the amount and/or debit_period of a subscription for a user """
     # check min/max payment amounts
-    if amount > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT or \
-            amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
+    if amount > settings.PAYMENTS_MAXIMUM_ALLOWED_MONTHLY_AMOUNT or \
+            amount < settings.PAYMENTS_MINIMUM_ALLOWED_MONTHLY_AMOUNT:
         return False
+
+    # set amount and debit period
     subscription.amount = amount
+    subscription.debit_period = debit_period
+
+    # safety check the debit amount
+    if subscription.debit_amount > settings.PAYMENTS_MAXIMUM_ALLOWED_PAYMENT_AMOUNT or \
+            subscription.debit_amount < settings.PAYMENTS_MINIMUM_ALLOWED_PAYMENT_AMOUNT:
+        return False
+
+    # save subscription and send email
     subscription.save()
     send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_AMOUNT_CHANGED)
     return True

@@ -45,6 +45,18 @@ class CheckAdminOnlyPhaseMixin(object):
         return super(CheckAdminOnlyPhaseMixin, self).dispatch(request, *args, **kwargs)
 
 
+class PaymentDebitPeriodMixin:
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(PaymentDebitPeriodMixin, self).get_context_data(*args, **kwargs)
+        context.update({
+            'debit_periods': Payment.DEBIT_PERIODS,
+            'debit_period_values': list(Payment.DEBIT_PERIODS.keys()),
+            'debit_period_months': Payment.DEBIT_PERIOD_MONTHS,
+        })
+        return context
+
+
 class BlockViewIfSoftDisabledMixin(object):
     """ Checks if settings.PAYMENTS_SOFT_DISABLE_PAYMENTS is True and if so,
         accepts no POST requests and shows an empty template with only a warning saying
@@ -61,7 +73,7 @@ class BlockViewIfSoftDisabledMixin(object):
         return super().get_template_names(*args, **kwargs)
 
 
-class PaymentView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
+class PaymentView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, PaymentDebitPeriodMixin, TemplateView):
     
     template_name = 'wechange_payments/payment_form.html'
     
@@ -235,10 +247,10 @@ class OverviewView(CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, RedirectView)
 overview = OverviewView.as_view()
 
 
-class MySubscriptionView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, TemplateView):
+class MySubscriptionView(BlockViewIfSoftDisabledMixin, CheckAdminOnlyPhaseMixin, RequireLoggedInMixin, PaymentDebitPeriodMixin, TemplateView):
     """ Shows informations about the active or queued subscription and lets the user
         adjust the payment amount. """
-    
+
     template_name = 'wechange_payments/my_subscription.html'
     
     def dispatch(self, request, *args, **kwargs):

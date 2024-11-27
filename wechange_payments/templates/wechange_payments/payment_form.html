@@ -1,16 +1,21 @@
 {% extends "wechange_payments/base.html" %}
 {% load l10n i18n cosinnus_tags static widget_tweaks %}
 
-{% block extrahead %}
+{% block cosinnus_jshead %}
 	{{ block.super }}
 	
 	{% if not displayed_subscription or displayed_subscription.state == 1 %}
-		{% include 'wechange_payments/partials/slider_dependencies.html' %}
+		{% include 'wechange_payments/partials/slider_constants.html' %}
 	{% else %}
-		{% include 'wechange_payments/partials/slider_dependencies.html' with slider_initial_amount=displayed_subscription.amount %}
-	{% endif %}		
+		{% include 'wechange_payments/partials/slider_constants.html' with slider_initial_amount=displayed_subscription.amount debit_period_initial=displayed_subscription.debit_period %}
+	{% endif %}
 {% endblock %}
 
+{% block extrahead %}
+	{{ block.super }}
+	
+	{% include 'wechange_payments/partials/slider_dependencies.html' %}
+{% endblock %}
 
 {% block page_title %}
 	{% if is_update_form %}
@@ -87,9 +92,9 @@
 					{% else %}
 						<h3>{% trans "Choose your monthly Contribution" context "(PF15)" %}:</h3>
 					{% endif %}
-					
+
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}
-        			
+
         			<div class="large-space">
         				<p>
         					{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF26)" %}Choose the amount you would like to contribute using the slider. The contribution amount includes {{ vat_amount }}% VAT.{% endblocktrans %}
@@ -98,7 +103,17 @@
         					{% trans "You may also choose a higher amount by entering it directly in the text box!" context "(PF24x)" %}
         				</p>
         			</div>
-        			
+
+                    {% if displayed_subscription and displayed_subscription.state != 1 %}
+                        <h3>{% trans "Confirm your debiting period" context "(PF27a)" %}:</h3>
+                    {% elif displayed_subscription and displayed_subscription.state == 1 %}
+                        <h3>{% trans "Choose your new debiting period" context "(PF27b)" %}:</h3>
+                    {% else %}
+                        <h3>{% trans "Choose your debiting period" context "(PF27)" %}:</h3>
+                    {% endif %}
+
+					{% include 'wechange_payments/fields/period_slider.html' with field_name='debit_period' %}
+
         			<div class="button-section clearfix">
         				{% comment %}  
         				Gone, because step1 disabled
@@ -222,7 +237,7 @@
 		            </div><!-- row -->
 		            
 		            {% trans "Payment shall be made on behalf of an organisation" as checkbox_label %}
-		            {% include 'cosinnus/fields/checkbox_field.html' with field=form.is_organisation label=None checkbox_label=checkbox_label %}
+		            {% include 'cosinnus/fields/checkbox_field.html' with field=form.is_organisation label='' checkbox_label=checkbox_label %}
 		            
 		            <div id="organisation_frame">
 			            {% trans "Organisation" as label %}
@@ -297,13 +312,13 @@
 					<div class="payment-summary payment-info-page">
 						<div class="large-space">
 							<table>
-								<tr>
-			    					<td>{% trans "Chosen Amount" %}</td>
-			    					<td><b><span data-summary-item="amount"></span> €</b></td>
-			    				</tr>
+                                <tr>
+                                    <td>{% trans "Debiting Amount" %}</td>
+                                    <td><b><span data-summary-item="debit_amount"></span> €</b></td>
+                                </tr>
 			    				<tr>
 			    					<td>{% trans "Debiting Period" %}</td>
-			    					<td>{% trans "Monthly" %}</td>
+                                    <td><b><span data-summary-item="debit_period"></span></b></td>
 			    				</tr>
 			    				<tr>
 			    					<td>{% trans "Payment Method" %}</td>
@@ -358,7 +373,7 @@
 						{% trans "Confirm and pay" context "(PF9 - legally binding!)" as confirm_and_pay_button_text %}
 						
 						<p>
-							{% blocktrans with amount='<span data-summary-item="amount"></span>' vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT payment_method=payment_type_html confirm_and_pay_button_text=confirm_and_pay_button_text context "(PF7)" %}By clicking on "{{ confirm_and_pay_button_text }}" you grant Wechange eG permission to debit {{ amount }} Euro per month (incl. {{ vat_amount }}% VAT) from you via {{ payment_method }}.{% endblocktrans %}
+							{% blocktrans with amount='<span data-summary-item="debit_amount"></span>' debit_period='<span data-summary-item="debit_period"></span>' vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT payment_method=payment_type_html confirm_and_pay_button_text=confirm_and_pay_button_text context "(PF7)" %}By clicking on "{{ confirm_and_pay_button_text }}" you grant Wechange eG permission to debit {{ amount }} Euro {{ debit_period }} (incl. {{ vat_amount }}% VAT) from you via {{ payment_method }}.{% endblocktrans %}
 							{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF7a)" %}This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. {{ vat_amount }}% VAT, which is shown on the invoice.{% endblocktrans %}
 							<br/><br/>
 							{% if displayed_subscription and displayed_subscription.next_due_date %}
@@ -367,11 +382,11 @@
 								{% else %}
 									{% trans "The next debit will be made immediately." context "(PF20)" %}
 								{% endif %}
-								{% blocktrans with date=displayed_subscription.get_due_date_after_next|localize context "(PF21)" %}Your monthly payments will resume on {{ date }}, a month after your old Contribution would have been due.{% endblocktrans %}
+								{% blocktrans with date=displayed_subscription.get_due_date_after_next|localize debit_period='<span data-summary-item="debit_period"></span>' context "(PF21)" %}Your {{ debit_period }} payments will resume on {{ date }}, after your old Contribution would have been due.{% endblocktrans %}
 							{% else %}
 								{% trans "The next debit will be made immediately." context "(PF20)" %}
 							{% endif %}
-							{% trans 'You can adjust the amount of your monthly contribution or terminate payments at any time by clicking “Your Contribution” in your user menu.' context "(PF22)" %}
+							{% trans 'You can adjust the amount and debiting period of your contribution or terminate payments at any time by clicking “Your Contribution” in your user menu.' context "(PF22)" %}
 						</p>
 						
 						{% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name context "(PF23)" %}Thank you for supporting {{ portal_name }}!{% endblocktrans %}

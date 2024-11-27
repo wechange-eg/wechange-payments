@@ -81,7 +81,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                     'unitName': 'Stück',
                     'unitPrice': {
                         'currency': 'EUR',
-                        'grossAmount': payment.amount,
+                        'grossAmount': payment.debit_amount,
                         'taxRatePercentage': self._get_tax_rate_percent(),
                     },
                 },
@@ -98,6 +98,10 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             },
             'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
         }
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            data.update({
+                'Portal-ID': f'{settings.PAYMENTS_INVOICE_PORTAL_ID}-{payment.user.id:>07}'
+            })
         data = self._add_contact_invoice_request_params(payment, data)
         
         if getattr(settings, 'PAYMENTS_INVOICE_REMARK'):
