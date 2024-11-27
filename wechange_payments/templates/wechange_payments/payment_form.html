@@ -237,7 +237,7 @@
 		            </div><!-- row -->
 		            
 		            {% trans "Payment shall be made on behalf of an organisation" as checkbox_label %}
-		            {% include 'cosinnus/fields/checkbox_field.html' with field=form.is_organisation label=None checkbox_label=checkbox_label %}
+		            {% include 'cosinnus/fields/checkbox_field.html' with field=form.is_organisation label='' checkbox_label=checkbox_label %}
 		            
 		            <div id="organisation_frame">
 			            {% trans "Organisation" as label %}
