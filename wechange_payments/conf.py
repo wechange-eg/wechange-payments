@@ -163,6 +163,11 @@ class WechangePaymentsDefaultSettings(AppConf):
     # {'Portal-ID': 'WE-0000003'} (for user-id 3)
     INVOICE_PORTAL_ID = None
     
+    # should we send out mails pre-announcing upcoming payment processings?
+    # note: `subscription.last_pre_notification_at` is still being updated, even if this is False,
+    # but no actual mail is being sent. this is so that if this gets re-enabled, no weirdly-dated mails are sent
+    SEND_PRE_NOTIFICATION_MAILS = False
+    
 
 class NonPrefixDefaultSettings(AppConf):
     """ Settings without a prefix namespace to provide default setting values for other apps.
