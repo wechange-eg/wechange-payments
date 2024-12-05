@@ -57,6 +57,13 @@ class TrytonInvoiceBackend(LexofficeInvoiceBackend):
             'transaction_id': invoice.payment.internal_transaction_id,
             'payment_type': invoice.payment.type,
         })
+        if settings.PAYMENTS_INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY and settings.PAYMENTS_INVOICE_TRYTON_PORTAL_ID:
+            # additional portal identifiers for the customer for tryton
+            # currently, type can be 'bp_weuser' for wechange, 'bp_wwuser' for wachstumswende
+            # see https://project.m-ds.de/projects/wechange/wiki/Wiki#Identifikatoren-an-der-Partei
+            data['address'].update({
+                'identifiers': [{'type': settings.PAYMENTS_INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY, 'code': self.get_customer_portal_id(invoice), }]
+            })
         return data
     
     def _add_contact_invoice_request_params(self, payment, data):
