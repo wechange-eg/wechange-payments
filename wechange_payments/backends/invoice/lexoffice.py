@@ -46,6 +46,10 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         auth_data = kwargs.get('auth_data')
         self.api_domain = auth_data.get('api_domain')
         self.api_key = auth_data.get('api_key')
+        
+    def get_customer_portal_id(self, invoice):
+        """ Build the customer ("party") ID for the user for this portal """
+        return f'{settings.PAYMENTS_INVOICE_TRYTON_PORTAL_ID}-{invoice.payment.user.id:>07}'
     
     def _make_invoice_request_params(self, invoice):
         """ Prepare all neccessary params for the invoice creation API for Lexoffice 
@@ -60,7 +64,11 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         
         item_name = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
         item_description = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
-        item_description += f' (transaction-id: {payment.internal_transaction_id}, type: {payment.type})'
+        # add the portal identifier key to the item description
+        addendum = ''
+        if settings.PAYMENTS_INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY and settings.PAYMENTS_INVOICE_TRYTON_PORTAL_ID:
+            addendum = f', participant-id: {self.get_customer_portal_id(invoice)}'
+        item_description += f' (transaction-id: {payment.internal_transaction_id}, type: {payment.type}{addendum})'
         data = {
             'archived': False,
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
@@ -98,10 +106,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             },
             'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
         }
-        if settings.PAYMENTS_INVOICE_PORTAL_ID:
-            data.update({
-                'Portal-ID': f'{settings.PAYMENTS_INVOICE_PORTAL_ID}-{payment.user.id:>07}'
-            })
         data = self._add_contact_invoice_request_params(payment, data)
         
         if getattr(settings, 'PAYMENTS_INVOICE_REMARK'):

@@ -237,7 +237,12 @@ def send_pre_notification_for_subscription_payment(subscription):
     if not subscription.check_pre_notification_due():
         return False
     # send mail
-    sent = send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION)
+    if settings.PAYMENTS_SEND_PRE_NOTIFICATION_MAILS:
+        sent = send_payment_event_payment_email(subscription.last_payment, PAYMENT_EVENT_SUBSCRIPTION_PAYMENT_PRE_NOTIFICATION)
+    else:
+        # we send no mail if pre-notifications are disabled, but`subscription.last_pre_notification_at` is still
+        # being updated. this is so that if this gets re-enabled, no weirdly-dated mails are sent
+        sent = True
     if sent is True:
         # set subscription's pre-notification date to now
         subscription.last_pre_notification_at = now()
