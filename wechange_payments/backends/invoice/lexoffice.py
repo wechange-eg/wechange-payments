@@ -167,7 +167,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Contact API creation failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-201 request return status code (request has been logged as error).')
             
@@ -175,7 +175,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'id' in result:
             extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Contact API creation result did not contain field "id".', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing fields in contact creation request result (request has been logged as error).')
         
@@ -228,7 +228,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API creation failed, request did not return status=201.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-201 request return status code (request has been logged as error).')
             
@@ -236,7 +236,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'id' in result:
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Invoice API creation result did not contain field "id".', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing fields in creation request result (request has been logged as error).')
         
@@ -291,14 +291,14 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API render failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
         
         document_file_id = self._parse_finalize_invoice_result(req)
         if not document_file_id:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             logger.error('Payments: Invoice API rendering result did not contain field "documentFileId".', extra=extra)
             raise Exception('Payments: Missing fields in rendering request result (request has been logged as error).')
@@ -342,7 +342,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API download failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
             
@@ -350,7 +350,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not content:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Invoice API download result was empty.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing content in download request result (request has been logged as error).')
         

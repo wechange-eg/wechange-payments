@@ -357,7 +357,7 @@ class PaymentsUnitTest(TestCase):
         self.assertEqual(yearly_subscription.next_due_date, next_year)
 
         # test monthly subscription (for completion’s sake)
-        with freeze_time(now()+timedelta(days=30)):
+        with freeze_time(now()+timedelta(days=31)):
             self.assertTrue(monthly_subscription.check_payment_due())
             self.assertFalse(quarterly_subscription.check_payment_due())
             self.assertFalse(half_yearly_subscription.check_payment_due())
