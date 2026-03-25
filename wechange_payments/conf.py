@@ -102,6 +102,11 @@ class WechangePaymentsDefaultSettings(AppConf):
     # a supplementary remark at the end of each invoice. left out if None.
     INVOICE_REMARK = None
     
+    # if supplied, will create each invoice assigned to the contact UUID set in lexware. works fine if a value isn't
+    # matched or is null for a payment type - the payment will be created without the contact assignment
+    # ex.: {'cc': '11111111-bbbb-cccc-dddd-222222222222',}
+    INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE = {}
+    
     # A lock for currently not-implemented behaviour, meant to make it clearer that the code
     # is not yet ready for WAITING, postponed payments that get cashed in later.
     # currently (and with the switch set to False), new subscriptions can only replace 
