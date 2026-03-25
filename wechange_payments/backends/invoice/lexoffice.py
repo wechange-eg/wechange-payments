@@ -94,7 +94,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                     'name': item_name,
                     'description': item_description,
                     'quantity': 1,
-                    'unitName': 'Stück',
+                    'unitName': 'pauschal',
                     'unitPrice': {
                         'currency': 'EUR',
                         'grossAmount': payment.debit_amount,
