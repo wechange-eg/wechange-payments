@@ -49,7 +49,10 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         
     def get_customer_portal_id(self, invoice):
         """ Build the customer ("party") ID for the user for this portal """
-        return f'{settings.PAYMENTS_INVOICE_TRYTON_PORTAL_ID}-{invoice.payment.user.id:>07}'
+        prefix = ''
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            prefix = f'{settings.PAYMENTS_INVOICE_PORTAL_ID}-'
+        return f'{prefix}{invoice.payment.user.id:>07}'
     
     def _make_invoice_request_params(self, invoice):
         """ Prepare all neccessary params for the invoice creation API for Lexoffice 
@@ -65,19 +68,28 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         item_name = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
         item_description = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
         # add the portal identifier key to the item description
-        addendum = ''
-        if settings.PAYMENTS_INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY and settings.PAYMENTS_INVOICE_TRYTON_PORTAL_ID:
-            addendum = f', participant-id: {self.get_customer_portal_id(invoice)}'
-        item_description += f' (transaction-id: {payment.internal_transaction_id}, type: {payment.type}{addendum})'
+        item_description += f' (order-id: {payment.internal_transaction_id}, type: {payment.type}, participant-id: {self.get_customer_portal_id(invoice)})'
+        
+        # if we have configured assigning contact ids to payments and it exists for this type, supply it
+        # this value can be supplied as None, it is equal to omitting 'contactId'
+        contact_id = None
+        if settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE:
+            contact_id = settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE.get(payment.type, None)
+            
         data = {
             'archived': False,
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
             'address': {
-                'name': recipient_name,
-                'supplement': supplement,
-                'street': payment.address,
-                'city': payment.city,
-                'zip': payment.postal_code,
+                'contactId': contact_id,
+                # es gibt kein vorname/nachname feld, nur name (wahrscheinlich wird das gesplitted von Lexware)
+                'name': str(payment.subscription.id) + ' ' + settings.PAYMENTS_INVOICE_PORTAL_ID, # 1. und 2.
+                'street': payment.internal_transaction_id, # 3.
+                # old:
+                #'name': recipient_name,
+                #'supplement': supplement,
+                #'street': payment.address,
+                #'city': payment.city,
+                #'zip': payment.postal_code,
                 'countryCode': str(payment.country),
             },
             'lineItems': [
@@ -86,7 +98,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                     'name': item_name,
                     'description': item_description,
                     'quantity': 1,
-                    'unitName': 'Stück',
+                    'unitName': 'pauschal',
                     'unitPrice': {
                         'currency': 'EUR',
                         'grossAmount': payment.debit_amount,
@@ -155,7 +167,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Contact API creation failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-201 request return status code (request has been logged as error).')
             
@@ -163,7 +175,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'id' in result:
             extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Contact API creation result did not contain field "id".', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing fields in contact creation request result (request has been logged as error).')
         
@@ -216,7 +228,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API creation failed, request did not return status=201.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-201 request return status code (request has been logged as error).')
             
@@ -224,7 +236,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'id' in result:
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Invoice API creation result did not contain field "id".', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing fields in creation request result (request has been logged as error).')
         
@@ -279,14 +291,14 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API render failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
         
         document_file_id = self._parse_finalize_invoice_result(req)
         if not document_file_id:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             logger.error('Payments: Invoice API rendering result did not contain field "documentFileId".', extra=extra)
             raise Exception('Payments: Missing fields in rendering request result (request has been logged as error).')
@@ -330,7 +342,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API download failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
             
@@ -338,7 +350,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not content:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Invoice API download result was empty.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing content in download request result (request has been logged as error).')
         
