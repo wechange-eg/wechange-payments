@@ -69,7 +69,7 @@ msgstr ""
 
 #, python-format
 msgctxt "Invoice PDF, important!"
-msgid "Electronic service - Ref-Nr. %(user_id)d"
+msgid "Electronic service"
 msgstr ""
 
 msgid "Direct Debit (SEPA)"
