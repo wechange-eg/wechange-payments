@@ -1,0 +1,7 @@
+{% extends 'cosinnus/dashboard.html' %}
+
+{% block extrafooter %}
+    {{ block.super }}
+
+    {% include 'cosinnus/conditional_payment_popup.html' %}
+{% endblock %}
