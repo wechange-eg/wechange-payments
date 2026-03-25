@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from annoying.functions import get_object_or_None
 from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 
@@ -24,6 +24,8 @@ class PaymentAdmin(admin.ModelAdmin):
     readonly_fields = ('user', 'subscription', 'is_reference_payment', 'completed_at', 'last_action_at', 'amount', 'debit_period', 'debit_amount', 'backend', 'vendor_transaction_id', 'internal_transaction_id', 'extra_data')
     raw_id_fields = ('user',)
     actions = ['create_invoice', 'create_additional_invoices', 'resend_payment_email',]
+    if settings.DEBUG:
+        actions += ['debug_only_recreate_invoice',]
     
     def user_account_name(self, obj):
         return obj.user.get_full_name()
@@ -53,6 +55,19 @@ class PaymentAdmin(admin.ModelAdmin):
         message = _('Started invoice creation for %(number)d payment(s) in background.') % {'number': len(queryset)}
         self.message_user(request, message)
     create_invoice.short_description = _("Create invoice in Invoice API (threaded)")
+    
+    if settings.DEBUG:
+        def debug_only_recreate_invoice(self, request, queryset):
+            invoice_backend = get_invoice_backend()
+            for payment in queryset:
+                invoice = get_object_or_None(Invoice, payment=payment)
+                if invoice:
+                    invoice.delete()
+                invoice_backend.create_invoice_for_payment(payment, threaded=True)
+            
+            message = 'DELETED invoice and started invoice creation for %(number)d payment(s) in background.' % {'number': len(queryset)}
+            self.message_user(request, message)
+        debug_only_recreate_invoice.short_description = "DEBUG ONLY: DELETED and recreate invoice in Invoice API (threaded)"
     
     def create_additional_invoices(self, request, queryset):
         for payment in queryset:
