@@ -81,11 +81,15 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
             'address': {
                 'contactId': contact_id,
-                'name': recipient_name,
-                'supplement': supplement,
-                'street': payment.address,
-                'city': payment.city,
-                'zip': payment.postal_code,
+                # es gibt kein vorname/nachname feld, nur name (wahrscheinlich wird das gesplitted von Lexware)
+                'name': str(payment.subscription.id) + ' ' + settings.PAYMENTS_INVOICE_PORTAL_ID, # 1. und 2.
+                'street': payment.internal_transaction_id, # 3.
+                # old:
+                #'name': recipient_name,
+                #'supplement': supplement,
+                #'street': payment.address,
+                #'city': payment.city,
+                #'zip': payment.postal_code,
                 'countryCode': str(payment.country),
             },
             'lineItems': [
