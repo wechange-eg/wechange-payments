@@ -97,7 +97,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     INVOICE_LINE_ITEM_NAME = pgettext_lazy('Invoice PDF, important!', 'User fee for %(portal_name)s')
     
     # paid-for-item description on the PDF invoice
-    INVOICE_LINE_ITEM_DESCRIPTION = pgettext_lazy('Invoice PDF, important!', 'Electronic service - Ref-Nr. %(user_id)d')
+    INVOICE_LINE_ITEM_DESCRIPTION = pgettext_lazy('Invoice PDF, important!', 'Electronic service')
     
     # a supplementary remark at the end of each invoice. left out if None.
     INVOICE_REMARK = None
@@ -158,13 +158,13 @@ class WechangePaymentsDefaultSettings(AppConf):
         }]
     """
     
-    # if set, will add a portal user identifier attribute to the tryton invoice creation payload, to identify the portal
-    # that the invoice came from. e.g. setting 'INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY = "bp_weuser'
-    # and `INVOICE_TRYTON_PORTAL_ID = "WE"` would result in the attribute:
+    # if set, will add a portal user identifier attribute to the invoice creation payload, to identify the portal
+    # that the invoice came from. e.g. setting 'INVOICE_PORTAL_PARTEI_IDENTIFIKATOR_KEY = "bp_weuser'
+    # and `INVOICE_PORTAL_ID = "WE"` would result in the attribute:
     #  ..., 'address': {'identifiers': [{'type': 'bp_weuser', 'code': 'WE-0000003'}]}, ... (for user-id 3)
-    INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY = None
-    # the portal portion of the user identifier value. see `INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY`
-    INVOICE_TRYTON_PORTAL_ID = None
+    INVOICE_PORTAL_PARTEI_IDENTIFIKATOR_KEY = None
+    # the portal portion of the user identifier value. see `INVOICE_PORTAL_PARTEI_IDENTIFIKATOR_KEY`
+    INVOICE_PORTAL_ID = None
     
     # should we send out mails pre-announcing upcoming payment processings?
     # note: `subscription.last_pre_notification_at` is still being updated, even if this is False,
