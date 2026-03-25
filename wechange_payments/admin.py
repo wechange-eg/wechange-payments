@@ -67,7 +67,7 @@ class PaymentAdmin(admin.ModelAdmin):
             
             message = 'DELETED invoice and started invoice creation for %(number)d payment(s) in background.' % {'number': len(queryset)}
             self.message_user(request, message)
-        debug_only_recreate_invoice.short_description = "DEBUG ONLY: DELETED and recreate invoice in Invoice API (threaded)"
+        debug_only_recreate_invoice.short_description = "DEBUG ONLY: DELETE and recreate invoice in Invoice API (threaded)"
     
     def create_additional_invoices(self, request, queryset):
         for payment in queryset:

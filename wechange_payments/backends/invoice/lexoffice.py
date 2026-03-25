@@ -76,8 +76,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE:
             contact_id = settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE.get(payment.type, None)
             
-        print(f'Submitting contact id {contact_id}')
-        
         data = {
             'archived': False,
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
