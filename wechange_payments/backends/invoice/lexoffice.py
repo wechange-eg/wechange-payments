@@ -3,17 +3,17 @@ import hashlib
 import logging
 from uuid import uuid1
 
+import requests
 from django.core.files.base import ContentFile
 from django.utils.encoding import force_str
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
-import requests
 
 from cosinnus.models.group import CosinnusPortal
 from wechange_payments.backends.invoice.base import BaseInvoiceBackend
 from wechange_payments.conf import settings
 from wechange_payments.models import Invoice
-
 
 logger = logging.getLogger('wechange-payments')
 
@@ -58,17 +58,20 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         """ Prepare all neccessary params for the invoice creation API for Lexoffice 
             from an invoices and its attached payment instance. """
         payment = invoice.payment
-        if payment.organisation:
-            recipient_name = payment.organisation
-            supplement = payment.first_name + ' ' + payment.last_name
+        
+        # add the portal id + subscription name as first address line ("WE 217")
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            name_line = f'{settings.PAYMENTS_INVOICE_PORTAL_ID} {payment.subscription.id}'
         else:
-            recipient_name = payment.first_name + ' ' + payment.last_name
-            supplement = None
+            name_line = f'{payment.subscription.id}'
+        
+        # add the internal Order ID as second line
+        street_line = str(_('Order Id')) + ': ' + payment.internal_transaction_id
         
         item_name = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
         item_description = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
         # add the portal identifier key to the item description
-        item_description += f' (order-id: {payment.internal_transaction_id}, type: {payment.type}, participant-id: {self.get_customer_portal_id(invoice)})'
+        item_description += f' (type: {payment.type}, participant-id: {self.get_customer_portal_id(invoice)})'
         
         # if we have configured assigning contact ids to payments and it exists for this type, supply it
         # this value can be supplied as None, it is equal to omitting 'contactId'
@@ -81,16 +84,10 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
             'address': {
                 'contactId': contact_id,
-                # es gibt kein vorname/nachname feld, nur name (wahrscheinlich wird das gesplitted von Lexware)
-                'name': str(payment.subscription.id) + ' ' + settings.PAYMENTS_INVOICE_PORTAL_ID, # 1. und 2.
-                'street': payment.internal_transaction_id, # 3.
-                # old:
-                #'name': recipient_name,
-                #'supplement': supplement,
-                #'street': payment.address,
-                #'city': payment.city,
-                #'zip': payment.postal_code,
-                'countryCode': str(payment.country),
+                # there is no first/last name field, only name (it's probably splitted by Lexware)
+                'name': name_line,
+                'street': street_line,
+                'countryCode': str(payment.country),  # country code is required
             },
             'lineItems': [
                 {
@@ -116,7 +113,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 'shippingDate': invoice.created.isoformat(timespec='milliseconds'), # the actual date of the booking
                 'shippingType': 'service'
             },
-            'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
+            'introduction': 'Kleinbetragsrechnung gemäß § 33 UStDV:',
         }
         data = self._add_contact_invoice_request_params(payment, data)
         

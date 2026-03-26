@@ -265,7 +265,7 @@ msgstr ""
 msgid "Vendor Transaction Id"
 msgstr ""
 
-msgid "Internal Transaction Id"
+msgid "Order Id"
 msgstr ""
 
 msgid "Monthly Amount"
