@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 from cosinnus.models.group import CosinnusPortal
+from cosinnus.templatetags.cosinnus_tags import get_country_name
 from wechange_payments.backends.invoice.base import BaseInvoiceBackend
 from wechange_payments.conf import settings
 from wechange_payments.models import Invoice
@@ -59,35 +60,58 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             from an invoices and its attached payment instance. """
         payment = invoice.payment
         
-        # add the portal id + subscription name as first address line ("WE 217")
+        # add the portal id + subscription id as first address line (where name would be) ("WE 217")
+        name_prefix = str(pgettext_lazy('Invoice PDF, important!', 'User-ID'))
         if settings.PAYMENTS_INVOICE_PORTAL_ID:
-            name_line = f'{settings.PAYMENTS_INVOICE_PORTAL_ID} {payment.subscription.id}'
+            name_line = f'{name_prefix}: {settings.PAYMENTS_INVOICE_PORTAL_ID} {payment.subscription.id}'
         else:
-            name_line = f'{payment.subscription.id}'
+            name_line = f'{name_prefix}: {payment.subscription.id}'
         
         # add the internal Order ID as second line
         street_line = str(_('Order Id')) + ': ' + payment.internal_transaction_id
         
+        # bold printed text in Position-item: "Nutzungsgebühr für PORTALNAME"
         item_name = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
-        item_description = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
-        # add the portal identifier key to the item description
-        item_description += f' (type: {payment.type}, participant-id: {self.get_customer_portal_id(invoice)})'
         
-        # if we have configured assigning contact ids to payments and it exists for this type, supply it
-        # this value can be supplied as None, it is equal to omitting 'contactId'
+        # Position-item starts with "Elektronische Dienstleistung"
+        item_description = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
+        # next is "Leistungsempfänger"
+        item_description += '\n\n' + str(pgettext_lazy('Invoice PDF, important!', 'Beneficiary')) + ':\n\n'
+        # now build the adress lines from user input
+        if payment.organisation:
+            item_description += payment.organisation + '\n'
+        if payment.first_name:
+            item_description += payment.first_name
+            if payment.last_name:
+                item_description += ' ' + payment.last_name
+            item_description += '\n'
+        if payment.address:
+            item_description += payment.address + '\n'
+        if payment.postal_code and payment.city:
+            item_description += payment.postal_code + ' ' + payment.city + '\n'
+        elif payment.postal_code:
+            item_description += payment.postal_code + '\n'
+        elif payment.city:
+            item_description += payment.city + '\n'
+        if payment.country:
+            item_description += str(get_country_name(payment.country)) + '\n'
+        
+        # if we have configured assigning contact ids to payments and it exists for this type, supply it.
+        # this value can be supplied as None, it is equal to omitting 'contactId'.
         contact_id = None
         if settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE:
             contact_id = settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE.get(payment.type, None)
-            
+        
         data = {
             'archived': False,
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
             'address': {
                 'contactId': contact_id,
-                # there is no first/last name field, only name (it's probably splitted by Lexware)
+                # es gibt kein vorname/nachname feld, nur name (wahrscheinlich wird das gesplitted von Lexware)
                 'name': name_line,
                 'street': street_line,
-                'countryCode': str(payment.country),  # country code is required
+                # Country for the invoice is locked to germany since invoices are processed here
+                'countryCode': 'DE',
             },
             'lineItems': [
                 {

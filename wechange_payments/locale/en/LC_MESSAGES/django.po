@@ -72,6 +72,14 @@ msgctxt "Invoice PDF, important!"
 msgid "Electronic service"
 msgstr ""
 
+msgctxt "Invoice PDF, important!"
+msgid "Beneficiary"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "User-ID"
+msgstr ""
+
 msgid "Direct Debit (SEPA)"
 msgstr ""
 
