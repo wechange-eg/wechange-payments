@@ -59,14 +59,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             from an invoices and its attached payment instance. """
         payment = invoice.payment
         
-        # OLD style (organisation is completely hidden for now)
-        # if payment.organisation:
-        #     recipient_name = payment.organisation
-        #     supplement = payment.first_name + ' ' + payment.last_name
-        # else:
-        #     recipient_name = payment.first_name + ' ' + payment.last_name
-        #     supplement = None
-        
         # add the portal id + subscription name as first address line ("WE 217")
         if settings.PAYMENTS_INVOICE_PORTAL_ID:
             name_line = f'{settings.PAYMENTS_INVOICE_PORTAL_ID} {payment.subscription.id}'
@@ -92,15 +84,9 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
             'address': {
                 'contactId': contact_id,
-                # es gibt kein vorname/nachname feld, nur name (wahrscheinlich wird das gesplitted von Lexware)
+                # there is no first/last name field, only name (it's probably splitted by Lexware)
                 'name': name_line,
                 'street': street_line,
-                # OLD style (proper address fields)
-                #'name': recipient_name,
-                #'supplement': supplement,
-                #'street': payment.address,
-                #'city': payment.city,
-                #'zip': payment.postal_code,
                 'countryCode': str(payment.country),  # country code is required
             },
             'lineItems': [
@@ -127,8 +113,6 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 'shippingDate': invoice.created.isoformat(timespec='milliseconds'), # the actual date of the booking
                 'shippingType': 'service'
             },
-            # OLD style (a general text formulation)
-            # 'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
             'introduction': 'Kleinbetragsrechnung gemäß § 33 UStDV:',
         }
         data = self._add_contact_invoice_request_params(payment, data)
