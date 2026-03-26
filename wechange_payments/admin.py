@@ -90,12 +90,16 @@ admin.site.register(Payment, PaymentAdmin)
 
 
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_ready', 'state', 'payment', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
+    list_display = ('payment__internal_transaction_id', 'user', 'is_ready', 'state', 'payment', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
     list_filter = ('is_ready', 'state', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'payment__vendor_transaction_id', 'payment__internal_transaction_id', 'payment__email', 'payment__first_name', 'payment__last_name', 'created')
     readonly_fields = ('user', 'is_ready', 'state', 'backend', 'extra_data')
     raw_id_fields = ('user',)
     actions = ['create_invoice',]
+    
+    @admin.display(description=_('Order Id'))
+    def payment__internal_transaction_id(self, obj):
+        return obj.payment.internal_transaction_id
     
     def user_account_name(self, obj):
         return obj.user.get_full_name()
