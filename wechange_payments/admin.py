@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+from annoying.functions import get_object_or_None
 from django.contrib import admin, messages
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from wechange_payments.backends import get_invoice_backend, get_additional_invoice_backends
 from wechange_payments.models import Payment, TransactionLog, Subscription, \
@@ -18,12 +18,23 @@ from django.contrib.admin import DateFieldListFilter
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('internal_transaction_id', 'status', 'user_account_name', 'invoice_name', 'email', 'debit_amount', 'amount', 'type', 'completed_at', 'subscription', 'additional_invoices')
+    list_display = ('internal_transaction_id', 'payl_user_id', 'status', 'user_account_name', 'invoice_name', 'email', 'debit_amount', 'amount', 'type', 'completed_at', 'subscription', 'additional_invoices')
     list_filter = ('type', ('completed_at', DateFieldListFilter),)
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'email', 'first_name', 'last_name', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
     readonly_fields = ('user', 'subscription', 'is_reference_payment', 'completed_at', 'last_action_at', 'amount', 'debit_period', 'debit_amount', 'backend', 'vendor_transaction_id', 'internal_transaction_id', 'extra_data')
     raw_id_fields = ('user',)
     actions = ['create_invoice', 'create_additional_invoices', 'resend_payment_email',]
+    if settings.DEBUG:
+        actions += ['debug_only_recreate_invoice',]
+    
+    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+    def payl_user_id(self, obj):
+        if not obj.subscription:
+            return '-'
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            return f'{settings.PAYMENTS_INVOICE_PORTAL_ID} {obj.subscription.id}'
+        else:
+            return str(obj.subscription.id)
     
     def user_account_name(self, obj):
         return obj.user.get_full_name()
@@ -54,6 +65,19 @@ class PaymentAdmin(admin.ModelAdmin):
         self.message_user(request, message)
     create_invoice.short_description = _("Create invoice in Invoice API (threaded)")
     
+    if settings.DEBUG:
+        def debug_only_recreate_invoice(self, request, queryset):
+            invoice_backend = get_invoice_backend()
+            for payment in queryset:
+                invoice = get_object_or_None(Invoice, payment=payment)
+                if invoice:
+                    invoice.delete()
+                invoice_backend.create_invoice_for_payment(payment, threaded=True)
+            
+            message = 'DELETED invoice and started invoice creation for %(number)d payment(s) in background.' % {'number': len(queryset)}
+            self.message_user(request, message)
+        debug_only_recreate_invoice.short_description = "DEBUG ONLY: DELETE and recreate invoice in Invoice API (threaded)"
+    
     def create_additional_invoices(self, request, queryset):
         for payment in queryset:
             for additional_invoice_backend in get_additional_invoice_backends():
@@ -75,12 +99,25 @@ admin.site.register(Payment, PaymentAdmin)
 
 
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_ready', 'state', 'payment', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
+    list_display = ('payment__internal_transaction_id', 'payl_user_id', 'user', 'is_ready', 'state', 'payment', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
     list_filter = ('is_ready', 'state', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'payment__vendor_transaction_id', 'payment__internal_transaction_id', 'payment__email', 'payment__first_name', 'payment__last_name', 'created')
     readonly_fields = ('user', 'is_ready', 'state', 'backend', 'extra_data')
     raw_id_fields = ('user',)
     actions = ['create_invoice',]
+    
+    @admin.display(description=_('Order Id'))
+    def payment__internal_transaction_id(self, obj):
+        return obj.payment.internal_transaction_id
+    
+    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+    def payl_user_id(self, obj):
+        if not obj.payment or not obj.payment.subscription:
+            return '-'
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            return f'{settings.PAYMENTS_INVOICE_PORTAL_ID} {obj.payment.subscription.id}'
+        else:
+            return str(obj.payment.subscription.id)
     
     def user_account_name(self, obj):
         return obj.user.get_full_name()
@@ -145,13 +182,20 @@ admin.site.register(TransactionLog, TransactionLogAdmin)
 
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'state', 'debit_amount', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
+    list_display = ('payl_user_id', 'user', 'state', 'debit_amount', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
     list_filter = ('state', 'has_problems', )
-    search_fields = ('user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
+    search_fields = ('id', 'user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
     readonly_fields = ('user', 'state', 'has_problems', 'reference_payment', 'last_payment', 'amount', 'debit_period', 'debit_amount', 'next_due_date', 'num_attempts_recurring', 'last_pre_notification_at')
     raw_id_fields = ('user',)
     
     actions = ['resend_both_initial_emails', 'resend_subscription_email', 'terminate_suspended',]
+
+    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+    def payl_user_id(self, obj):
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            return f'{settings.PAYMENTS_INVOICE_PORTAL_ID} {obj.id}'
+        else:
+            return str(obj.id)
     
     def resend_both_initial_emails(self, request, queryset):
         for subscription in queryset:

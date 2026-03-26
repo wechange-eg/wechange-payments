@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-30 09:05+0100\n"
-"PO-Revision-Date: 2024-10-29 14:56+0100\n"
+"PO-Revision-Date: 2026-03-26 15:42+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -55,8 +55,16 @@ msgstr "Nutzungsgebühr für %(portal_name)s"
 
 #, python-format
 msgctxt "Invoice PDF, important!"
-msgid "Electronic service - Ref-Nr. %(user_id)d"
-msgstr "Elektronische Dienstleistung - Ref-Nr. %(user_id)d"
+msgid "Electronic service"
+msgstr "Elektronische Dienstleistung"
+
+msgctxt "Invoice PDF, important!"
+msgid "Beneficiary"
+msgstr "Leistungsempfänger"
+
+msgctxt "Invoice PDF, important!"
+msgid "User-ID"
+msgstr "Nutzer-ID"
 
 msgid "Direct Debit (SEPA)"
 msgstr "Bankeinzug (SEPA)"
@@ -251,8 +259,8 @@ msgstr "Abgebrochen"
 msgid "Vendor Transaction Id"
 msgstr "Vendor Transaction Id"
 
-msgid "Internal Transaction Id"
-msgstr "Internal Transaction Id"
+msgid "Order Id"
+msgstr "Bestell-ID"
 
 msgid "Monthly Amount"
 msgstr "Monatlicher Betrag"

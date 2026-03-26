@@ -55,7 +55,15 @@ msgstr ""
 
 #, python-format
 msgctxt "Invoice PDF, important!"
-msgid "Electronic service - Ref-Nr. %(user_id)d"
+msgid "Electronic service"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "Beneficiary"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "User-ID"
 msgstr ""
 
 msgid "Direct Debit (SEPA)"
@@ -182,7 +190,7 @@ msgstr ""
 msgid "Vendor Transaction Id"
 msgstr ""
 
-msgid "Internal Transaction Id"
+msgid "Order Id"
 msgstr ""
 
 msgid "Payment Type"

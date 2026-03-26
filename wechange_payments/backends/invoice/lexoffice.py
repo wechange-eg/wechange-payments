@@ -3,17 +3,18 @@ import hashlib
 import logging
 from uuid import uuid1
 
+import requests
 from django.core.files.base import ContentFile
 from django.utils.encoding import force_str
 from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
-import requests
 
 from cosinnus.models.group import CosinnusPortal
+from cosinnus.templatetags.cosinnus_tags import get_country_name
 from wechange_payments.backends.invoice.base import BaseInvoiceBackend
 from wechange_payments.conf import settings
 from wechange_payments.models import Invoice
-
 
 logger = logging.getLogger('wechange-payments')
 
@@ -49,36 +50,68 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         
     def get_customer_portal_id(self, invoice):
         """ Build the customer ("party") ID for the user for this portal """
-        return f'{settings.PAYMENTS_INVOICE_TRYTON_PORTAL_ID}-{invoice.payment.user.id:>07}'
+        prefix = ''
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            prefix = f'{settings.PAYMENTS_INVOICE_PORTAL_ID}-'
+        return f'{prefix}{invoice.payment.user.id:>07}'
     
     def _make_invoice_request_params(self, invoice):
         """ Prepare all neccessary params for the invoice creation API for Lexoffice 
             from an invoices and its attached payment instance. """
         payment = invoice.payment
-        if payment.organisation:
-            recipient_name = payment.organisation
-            supplement = payment.first_name + ' ' + payment.last_name
-        else:
-            recipient_name = payment.first_name + ' ' + payment.last_name
-            supplement = None
         
+        # add the portal id + subscription id as first address line (where name would be) ("WE 217")
+        name_prefix = str(pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+        if settings.PAYMENTS_INVOICE_PORTAL_ID:
+            name_line = f'{name_prefix}: {settings.PAYMENTS_INVOICE_PORTAL_ID} {payment.subscription.id}'
+        else:
+            name_line = f'{name_prefix}: {payment.subscription.id}'
+        
+        # add the internal Order ID as second line
+        street_line = str(_('Order Id')) + ': ' + payment.internal_transaction_id
+        
+        # bold printed text in Position-item: "Nutzungsgebühr für PORTALNAME"
         item_name = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_NAME % {'portal_name': CosinnusPortal.get_current().name})
+        
+        # Position-item starts with "Elektronische Dienstleistung"
         item_description = force_str(settings.PAYMENTS_INVOICE_LINE_ITEM_DESCRIPTION % {'user_id': invoice.user.id})
-        # add the portal identifier key to the item description
-        addendum = ''
-        if settings.PAYMENTS_INVOICE_TRYTON_PORTAL_PARTEI_IDENTIFIKATOR_KEY and settings.PAYMENTS_INVOICE_TRYTON_PORTAL_ID:
-            addendum = f', participant-id: {self.get_customer_portal_id(invoice)}'
-        item_description += f' (transaction-id: {payment.internal_transaction_id}, type: {payment.type}{addendum})'
+        # next is "Leistungsempfänger"
+        item_description += '\n\n' + str(pgettext_lazy('Invoice PDF, important!', 'Beneficiary')) + ':\n\n'
+        # now build the adress lines from user input
+        if payment.organisation:
+            item_description += payment.organisation + '\n'
+        if payment.first_name:
+            item_description += payment.first_name
+            if payment.last_name:
+                item_description += ' ' + payment.last_name
+            item_description += '\n'
+        if payment.address:
+            item_description += payment.address + '\n'
+        if payment.postal_code and payment.city:
+            item_description += payment.postal_code + ' ' + payment.city + '\n'
+        elif payment.postal_code:
+            item_description += payment.postal_code + '\n'
+        elif payment.city:
+            item_description += payment.city + '\n'
+        if payment.country:
+            item_description += str(get_country_name(payment.country)) + '\n'
+        
+        # if we have configured assigning contact ids to payments and it exists for this type, supply it.
+        # this value can be supplied as None, it is equal to omitting 'contactId'.
+        contact_id = None
+        if settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE:
+            contact_id = settings.PAYMENTS_INVOICE_CONTACT_UUID_FOR_PAYMENT_TYPE.get(payment.type, None)
+        
         data = {
             'archived': False,
             'voucherDate': now().isoformat(timespec='milliseconds'), # creation date can only be >= present
             'address': {
-                'name': recipient_name,
-                'supplement': supplement,
-                'street': payment.address,
-                'city': payment.city,
-                'zip': payment.postal_code,
-                'countryCode': str(payment.country),
+                'contactId': contact_id,
+                # es gibt kein vorname/nachname feld, nur name (wahrscheinlich wird das gesplitted von Lexware)
+                'name': name_line,
+                'street': street_line,
+                # Country for the invoice is locked to germany since invoices are processed here
+                'countryCode': 'DE',
             },
             'lineItems': [
                 {
@@ -86,7 +119,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                     'name': item_name,
                     'description': item_description,
                     'quantity': 1,
-                    'unitName': 'Stück',
+                    'unitName': 'pauschal',
                     'unitPrice': {
                         'currency': 'EUR',
                         'grossAmount': payment.debit_amount,
@@ -104,7 +137,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 'shippingDate': invoice.created.isoformat(timespec='milliseconds'), # the actual date of the booking
                 'shippingType': 'service'
             },
-            'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
+            'introduction': 'Kleinbetragsrechnung gemäß § 33 UStDV:',
         }
         data = self._add_contact_invoice_request_params(payment, data)
         
@@ -155,7 +188,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Contact API creation failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-201 request return status code (request has been logged as error).')
             
@@ -163,7 +196,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'id' in result:
             extra = {'post_url': contact_post_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Contact API creation result did not contain field "id".', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing fields in contact creation request result (request has been logged as error).')
         
@@ -216,7 +249,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
             
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API creation failed, request did not return status=201.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-201 request return status code (request has been logged as error).')
             
@@ -224,7 +257,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not 'id' in result:
             extra = {'post_url': post_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Invoice API creation result did not contain field "id".', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing fields in creation request result (request has been logged as error).')
         
@@ -279,14 +312,14 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API render failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
         
         document_file_id = self._parse_finalize_invoice_result(req)
         if not document_file_id:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             logger.error('Payments: Invoice API rendering result did not contain field "documentFileId".', extra=extra)
             raise Exception('Payments: Missing fields in rendering request result (request has been logged as error).')
@@ -330,7 +363,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not req.status_code == 200:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content}
             logger.error('Payments: Invoice API download failed, request did not return status=200.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Non-200 request return status code (request has been logged as error).')
             
@@ -338,7 +371,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         if not content:
             extra = {'get_url': get_url, 'status': req.status_code, 'content': req._content, 'result': req.result}
             logger.error('Payments: Invoice API download result was empty.', extra=extra)
-            if settings.DEBUG:
+            if settings.DEBUG or settings.TESTING:
                 print(extra)
             raise Exception('Payments: Missing content in download request result (request has been logged as error).')
         
