@@ -63,7 +63,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the lowest allowed amount for a monthly payment
     MINIMUM_ALLOWED_MONTHLY_AMOUNT = 1.0
     # the highest allowed amount for a monthly payment
-    MAXIMUM_ALLOWED_MONTHLY_AMOUNT = 100.0
+    MAXIMUM_ALLOWED_MONTHLY_AMOUNT = 20.0
 
     # the lowest allowed amount for a payment transaction
     MINIMUM_ALLOWED_PAYMENT_AMOUNT = MINIMUM_MONTHLY_AMOUNT
