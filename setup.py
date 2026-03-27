@@ -50,8 +50,8 @@ setup(
     packages=get_packages(package),
     package_data=get_package_data(package),
     install_requires=[
-        'django-countries==7.2.1',
-        'schwifty==2018.9.1',
+        'django-countries==8.2.0',  # TODO: PY UPGRADE CHECK
+        'schwifty==2026.3.0',   # TODO: PY UPGRADE CHECK
     ],
 )
 
