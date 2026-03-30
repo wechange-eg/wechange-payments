@@ -63,7 +63,7 @@ msgid "Beneficiary"
 msgstr ""
 
 msgctxt "Invoice PDF, important!"
-msgid "User-ID"
+msgid "Subscription-ID"
 msgstr ""
 
 msgid "Direct Debit (SEPA)"
@@ -191,6 +191,9 @@ msgid "Vendor Transaction Id"
 msgstr ""
 
 msgid "Order Id"
+msgstr ""
+
+msgid "Last Order Id"
 msgstr ""
 
 msgid "Payment Type"

@@ -61,7 +61,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
         payment = invoice.payment
         
         # add the portal id + subscription id as first address line (where name would be) ("WE 217")
-        name_prefix = str(pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+        name_prefix = str(pgettext_lazy('Invoice PDF, important!', 'Subscription-ID'))
         if settings.PAYMENTS_INVOICE_PORTAL_ID:
             name_line = f'{name_prefix}: {settings.PAYMENTS_INVOICE_PORTAL_ID} {payment.subscription.id}'
         else:
