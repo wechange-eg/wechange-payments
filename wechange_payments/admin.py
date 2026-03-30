@@ -18,7 +18,7 @@ from django.contrib.admin import DateFieldListFilter
 
 
 class PaymentAdmin(admin.ModelAdmin):
-    list_display = ('internal_transaction_id', 'payl_user_id', 'status', 'user_account_name', 'invoice_name', 'email', 'debit_amount', 'amount', 'type', 'completed_at', 'subscription', 'additional_invoices')
+    list_display = ('internal_transaction_id', 'payl_user_id', 'status', 'user_account_name', 'invoice_name', 'email', 'debit_amount', 'amount', 'debit_period', 'type', 'completed_at', 'subscription', 'additional_invoices')
     list_filter = ('type', ('completed_at', DateFieldListFilter),)
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'email', 'first_name', 'last_name', 'completed_at', 'vendor_transaction_id', 'internal_transaction_id',)
     readonly_fields = ('user', 'subscription', 'is_reference_payment', 'completed_at', 'last_action_at', 'amount', 'debit_period', 'debit_amount', 'backend', 'vendor_transaction_id', 'internal_transaction_id', 'extra_data')
@@ -27,7 +27,7 @@ class PaymentAdmin(admin.ModelAdmin):
     if settings.DEBUG:
         actions += ['debug_only_recreate_invoice',]
     
-    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'Subscription-ID'))
     def payl_user_id(self, obj):
         if not obj.subscription:
             return '-'
@@ -99,7 +99,7 @@ admin.site.register(Payment, PaymentAdmin)
 
 
 class InvoiceAdmin(admin.ModelAdmin):
-    list_display = ('payment__internal_transaction_id', 'payl_user_id', 'user', 'is_ready', 'state', 'payment', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
+    list_display = ('payment__internal_transaction_id', 'payl_user_id', 'user', 'is_ready', 'state', 'user_account_name', 'payment_name', 'payment_email', 'created', 'last_action_at')
     list_filter = ('is_ready', 'state', )
     search_fields = ('user__first_name', 'user__last_name', 'user__email', 'payment__vendor_transaction_id', 'payment__internal_transaction_id', 'payment__email', 'payment__first_name', 'payment__last_name', 'created')
     readonly_fields = ('user', 'is_ready', 'state', 'backend', 'extra_data')
@@ -110,7 +110,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     def payment__internal_transaction_id(self, obj):
         return obj.payment.internal_transaction_id
     
-    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'Subscription-ID'))
     def payl_user_id(self, obj):
         if not obj.payment or not obj.payment.subscription:
             return '-'
@@ -182,7 +182,7 @@ admin.site.register(TransactionLog, TransactionLogAdmin)
 
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('payl_user_id', 'user', 'state', 'debit_amount', 'amount', 'next_due_date', 'has_problems', 'created', 'terminated')
+    list_display = ('payl_user_id', 'user', 'state', 'debit_amount', 'amount', 'debit_period', 'next_due_date', 'payl_last_payment_internal_transaction_id', 'has_problems', 'created', 'terminated')
     list_filter = ('state', 'has_problems', )
     search_fields = ('id', 'user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
     readonly_fields = ('user', 'state', 'has_problems', 'reference_payment', 'last_payment', 'amount', 'debit_period', 'debit_amount', 'next_due_date', 'num_attempts_recurring', 'last_pre_notification_at')
@@ -190,12 +190,18 @@ class SubscriptionAdmin(admin.ModelAdmin):
     
     actions = ['resend_both_initial_emails', 'resend_subscription_email', 'terminate_suspended',]
 
-    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'User-ID'))
+    @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'Subscription-ID'))
     def payl_user_id(self, obj):
         if settings.PAYMENTS_INVOICE_PORTAL_ID:
             return f'{settings.PAYMENTS_INVOICE_PORTAL_ID} {obj.id}'
         else:
             return str(obj.id)
+        
+    @admin.display(description=_('Last Order Id'))
+    def payl_last_payment_internal_transaction_id(self, obj):
+        if obj.last_payment:
+            return obj.last_payment.internal_transaction_id
+        return '-'
     
     def resend_both_initial_emails(self, request, queryset):
         for subscription in queryset:
@@ -250,7 +256,7 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 subscription.save()
             message = 'Terminated subscriptions.'
             self.message_user(request, message)
-        debug_terminate_subscriptions.short_description = "DEBUG: Terminate selected subcriptions"
+        debug_terminate_subscriptions.short_description = "DEBUG: Terminate selected subscriptions"
         
         def debug_timeshift_due_date(self, request, queryset):
             for subscription in queryset:
