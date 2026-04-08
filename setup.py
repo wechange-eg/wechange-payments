@@ -52,6 +52,7 @@ setup(
     install_requires=[
         'django-countries==8.2.0',  # TODO: PY UPGRADE CHECK
         'schwifty==2026.3.0',   # TODO: PY UPGRADE CHECK
+        'freezegun==1.5.5',  # for unit-testing
     ],
 )
 
