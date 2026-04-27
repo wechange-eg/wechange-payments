@@ -41,6 +41,13 @@ class DebitPeriodMixin:
         DEBIT_PERIOD_HALF_YEARLY: _('half-yearly'),
         DEBIT_PERIOD_YEARLY: _('yearly'),
     }
+    # untranslated as of now, as it is custom tailored for the German nomenclature
+    DEBIT_PERIODS_BANK_STATEMENT_FRAGMENT = {
+        DEBIT_PERIOD_MONTHLY: 'monatliche',
+        DEBIT_PERIOD_QUARTER_YEARLY: 'vierteljährliche',
+        DEBIT_PERIOD_HALF_YEARLY: 'halbjährliche',
+        DEBIT_PERIOD_YEARLY: 'jährliche',
+    }
     DEBIT_PERIOD_CHOICES = [(k, v) for k, v in DEBIT_PERIODS.items()]
 
     # conversion to number of months

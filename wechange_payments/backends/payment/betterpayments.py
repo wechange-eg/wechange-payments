@@ -17,7 +17,7 @@ from cosinnus.models.group import CosinnusPortal
 from wechange_payments.backends.payment.base import BaseBackend
 from wechange_payments.conf import settings, PAYMENT_TYPE_DIRECT_DEBIT, \
     PAYMENT_TYPE_CREDIT_CARD, REDIRECTING_PAYMENT_TYPES, PAYMENT_TYPE_PAYPAL
-from wechange_payments.models import TransactionLog, Payment, Subscription
+from wechange_payments.models import TransactionLog, Payment, Subscription, DebitPeriodMixin
 from wechange_payments.payment import suspend_failed_subscription, handle_successful_payment,\
     handle_payment_refunded
 import time
@@ -314,10 +314,13 @@ class BetterPaymentBackend(BaseBackend):
             return None, _('Making postponed payments is currently not possible!')
         else:
             post_url = settings.PAYMENTS_BETTERPAYMENT_API_DOMAIN + BETTERPAYMENTS_API_ENDPOINT_PAYMENT
+            
+        # see https://testdashboard.betterpayment.de/docs/#payment-api-parameters
         data = {
             'api_key': settings.PAYMENTS_BETTERPAYMENT_API_KEY,
             'payment_type': payment_type,
             'order_id': order_id,
+            'merchant_reference': self._build_payment_bank_statement_string(order_id, is_recurring, params),
             'recurring': 1,
             'postback_url': CosinnusPortal.get_current().get_domain() + reverse('wechange-payments:api-postback-endpoint'),
             
@@ -488,7 +491,24 @@ class BetterPaymentBackend(BaseBackend):
         except Exception as e:
             logger.critical('Payments: Payment object could not be saved for a transaction of type "%s"!' % payment_type, extra={'internal_transaction_id': payment.internal_transaction_id, 'order_id': order_id, 'exception': e, 'payment_data': str(payment.__dict__)})
         return payment, None
-            
+    
+    def _build_payment_bank_statement_string(self, order_id, is_recurring, payment_params):
+        """
+        Builds the string that is visible as "Description" or "Purpose" on your bank statement for that transaction.
+        See https://testdashboard.betterpayment.de/docs/#merchant-reference
+        See https://git.wechange.de/gl/code/wechange-payments/-/issues/6#note_157829
+        :param order_id: Order ID of the payment
+        :param is_recurring: whether the payment is recurring
+        :param payment_params: param dict, as given to `_make_actual_payment()`
+        :return: a <str> of max 140 chars
+        """
+        portal_str = settings.COSINNUS_PORTAL_URL
+        recur_str = 'erste ' if not is_recurring else ''
+        period_str = DebitPeriodMixin.DEBIT_PERIODS_BANK_STATEMENT_FRAGMENT.get(payment_params.get('debit_period', -1), '')
+        bank_statement_string = f'{portal_str} / Danke fuer deine {recur_str}freiwillige {period_str} Zahlung / Bestell-ID: {order_id}'
+        # truncate statement string at 140 chars (SEPA max length)
+        return bank_statement_string[:140]
+    
     def handle_success_redirect(self, request, params):
         """ The user gets navigated here after completing a transaction on a popup/external payment provider.
             @return: The targetted Payment if the redirect was valid and active, False if it was an expired or inactive session. 
