@@ -182,14 +182,18 @@ admin.site.register(TransactionLog, TransactionLogAdmin)
 
 
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('payl_user_id', 'user', 'state', 'debit_amount', 'amount', 'debit_period', 'next_due_date', 'payl_last_payment_internal_transaction_id', 'has_problems', 'created', 'terminated')
+    list_display = ('payl_user_id', '_user_email', 'state', 'debit_amount', 'amount', 'debit_period', 'next_due_date', 'payl_last_payment_internal_transaction_id', 'has_problems', 'created', 'terminated')
     list_filter = ('state', 'has_problems', )
     search_fields = ('id', 'user__first_name', 'user__last_name', 'user__email', 'reference_payment__vendor_transaction_id', 'reference_payment__internal_transaction_id', 'created')
     readonly_fields = ('user', 'state', 'has_problems', 'reference_payment', 'last_payment', 'amount', 'debit_period', 'debit_amount', 'next_due_date', 'num_attempts_recurring', 'last_pre_notification_at')
     raw_id_fields = ('user',)
     
-    actions = ['resend_both_initial_emails', 'resend_subscription_email', 'terminate_suspended',]
-
+    actions = ['resend_both_initial_emails', 'resend_subscription_email', 'terminate_suspended', 'reactivate_suspended']
+    
+    @admin.display(description=_('User'))
+    def _user_email(self, obj):
+        return obj.user.email
+    
     @admin.display(description=pgettext_lazy('Invoice PDF, important!', 'Subscription-ID'))
     def payl_user_id(self, obj):
         if settings.PAYMENTS_INVOICE_PORTAL_ID:
@@ -244,6 +248,20 @@ class SubscriptionAdmin(admin.ModelAdmin):
                 level = messages.ERROR
             self.message_user(request, message, level=level)
     terminate_suspended.short_description = "TERMINATE subscription (suspended subscriptions only!)"
+    
+    def reactivate_suspended(self, request, queryset):
+        for subscription in queryset:
+            if subscription.state == Subscription.STATE_99_FAILED_PAYMENTS_SUSPENDED:
+                subscription.state = Subscription.STATE_2_ACTIVE
+                subscription.num_attempts_recurring = 0
+                subscription.save()
+                message = f'Subscription {self.payl_user_id(subscription)} was reactivated and its booking attempt count reset.'
+                level = messages.SUCCESS
+            else:
+                message = f'Subscription {self.payl_user_id(subscription)} could not be terminated because it is not in a SUSPENDED state!'
+                level = messages.ERROR
+            self.message_user(request, message, level=level)
+    reactivate_suspended.short_description = "DANGER: Reactivate subscription (suspended subscriptions only!)"
     
     if getattr(settings, 'PAYMENTS_TEST_PHASE', False) or getattr(settings, 'COSINNUS_PAYMENTS_ENABLED_ADMIN_ONLY', False) \
         or getattr(settings, 'COSINNUS_PAYMENTS_ADMIN_DEBUG_FUNCTIONS_ENABLED', False):
