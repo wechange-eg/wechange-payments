@@ -67,8 +67,16 @@ class WechangePaymentsDefaultSettings(AppConf):
 
     # the lowest allowed amount for a payment transaction
     MINIMUM_ALLOWED_PAYMENT_AMOUNT = MINIMUM_MONTHLY_AMOUNT
-    # the highest allowed amount for payment transaction
+    # the highest allowed amount for a payment transaction
     MAXIMUM_ALLOWED_PAYMENT_AMOUNT = MAXIMUM_ALLOWED_MONTHLY_AMOUNT * 12
+    # No further recurring payments can be made by a user account if the aggregated sum of all
+    #   successful payments in the last year exceeds this value, in euros.
+    # This is an absolute ceiling to prevent booking vast sums by error.
+    # The value of 1500 is the legacy max amount of 100eur monthly * 12 month, with a 3 month
+    #   leeway to accommodate if a big subscriber changes their payment details once or twice
+    #   (in that case, an instant payment is made and the subscription time extended, but this
+    #   may exceed the yearly hardcap in that 12-month window).
+    HARDCAP_RECURRING_YEARLY_ACCOUNT_AGGREGATED_PAYMENT_SUM = 1500
 
     # how many days until the payment popup is shown again for non-subscribers, after clicking it away
     POPUP_SHOW_AGAIN_DAYS = 30
