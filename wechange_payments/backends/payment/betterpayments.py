@@ -22,6 +22,8 @@ from wechange_payments.payment import suspend_failed_subscription, handle_succes
     handle_payment_refunded
 import time
 
+from wechange_payments.utils.utils import send_admin_mail_notification
+
 logger = logging.getLogger('wechange-payments')
 
 BETTERPAYMENTS_API_ENDPOINT_PAYMENT = '/rest/payment'
@@ -237,14 +239,25 @@ class BetterPaymentBackend(BaseBackend):
             @param params: Expected params can be found in `REQUIRED_PARAMS`.
             @return: A tuple of (`Payment`, None) if successful, returning the *new* Payment,
                 or (None, Str-error-message) """
+        mail_error_text = (
+            'In the PAYL system, a payment could not be processed because it violated an internal security rule. This hints at a misconfiguration or bug in the PAYL configs. Please report this to a dev immediately!\n\n'
+            'The error message was of the offending security check was: %s\n\n'
+            f'The involved PAYL subscription can be found here: {reference_payment.subscription.get_admin_change_url()}'
+        )
         if not self.user_pre_recurring_payment_safety_checks(reference_payment.user):
-            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
+            error_message = _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -6}
+            send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', mail_error_text % error_message)
+            return None, error_message
         # additional check: reference payment must be coming from an active subscription!
         if not reference_payment.subscription or not reference_payment.subscription.state == Subscription.STATE_2_ACTIVE:
-            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -7}
+            error_message = _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -7}
+            send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', mail_error_text % error_message)
+            return None, error_message
         # additional check: reference payment must be coming from an active subscription that has no pending payments!
         if reference_payment.subscription.has_pending_payment():
-            return None, _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -8}
+            error_message = _('Error: "%(error_message)s" (%(error_code)d)') % {'error_message': ERROR_MESSAGE_PAYMENT_SECURITY_CHECK_FAILED, 'error_code': -8}
+            send_admin_mail_notification('WECHANGE Payments: Received a Refund or chargeback!', mail_error_text % error_message)
+            return None, error_message
         
         # collect params from reference payment
         order_id = str(uuid.uuid4())

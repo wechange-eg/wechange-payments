@@ -199,16 +199,18 @@ def book_next_subscription_payment(subscription):
         
         subscription.num_attempts_recurring += 1
         # the server might just be down, or some error could have occured that has nothing
-        # to do with the actual payment. so we retry this 3 different times
-        if subscription.num_attempts_recurring < 3:
-            # we haven't retried 3 times, count up tries in the subscription  
+        # to do with the actual payment, or the account does not have sufficient funds right now.
+        # so we retry this 7 different times, one each day, giving some time for the user to refill their account
+        # or for the devs to fix problems with payment processing
+        if subscription.num_attempts_recurring < 7:
+            # we haven't retried 7 times, count up tries in the subscription
             logger.warning('Payments: (will retry) Trying to make the next subscription payment returned an error (often an actual payment method issue). Retrying next day.',
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             subscription.has_problems = True
             subscription.save()
         else:
-            # we have retried 3 times. appearently the problem is with the payment itself
-            logger.warning('Payments: (giving up) Trying to make the next subscription payment returned an error (often an actual payment method issue). Failed 3 times for this subscription and giving up.',
+            # we have retried 7 times. appearently the problem is with the payment itself
+            logger.warning('Payments: (giving up) Trying to make the next subscription payment returned an error (often an actual payment method issue). Failed 7 times for this subscription and giving up.',
                  extra={'user': subscription.user, 'subscription': subscription, 'error_message': error})
             # set the subscription to failed and email the user
             suspend_failed_subscription(subscription)
