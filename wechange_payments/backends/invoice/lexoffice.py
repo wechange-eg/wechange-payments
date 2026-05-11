@@ -137,7 +137,7 @@ class LexofficeInvoiceBackend(BaseInvoiceBackend):
                 'shippingDate': invoice.created.isoformat(timespec='milliseconds'), # the actual date of the booking
                 'shippingType': 'service'
             },
-            'introduction': 'Kleinbetragsrechnung gemäß § 33 UStDV:',
+            'introduction': force_str(pgettext_lazy('Invoice PDF, important!', 'We charge you for our services as follows:')),
         }
         data = self._add_contact_invoice_request_params(payment, data)
         
