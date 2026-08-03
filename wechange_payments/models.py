@@ -550,6 +550,8 @@ class Subscription(DebitPeriodMixin, models.Model):
                 raise Exception('Payments: Fatal: Sanity check failed for subscription: \
                     Tried to save a subscription when another subscription with an exclusive state exists for the same user!')
         super(Subscription, self).save(*args, **kwargs)
+        # update cached field so it is not stale for next changes to this instance
+        self._old_state = self.state
     
     def get_admin_change_url(self):
         """ Returns the django admin edit page for this object. """
