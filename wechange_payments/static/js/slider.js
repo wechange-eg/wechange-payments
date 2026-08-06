@@ -95,7 +95,7 @@ $(function() {
 	// on initial, trigger slide event to update visuals
 	$slider.slider('option', 'slide')(null, {value: $slider.slider('value'), initial: true});
 	// initially focus but deselect slider value
-	var textInput = $('.slider-container #value').focus();
+	var textInput = $('.slider-container #value');
 	// set textbox value again incase it was higher than slider max and has now been reset
 	$(".payment-slider #value").val(PAYMENTS_SLIDER_INITIAL_MONTHLY_AMOUNT);
 
