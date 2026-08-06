@@ -37,6 +37,7 @@
 		        <p class="error-message"></p>
 		    </div>
 		    
+			{% block running_subscription_campain %}
 		    <h2>
                 {% blocktrans with amount=subscription.debit_amount|intify debit_period=subscription.get_debit_period_display context "(MS2)" %}Your current Contribution is {{ amount }} Euro {{ debit_period }}{% endblocktrans %}
                 {% if not subscription.is_monthly %}
@@ -49,6 +50,7 @@
 If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!{% endblocktrans %}{% endcaptureas %}
                 {{ desc_text|linebreaksbr }}
 			</p>
+			{% endblock running_subscription_campain %}
 			
 			{% include "wechange_payments/partials/additional_campaign_header.html" %}
 			
@@ -60,11 +62,11 @@ If you can contribute less or nothing at all, we're sure you have good reasons. 
 			
 			<hr/>
 			
-			<h3>{% trans "Change your monthly Contribution" context "(MS7)" %}:</h3>
+			<h3>{% trans "Change your Contribution" context "(MS7)" %}:</h3>
 			
         	<div class="large-space">
 				<span>
-					{% trans "If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually." context "(MS8)" %}
+					{% trans "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field." context "(MS8)" %}
 					{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF24)" %}Contribution amount includes {{ vat_amount }}% VAT.{% endblocktrans %}
 				</span>
 			</div>
