@@ -37,6 +37,7 @@
 		        <p class="error-message"></p>
 		    </div>
 		    
+			{% block running_subscription_campain %}
 		    <h2>
                 {% blocktrans with amount=subscription.debit_amount|intify debit_period=subscription.get_debit_period_display context "(MS2)" %}Your current Contribution is {{ amount }} Euro {{ debit_period }}{% endblocktrans %}
                 {% if not subscription.is_monthly %}
@@ -49,6 +50,7 @@
 If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!{% endblocktrans %}{% endcaptureas %}
                 {{ desc_text|linebreaksbr }}
 			</p>
+			{% endblock running_subscription_campain %}
 			
 			{% include "wechange_payments/partials/additional_campaign_header.html" %}
 			
