@@ -66,7 +66,7 @@ If you can contribute less or nothing at all, we're sure you have good reasons. 
 			
         	<div class="large-space">
 				<span>
-					{% trans "If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually." context "(MS8)" %}
+					{% trans "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field." context "(MS8)" %}
 					{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF24)" %}Contribution amount includes {{ vat_amount }}% VAT.{% endblocktrans %}
 				</span>
 			</div>

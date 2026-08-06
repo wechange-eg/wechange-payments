@@ -615,7 +615,7 @@ msgid "Change your Contribution"
 msgstr ""
 
 msgctxt "(MS8)"
-msgid "If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually."
+msgid "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field."
 msgstr ""
 
 #, python-format
