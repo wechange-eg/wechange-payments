@@ -86,11 +86,11 @@
 					<hr/>
 					
 					{% if displayed_subscription and displayed_subscription.state != 1 %}
-						<h3>{% trans "Confirm your monthly Contribution" context "(PF15a)" %}:</h3>
+						<h3>{% trans "Confirm your Contribution" context "(PF15a)" %}:</h3>
 					{% elif displayed_subscription and displayed_subscription.state == 1 %}
-						<h3>{% trans "Choose your new monthly Contribution" context "(PF15b)" %}:</h3>
+						<h3>{% trans "Choose your new Contribution" context "(PF15b)" %}:</h3>
 					{% else %}
-						<h3>{% trans "Choose your monthly Contribution" context "(PF15)" %}:</h3>
+						<h3>{% trans "Choose your Contribution" context "(PF15)" %}:</h3>
 					{% endif %}
 
         			{% include 'wechange_payments/fields/slider.html' with field_name='amount' %}

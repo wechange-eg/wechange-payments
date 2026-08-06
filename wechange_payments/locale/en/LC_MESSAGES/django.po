@@ -611,7 +611,7 @@ msgid "Learn more"
 msgstr ""
 
 msgctxt "(MS7)"
-msgid "Change your monthly Contribution"
+msgid "Change your Contribution"
 msgstr ""
 
 msgctxt "(MS8)"
@@ -746,15 +746,15 @@ msgid "Update payment information"
 msgstr ""
 
 msgctxt "(PF15a)"
-msgid "Confirm your monthly Contribution"
+msgid "Confirm your Contribution"
 msgstr ""
 
 msgctxt "(PF15b)"
-msgid "Choose your new monthly Contribution"
+msgid "Choose your new Contribution"
 msgstr ""
 
 msgctxt "(PF15)"
-msgid "Choose your monthly Contribution"
+msgid "Choose your Contribution"
 msgstr ""
 
 #, python-format
