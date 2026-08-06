@@ -97,10 +97,7 @@
 
         			<div class="large-space">
         				<p>
-        					{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF26)" %}Choose the amount you would like to contribute using the slider. The contribution amount includes {{ vat_amount }}% VAT.{% endblocktrans %}
-        				</p>
-        				<p>
-        					{% trans "You may also choose a higher amount by entering it directly in the text box!" context "(PF24x)" %}
+        					{% blocktrans with vat_amount=SETTINGS.PAYMENTS_INVOICE_PROVIDER_TAX_RATE_PERCENT context "(PF26)" %}Use the slider to select your monthly contribution as an individual or for your group. Alternatively, you can enter a higher amount directly in the text field. The contribution automatically includes {{ vat_amount }}% VAT and you will receive an invoice.{% endblocktrans %}
         				</p>
         			</div>
 
@@ -109,7 +106,7 @@
                     {% elif displayed_subscription and displayed_subscription.state == 1 %}
                         <h3>{% trans "Choose your new debiting period" context "(PF27b)" %}:</h3>
                     {% else %}
-                        <h3>{% trans "Choose your debiting period" context "(PF27)" %}:</h3>
+                        <h3>{% trans "Choose your billing interval" context "(PF27)" %}:</h3>
                     {% endif %}
 
 					{% include 'wechange_payments/fields/period_slider.html' with field_name='debit_period' %}

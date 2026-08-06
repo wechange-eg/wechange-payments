@@ -633,7 +633,7 @@ msgstr ""
 
 #, python-format
 msgctxt "(PF26)"
-msgid "Choose the amount you would like to contribute using the slider. The contribution amount includes %(vat_amount)s%% VAT."
+msgid "Use the slider to select your monthly contribution as an individual or for your group. Alternatively, you can enter a higher amount directly in the text field. The contribution automatically includes %(vat_amount)s%% VAT and you will receive an invoice."
 msgstr ""
 
 msgctxt "(PF24x)"
