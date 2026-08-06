@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 
 # The wechange_payments version
-VERSION = '0.1.13'
+VERSION = '0.1.14'

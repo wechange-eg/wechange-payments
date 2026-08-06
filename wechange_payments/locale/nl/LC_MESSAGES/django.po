@@ -508,11 +508,11 @@ msgid "Learn more"
 msgstr ""
 
 msgctxt "(MS7)"
-msgid "Change your monthly Contribution"
+msgid "Change your Contribution"
 msgstr ""
 
 msgctxt "(MS8)"
-msgid "If you would like to change the amount you contribute, you can choose a new amount using the slider. You may also choose a higher amount by entering it manually."
+msgid "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field."
 msgstr ""
 
 #, python-format
@@ -620,20 +620,20 @@ msgid "Update payment information"
 msgstr ""
 
 msgctxt "(PF15a)"
-msgid "Confirm your monthly Contribution"
+msgid "Confirm your Contribution"
 msgstr ""
 
 msgctxt "(PF15b)"
-msgid "Choose your new monthly Contribution"
+msgid "Choose your new Contribution"
 msgstr ""
 
 msgctxt "(PF15)"
-msgid "Choose your monthly Contribution"
+msgid "Choose your Contribution"
 msgstr ""
 
 #, python-format
 msgctxt "(PF26)"
-msgid "Choose the amount you would like to contribute using the slider. The contribution amount includes %(vat_amount)s%% VAT."
+msgid "Use the slider to select your monthly contribution as an individual or for your group. Alternatively, you can enter a higher amount directly in the text field. The contribution automatically includes %(vat_amount)s%% VAT and you will receive an invoice."
 msgstr ""
 
 msgctxt "(PF24x)"
