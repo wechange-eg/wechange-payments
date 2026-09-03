@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 from datetime import timedelta
 import logging
 
@@ -33,10 +34,13 @@ def current_subscription(request):
     # determine if payment popup should be shown
     if not current_subscription:
         try:
-            excepted_urls = LOGIN_URLS + ['/account/', '/payments/',]
-            if request.user.is_authenticated \
-                    and request.META.get('HTTP_REFERER', '').startswith(CosinnusPortal.get_current().get_domain()) \
-                    and not any([request.path.startswith(never_path) for never_path in excepted_urls]):
+            shown_on_urls = [r'^/dashboard/', r'^/group/([^\/]+)/$',]
+            is_showable_url = False
+            for url_pattern in shown_on_urls:
+                if re.match(url_pattern, request.path):
+                    is_showable_url = True
+            
+            if request.user.is_authenticated and is_showable_url:
                 profile = request.user.cosinnus_profile
                 clicked_away_date = profile.settings.get(USERPROFILE_SETTING_POPUP_CLOSED, None)
                 threshold_date = now() - timedelta(days=settings.PAYMENTS_POPUP_SHOW_AGAIN_DAYS)
