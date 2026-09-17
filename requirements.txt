@@ -1,3 +1,0 @@
-Django>=2.1.5
-django-countries==7.2.1
-schwifty==2018.9.1
