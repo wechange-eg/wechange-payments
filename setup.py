@@ -6,7 +6,7 @@ from wechange_payments import VERSION as PAYMENTS_VERSION
 name = 'wechange-payments'
 package = 'wechange_payments'
 
-url = 'https://github.com/wechange-eg/wechange-payments'
+url = 'https://git.wechange.de/gl/code/wechange-payments'
 author = 'Sascha Narr'
 author_email = 'saschanarr@wechange.de'
 license_ = 'GNU'
