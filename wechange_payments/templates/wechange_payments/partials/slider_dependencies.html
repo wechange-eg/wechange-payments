@@ -1,5 +1,5 @@
 {% load static %}
 
-<script src="{% static "js/vendor/jquery-ui.slider.min.js" %}"></script>
-<script src="{% static "js/slider.js" %}"></script>
-<script src="{% static "js/payments.js" %}"></script>
+<script src="{% static "js/vendor/jquery-ui.slider.min.js" %}?js_v={{ SETTINGS.PAYMENTS_VERSION }}"></script>
+<script src="{% static "js/slider.js" %}?js_v={{ SETTINGS.PAYMENTS_VERSION }}"></script>
+<script src="{% static "js/payments.js" %}?js_v={{ SETTINGS.PAYMENTS_VERSION }}"></script>

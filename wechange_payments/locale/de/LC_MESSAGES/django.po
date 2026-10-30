@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: wechange-payments\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-30 09:05+0100\n"
-"PO-Revision-Date: 2026-08-06 13:38+0200\n"
+"PO-Revision-Date: 2026-10-30 13:13+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -19,536 +19,6 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 
 #, python-format
-msgid "Started invoice creation for %(number)d payment(s) in background."
-msgstr "Started invoice creation for %(number)d payment(s) in background."
-
-msgid "Create invoice in Invoice API (threaded)"
-msgstr "Create invoice in Invoice API (threaded)"
-
-msgid "Run/continue invoice in Invoice API (threaded)"
-msgstr "Run/continue invoice in Invoice API (threaded)"
-
-msgctxt "Invoice PDF, important!"
-msgid "We charge you for our services as follows:"
-msgstr "Unsere Leistungen stellen wir Ihnen wie folgt in Rechnung:"
-
-msgid "You cannot make any additional payments at this time. Please contact our support!"
-msgstr "Du kannst zur Zeit keine weiteren Zahlungen vornehmen. Bitte kontaktiere unseren Support!"
-
-#, python-format
-msgid "Error: \"%(error_message)s\" (%(error_code)d)"
-msgstr "Fehler: \"%(error_message)s\" (%(error_code)d)"
-
-msgid "Making postponed payments is currently not possible!"
-msgstr "Es ist aktuell nicht möglich, verzögerte Zahlungen zu machen!"
-
-msgid "The payment provider could not be reached."
-msgstr "Der Zahlungsdienstleister konnte ist nicht erreichbar."
-
-msgid "Unexpected response from payment provider."
-msgstr "Unbekanntes Ergebnis vom Zahlungsdienstleister."
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "User fee for %(portal_name)s"
-msgstr "Nutzungsgebühr für %(portal_name)s"
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "Electronic service"
-msgstr "Elektronische Dienstleistung"
-
-msgctxt "Invoice PDF, important!"
-msgid "Beneficiary"
-msgstr "Leistungsempfänger"
-
-msgctxt "Invoice PDF, important!"
-msgid "Subscription-ID"
-msgstr "Abo-ID"
-
-msgid "Direct Debit (SEPA)"
-msgstr "Bankeinzug (SEPA)"
-
-msgid "Credit Card"
-msgstr "Kreditkarte"
-
-msgid "Paypal"
-msgstr "Paypal"
-
-msgid "The IBAN you entered does not seem to be correct!"
-msgstr "Die eingegebene IBAN scheint nicht korrekt zu sein!"
-
-msgid "The BIC you entered does not seem to be correct!"
-msgstr "Die eingegebene BIC scheint nicht korrekt zu sein!"
-
-#, python-format
-msgctxt "(MAILPRE)"
-msgid "(MAILPRE) with variables: %(username)s,"
-msgstr "Liebe*r %(username)s,"
-
-#, python-format
-msgctxt "(MAILLINKS)"
-msgid "(MAILLINKS) %(link_payment_info)s %(link_invoices)s"
-msgstr ""
-"Weitere Informationen zu deinem Beitrag erfährst du unter: %(link_payment_info)s \n"
-"Deine Rechnungen kannst du unter folgendem Link abrufen: %(link_invoices)s"
-
-#, python-format
-msgctxt "(MAILPOST)"
-msgid "(MAILPOST) with variables: %(portal_name)s"
-msgstr ""
-"Danke!\n"
-"\n"
-"Dein %(portal_name)s Support Team"
-
-#, python-format
-msgctxt "(MAIL2)"
-msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s %(payment_debit_period)s"
-msgstr ""
-"Danke für deinen Beitrag! Wir haben die Buchung deines %(payment_debit_period)sen Beitrags soeben veranlasst.\n"
-"\n"
-"Gesamtbetrag (inkl. %(vat_amount)s%% USt): **%(payment_amount)s EUR**\n"
-"Zahlungsart: %(payment_method)s"
-
-#, python-format
-msgctxt "(MAIL1a)"
-msgid "(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s %(payment_debit_period)s"
-msgstr ""
-"Danke für deinen Beitrag! Wir freuen uns, dich als Unterstützer*in von %(portal_name)s begrüßen zu dürfen!\n"
-"\n"
-"Du hast einen Beitrag in Höhe von **%(payment_amount)s Euro %(payment_debit_period)s** festgelegt. Die erste Abbuchung ist soeben erfolgt. Dafür erhältst du eine separate Bestätigung per E-Mail.\n"
-"\n"
-"Die nächste Abbuchung wird am %(next_debit_date)s erfolgen. Bitte trage dafür Sorge, dass Dein Konto ausreichende Deckung aufweist. "
-
-#, python-format
-msgctxt "(MAIL1b)"
-msgid "(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s %(payment_debit_period)s"
-msgstr ""
-"Danke für deinen Beitrag! Wir freuen uns, dich als Unterstützer*in von %(portal_name)s begrüßen zu dürfen!\n"
-"\n"
-"Du hast deinen alten Beitrag mit einem neuen Beitrag in Höhe von **%(payment_amount)s Euro %(payment_debit_period)s** ersetzt. Die erste Abbuchung mit deinen neuen Zahlungsdaten ist soeben erfolgt. Dafür erhältst du eine separate Bestätigung per E-Mail.\n"
-"\n"
-"Die nächste Abbuchung wird am %(next_debit_date)s erfolgen. Bitte trage dafür Sorge, dass Dein Konto ausreichende Deckung aufweist. "
-
-#, python-format
-msgctxt "(MAIL3)"
-msgid "(MAIL3) with variables: %(subscription_amount)s %(next_debit_date)s %(subscription_debit_period)s"
-msgstr ""
-"Du hast deinen Beitrag auf %(subscription_amount)s Euro %(subscription_debit_period)s geändert.\n"
-"\n"
-"Die nächste Abbuchung wird am %(next_debit_date)s erfolgen. Bitte trage dafür Sorge, dass Dein Konto ausreichende Deckung aufweist. "
-
-#, python-format
-msgctxt "(MAIL4)"
-msgid "(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s"
-msgstr ""
-"Schade, dass du deine Zahlungen eingestellt hast. Wir danken dir für deine bisherige Unterstützung unserer Arbeit und hoffen, dass Du %(portal_name)s weiter treu bleibst. \n"
-"\n"
-"Falls Du lediglich Deine Zahlungsdaten ändern möchtest, klicke bitte hier und richte die Zahlung neu ein: %(link_new_payment)s\n"
-"\n"
-"Solltest Du mit %(portal_name)s unzufrieden sein, freuen wir uns über Dein konstruktives Feedback an %(support_email)s"
-
-#, python-format
-msgctxt "(MAIL5)"
-msgid "(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s %(subscription_debit_period)s"
-msgstr ""
-"Wir konnten aufgrund eines Fehlers keine Abbuchung für deinen %(subscription_debit_period)s Beitrag vornehmen! Für weitere Details, klicke bitte hier: %(link_payment_issues)s\n"
-"\n"
-"Dein Beitrag wird hiermit ausgesetzt. \n"
-"\n"
-"Um weiterhin einen Beitrag zu leisten und %(portal_name)s zu unterstützen, richte bitte hier eine neue Zahlung ein: %(link_new_payment)s\n"
-"\n"
-"Bitte stelle sicher, dass dein Konto weiterhin gültig ist und über eine ausreichende Deckung verfügt! "
-
-#, python-format
-msgctxt "(MAIL6)"
-msgid "(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s %(sepa_creditor)s %(next_debit_date)s %(subscription_amount)s %(support_email)s"
-msgstr ""
-"Hiermit erhältst du die SEPA-Lastschriftvorankündigung für die Abbuchung deines nächsten %(portal_name)s-Beitrags:\n"
-"\n"
-"Bankkonto (IBAN): %(iban)s\n"
-"SEPA-Mandatsreferenz: %(sepa_mandate)s\n"
-"Gläubiger-Identifikationsnummer: %(sepa_creditor)s\n"
-" \n"
-"Abbuchungsdatum: %(next_debit_date)s\n"
-"Gesamtbetrag: %(subscription_amount)s EUR\n"
-"\n"
-"Der Betrag wird ab dem Abbuchungsdatum von Deinem bei uns hinterlegten Konto eingezogen.\n"
-"\n"
-"Aus rechtlichen Gründen sind wir verpflichtet Dich über jede SEPA-Lastschrift vorab zu informieren. Dies ist eine automatisch generierte E-Mail.\n"
-"\n"
-"Bei Fragen wende Dich bitte an %(support_email)s."
-
-msgctxt "(MAIL2s)"
-msgid "(MAIL2s) with variables: -"
-msgstr "Dein Beitrag"
-
-#, python-format
-msgctxt "(MAIL1s)"
-msgid "(MAIL1s) with variables: %(portal_name)s"
-msgstr "Dein Beitrag für %(portal_name)s"
-
-msgctxt "(MAIL3s)"
-msgid "(MAIL3s) with variables: -"
-msgstr "Dein Beitrag wurde geändert"
-
-msgctxt "(MAIL4s)"
-msgid "(MAIL4s) with variables: -"
-msgstr "Deine Zahlungen wurden beendet"
-
-msgctxt "(MAIL5s)"
-msgid "(MAIL5s) with variables: -"
-msgstr "Deine Zahlungen wurden ausgesetzt"
-
-msgctxt "(MAIL6s)"
-msgid "(MAIL6s) with variables: -"
-msgstr "Deine SEPA-Lastschriftvorankündigung für deinen Beitrag"
-
-msgctxt "(URL-LABEL)"
-msgid "Link"
-msgstr "Link"
-
-msgid "monthly"
-msgstr "monatlich"
-
-msgid "quarterly"
-msgstr "vierteljährlich"
-
-msgid "half-yearly"
-msgstr "halbjährlich"
-
-msgid "yearly"
-msgstr "jährlich"
-
-#, python-format
-msgid "every month"
-msgid_plural "every %(months)s months"
-msgstr[0] "jeden Monat"
-msgstr[1] "jeden %(months)s-ten Monat"
-
-msgid "Debiting Amount"
-msgstr "Abbuchungsbetrag"
-
-msgid "PayPal"
-msgstr "PayPal"
-
-msgid "Not started"
-msgstr "Noch nicht begonnen"
-
-msgid "Payment initiated but not completed by user yet"
-msgstr "Zahlung initiiert, aber noch nicht vom Benutzer abgeschlossen"
-
-msgid "Payment processing"
-msgstr "Zahlung wird bearbeitet"
-
-msgid "Successfully paid"
-msgstr "Erfolgreich bezahlt"
-
-msgid "Pre-authorized for payment, but not yet paid"
-msgstr "Vor-authorisiert, aber noch nicht bezahlt"
-
-msgid "Failed"
-msgstr "Fehlgeschlagen"
-
-msgid "Retracted"
-msgstr "Zurückgezogen"
-
-msgid "Canceled"
-msgstr "Abgebrochen"
-
-msgid "Vendor Transaction Id"
-msgstr "Vendor Transaction Id"
-
-msgid "Order Id"
-msgstr "Bestell-ID"
-
-msgid "Last Order Id"
-msgstr "Letzte Bestell-ID"
-
-msgid "Monthly Amount"
-msgstr "Monatlicher Betrag"
-
-msgid "Debiting Period"
-msgstr "Abbuchungszeitraum"
-
-msgid "Payment Type"
-msgstr "Zahlungsart"
-
-msgid "Last Action At"
-msgstr "Letzte Aktion am"
-
-msgid "Completed At"
-msgstr "Abgeschlossen am"
-
-msgid "Payment Status"
-msgstr "Zahlungsstatus"
-
-msgid "Is reference payment"
-msgstr "Ist Referenzzahlung"
-
-msgid "Is postponed payment"
-msgstr "Ist verzögerte zahlung"
-
-msgid "Has been revoked"
-msgstr "Wurde abgewiesen"
-
-msgid "Backend class used"
-msgstr "Backend class used"
-
-msgid "Payment"
-msgstr "Zahlung"
-
-msgid "Payments"
-msgstr "Zahlungen"
-
-msgid "Direct Request"
-msgstr "Direct Request"
-
-msgid "Received Postback"
-msgstr "Received Postback"
-
-msgid "Created"
-msgstr "Erstellt"
-
-msgid "API Endpoint URL"
-msgstr "API Endpoint URL"
-
-msgid "Transaction Type"
-msgstr "Transaction Type"
-
-msgid "Payment Transaction Log"
-msgstr "Zahlungstransaktions-Logs"
-
-msgid "Payment Transaction Logs"
-msgstr "Payment Transaction Logs"
-
-msgid "Terminated."
-msgstr "Terminated."
-
-msgid "Cancelled, but still active"
-msgstr "Cancelled, but still active"
-
-msgid "Active"
-msgstr "Active"
-
-msgid "Waiting, becoming active at next payment due date"
-msgstr "Waiting, becoming active at next payment due date"
-
-msgid "Suspended, because of payment errors"
-msgstr "Ausgesetzt, wegen Zahlungsfehlern"
-
-msgid "User"
-msgstr "Benutzer"
-
-msgid "Reference Payment"
-msgstr "Referenzzahlung"
-
-msgid "Subscription State"
-msgstr "Abo-Status"
-
-msgid "Has Problems"
-msgstr "Hat Probleme"
-
-msgid "Attempts of booking recurring payment"
-msgstr "Versuche eine wiederholte Zahlung zu buchen"
-
-msgid "Next due date"
-msgstr "Nächstes Buchungsdatum"
-
-msgid "Last pre-notification at"
-msgstr "Letzte Vorbenachrichtigung am"
-
-msgid "Last Payment"
-msgstr "Letzte Zahlung"
-
-msgid "Cancelled by User"
-msgstr "Vom Benutzer abgebrochen"
-
-msgid "Finally terminated by System"
-msgstr "Endgültig vom System terminiert"
-
-msgid "Subscription"
-msgstr "Abo"
-
-msgid "Not created at provider."
-msgstr "Noch nicht beim Dienstleister erstellt."
-
-msgid "Created, but not finalized"
-msgstr "Erstellt, aber nicht finalisiert"
-
-msgid "Finalized, but not downloaded"
-msgstr "Finalisiert, aber nicht heruntergeladen"
-
-msgid "Downloaded and ready"
-msgstr "Heruntergeladen und bereit"
-
-msgid "Invoice State"
-msgstr "Rechnungsstatus"
-
-msgid "Is Ready"
-msgstr "Bereit"
-
-msgid "File"
-msgstr "Datei"
-
-msgid "Provider Invoice ID"
-msgstr "Dienstleister-Rechnungs-ID"
-
-msgid "Invoice Provider Backend class used"
-msgstr "Invoice Provider Backend class used"
-
-msgid "Invoice"
-msgstr "Rechnung"
-
-msgid "Invoices"
-msgstr "Rechnungen"
-
-msgid "Additional Invoice"
-msgstr "Weitere Rechnung"
-
-msgid "Additional Invoices"
-msgstr "Weitere Rechnungen"
-
-msgid "Related to"
-msgstr ""
-
-msgctxt "(BS1)"
-msgid "Payments"
-msgstr "Zahlungen"
-
-msgctxt "(BS2)"
-msgid "Payments"
-msgstr "Zahlungen"
-
-msgctxt "(TS1)"
-msgid "Stop payments"
-msgstr "Zahlungen einstellen"
-
-msgctxt "(TS2)"
-msgid "Too bad you want to end your contribution! Don't you want to reconsider? You can also choose a smaller amount. Every small contribution helps us. If you are dissatisfied with something, we would be happy to receive your feedback at support@wechange.de"
-msgstr "Schade, dass du deine Unterstützung beenden willst! Magst du es dir nicht noch einmal überlegen? Du kannst auch einen geringeren Betrag wählen. Jeder kleine Beitrag hilft uns weiter. Wenn du mit etwas unzufrieden bist, freuen wir uns über ein Feedback von dir an support@wechange.de!"
-
-msgctxt "(TS3)"
-msgid "What happens when you terminate your subscription"
-msgstr "Wenn du deine Beitragszahlungen einstellst"
-
-msgctxt "(TS4) (explanation)"
-msgid "No payments have been made yet. Your Contribution will be cancelled."
-msgstr "Es wurde noch keine Zahlung veranlasst. Deine Zahlungen werden abgebrochen."
-
-#, python-format
-msgctxt "(TS5)"
-msgid "Your subscription will be terminated and no future payments will be made. Your current payment status will remain active until %(date)s. You can reset the payments at any time."
-msgstr "Dein aktueller Zahlungsstatus bleibt bis zum %(date)s erhalten. Danach werden keine weiteren Abbuchungen mehr vorgenommen. Du kannst die Zahlungen jederzeit wieder neu einrichten. "
-
-msgctxt "(MS5-rethink-cancelling)"
-msgid "Modify Contribution Amount"
-msgstr "Beitragshöhe anpassen"
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgctxt "(TS6)"
-msgid "Terminate subscription"
-msgstr "Zahlungen beenden"
-
-msgctxt "(TS7)"
-msgid "Do you really want to terminate your subscriptions? You can create a new contribution at any time."
-msgstr "Möchtest du deine Zahlungen wirklich beenden? Du kannst jederzeit einen neuen Beitrag einrichten."
-
-msgctxt "(TS8)"
-msgid "You don't want to pay contributions anymore?"
-msgstr "Du möchtest ab sofort keine Beiträge mehr zahlen?"
-
-#, python-format
-msgid "You can contribute any amount up to %(max_amount)s by entering it here. For larger contributions, please contact our support!"
-msgstr "Du kannst einen beliebigen Betrag bis maximal %(max_amount)s beisteuern, indem du ihn direkt eingibst. Für größere Beiträge, kontaktiere bitte unseren Support!"
-
-msgctxt "(SLD1)"
-msgid "Thank you. Every small contribution helps."
-msgstr "Danke! Jeder kleine Beitrag hilft. "
-
-msgctxt "(SLD2)"
-msgid "Thank you for helping us to develop WECHANGE."
-msgstr "Danke, dass du uns hilfst, wechange.de weiterzuentwickeln."
-
-msgctxt "(SLD3)"
-msgid "Whoa! You're really helping us!"
-msgstr "Wow! Du hilfst uns wirklich sehr!"
-
-msgctxt "(SLD4)"
-msgid "Magnificent! With your support, the WECHANGE community can grow and prosper!"
-msgstr "Großartig! Mit deiner Unterstützung kann die wechange.de Community prächtig wachsen und gedeihen!"
-
-#, python-format
-msgid "Invoice from %(date)s"
-msgstr "Rechnung vom %(date)s"
-
-msgid "Your Invoices"
-msgstr "Deine Rechnungen"
-
-msgid "Payment Purpose"
-msgstr "Zahlungszweck"
-
-msgid "Monthly Contribution Payment (recurring)"
-msgstr "Monatliche Beitragszahlung (wiederkehrend)"
-
-msgctxt "(INF11)"
-msgid "Amount"
-msgstr "Betrag"
-
-msgid "Download Invoice (PDF)"
-msgstr "Rechnung herunterladen (PDF)"
-
-msgid "Creating your invoice download is taking longer than expected."
-msgstr "Die Erstellung deiner Rechnung dauert länger als erwartet."
-
-msgid "Please contact our support for assistance!"
-msgstr "Bitte kontaktiere unseren Support für Unterstützung!"
-
-msgid "Your invoice is still being prepared and will be ready for download shortly. Please return to this page in a few minutes."
-msgstr "Deine Rechnung wird aktuell vorbereitet und wird demnächst für den Download bereitstehen. Bitte rufe diese Seite in ein paar Minuten erneut auf."
-
-#, python-format
-msgid "Invoice for %(amount)s€ from %(date)s"
-msgstr "Rechnung über %(amount)s€ vom %(date)s"
-
-msgctxt "(FC1)"
-msgid "Current Payment Issues"
-msgstr "Aktuelle Zahlungsprobleme"
-
-msgctxt "(LN1)"
-msgid "Your Contribution"
-msgstr "Dein Beitrag"
-
-msgctxt "(LN2)"
-msgid "Your payment details"
-msgstr "Deine Zahlungsdaten"
-
-msgctxt "(LN3)"
-msgid "Your Invoices"
-msgstr "Deine Rechnungen"
-
-msgctxt "(LN4)"
-msgid "Past Contributions"
-msgstr "Vergangene Beiträge"
-
-msgctxt "(LN7)"
-msgid "If you have any questions about your Contribution or encountered any problems, please send an email to"
-msgstr "Falls du Fragen über unsere Beitragszahlungen hast, oder ein Problem aufgetreten ist, kontaktiere bitte unseren Support mit einer E-Mail an"
-
-msgctxt "(LN7)"
-msgid "Please include this reference number in your e-mail"
-msgstr "Bitte gib in deiner E-Mail diese Referenznummer an"
-
-msgctxt "(LN5)"
-msgid "Contact support"
-msgstr "Support kontaktieren"
-
-msgctxt "(LN6)"
-msgid "Contact our Support"
-msgstr "Support kontaktieren"
-
 msgid ""
 "\n"
 "The SEPA payment will be debited from your account within the next few days. \n"
@@ -582,98 +52,921 @@ msgstr ""
 "IBAN: %(iban)s\n"
 " \n"
 
-msgctxt "(MS1)"
-msgid "Your Contribution"
-msgstr "Dein Beitrag"
+msgctxt "(PF5)"
+msgid " Almost done! Please enter your account information below."
+msgstr "Fast geschafft! Gib bitte deine Zahlungsdaten ein. "
 
-msgctxt "(MS2)"
-msgid "Your current Contribution is %(amount)s Euro %(debit_period)s"
-msgstr "Dein Beitrag beträgt aktuell %(amount)s Euro %(debit_period)s"
-
+#, python-format
 msgctxt "(MS9)"
 msgid "(%(amount)s Euro per month)"
 msgstr "(%(amount)s Euro pro Monat)"
 
-msgctxt "(MS3)"
-msgid ""
-"We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.\n"
-"\n"
-"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
+#, python-format
+msgctxt "(MAIL1a)"
+msgid "(MAIL1a) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s %(payment_debit_period)s"
 msgstr ""
-"Wir verstehen wechange.de als Gemeingut: Du zahlst für die Nutzung von wechange.de, was es dir wert ist. Mit jedem Euro hilfst du mit, wechange.de besser zu machen. Mit durchschnittlich 7 Euro pro Monat können wir die Plattform kostendeckend anbieten, alles darüber trägt unmittelbar zur Weiterentwicklung bei. \n"
+"Danke für deinen Beitrag! Wir freuen uns, dich als Unterstützer*in von %(portal_name)s begrüßen zu dürfen!\n"
 "\n"
-"Wenn du weniger oder gar nichts beitragen kannst, hast du dafür sicherlich gute Gründe. Doch bitte denk daran: Das ist nur möglich, weil andere Nutzer*innen dich mittragen!"
+"Du hast einen Beitrag in Höhe von **%(payment_amount)s Euro %(payment_debit_period)s** festgelegt. Die erste Abbuchung ist soeben erfolgt. Dafür erhältst du eine separate Bestätigung per E-Mail.\n"
+"\n"
+"Die nächste Abbuchung wird am %(next_debit_date)s erfolgen. Bitte trage dafür Sorge, dass Dein Konto ausreichende Deckung aufweist. "
 
-msgctxt "(MS4)"
-msgid "Learn more"
-msgstr "Mehr erfahren"
+#, python-format
+msgctxt "(MAIL1b)"
+msgid "(MAIL1b) with variables: %(portal_name)s %(next_debit_date)s %(payment_amount)s %(payment_debit_period)s"
+msgstr ""
+"Danke für deinen Beitrag! Wir freuen uns, dich als Unterstützer*in von %(portal_name)s begrüßen zu dürfen!\n"
+"\n"
+"Du hast deinen alten Beitrag mit einem neuen Beitrag in Höhe von **%(payment_amount)s Euro %(payment_debit_period)s** ersetzt. Die erste Abbuchung mit deinen neuen Zahlungsdaten ist soeben erfolgt. Dafür erhältst du eine separate Bestätigung per E-Mail.\n"
+"\n"
+"Die nächste Abbuchung wird am %(next_debit_date)s erfolgen. Bitte trage dafür Sorge, dass Dein Konto ausreichende Deckung aufweist. "
+
+#, python-format
+msgctxt "(MAIL1s)"
+msgid "(MAIL1s) with variables: %(portal_name)s"
+msgstr "Dein Beitrag für %(portal_name)s"
+
+#, python-format
+msgctxt "(MAIL2)"
+msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s %(payment_debit_period)s"
+msgstr ""
+"Danke für deinen Beitrag! Wir haben die Buchung deines %(payment_debit_period)sen Beitrags soeben veranlasst.\n"
+"\n"
+"Gesamtbetrag (inkl. %(vat_amount)s%% USt): **%(payment_amount)s EUR**\n"
+"Zahlungsart: %(payment_method)s"
+
+msgctxt "(MAIL2s)"
+msgid "(MAIL2s) with variables: -"
+msgstr "Dein Beitrag"
+
+#, python-format
+msgctxt "(MAIL3)"
+msgid "(MAIL3) with variables: %(subscription_amount)s %(next_debit_date)s %(subscription_debit_period)s"
+msgstr ""
+"Du hast deinen Beitrag auf %(subscription_amount)s Euro %(subscription_debit_period)s geändert.\n"
+"\n"
+"Die nächste Abbuchung wird am %(next_debit_date)s erfolgen. Bitte trage dafür Sorge, dass Dein Konto ausreichende Deckung aufweist. "
+
+msgctxt "(MAIL3s)"
+msgid "(MAIL3s) with variables: -"
+msgstr "Dein Beitrag wurde geändert"
+
+#, python-format
+msgctxt "(MAIL4)"
+msgid "(MAIL4) with variables: %(portal_name)s %(link_new_payment)s %(support_email)s"
+msgstr ""
+"Schade, dass du deine Zahlungen eingestellt hast. Wir danken dir für deine bisherige Unterstützung unserer Arbeit und hoffen, dass Du %(portal_name)s weiter treu bleibst. \n"
+"\n"
+"Falls Du lediglich Deine Zahlungsdaten ändern möchtest, klicke bitte hier und richte die Zahlung neu ein: %(link_new_payment)s\n"
+"\n"
+"Solltest Du mit %(portal_name)s unzufrieden sein, freuen wir uns über Dein konstruktives Feedback an %(support_email)s"
+
+msgctxt "(MAIL4s)"
+msgid "(MAIL4s) with variables: -"
+msgstr "Deine Zahlungen wurden beendet"
+
+#, python-format
+msgctxt "(MAIL5)"
+msgid "(MAIL5) with variables: %(portal_name)s %(link_new_payment)s %(link_payment_issues)s %(subscription_debit_period)s"
+msgstr ""
+"Wir konnten aufgrund eines Fehlers keine Abbuchung für deinen %(subscription_debit_period)s Beitrag vornehmen! Für weitere Details, klicke bitte hier: %(link_payment_issues)s\n"
+"\n"
+"Dein Beitrag wird hiermit ausgesetzt. \n"
+"\n"
+"Um weiterhin einen Beitrag zu leisten und %(portal_name)s zu unterstützen, richte bitte hier eine neue Zahlung ein: %(link_new_payment)s\n"
+"\n"
+"Bitte stelle sicher, dass dein Konto weiterhin gültig ist und über eine ausreichende Deckung verfügt! "
+
+msgctxt "(MAIL5s)"
+msgid "(MAIL5s) with variables: -"
+msgstr "Deine Zahlungen wurden ausgesetzt"
+
+#, python-format
+msgctxt "(MAIL6)"
+msgid "(MAIL6) with variables: %(portal_name)s %(iban)s %(sepa_mandate)s %(sepa_creditor)s %(next_debit_date)s %(subscription_amount)s %(support_email)s"
+msgstr ""
+"Hiermit erhältst du die SEPA-Lastschriftvorankündigung für die Abbuchung deines nächsten %(portal_name)s-Beitrags:\n"
+"\n"
+"Bankkonto (IBAN): %(iban)s\n"
+"SEPA-Mandatsreferenz: %(sepa_mandate)s\n"
+"Gläubiger-Identifikationsnummer: %(sepa_creditor)s\n"
+" \n"
+"Abbuchungsdatum: %(next_debit_date)s\n"
+"Gesamtbetrag: %(subscription_amount)s EUR\n"
+"\n"
+"Der Betrag wird ab dem Abbuchungsdatum von Deinem bei uns hinterlegten Konto eingezogen.\n"
+"\n"
+"Aus rechtlichen Gründen sind wir verpflichtet Dich über jede SEPA-Lastschrift vorab zu informieren. Dies ist eine automatisch generierte E-Mail.\n"
+"\n"
+"Bei Fragen wende Dich bitte an %(support_email)s."
+
+msgctxt "(MAIL6s)"
+msgid "(MAIL6s) with variables: -"
+msgstr "Deine SEPA-Lastschriftvorankündigung für deinen Beitrag"
+
+#, python-format
+msgctxt "(MAILLINKS)"
+msgid "(MAILLINKS) %(link_payment_info)s %(link_invoices)s"
+msgstr ""
+"Weitere Informationen zu deinem Beitrag erfährst du unter: %(link_payment_info)s \n"
+"Deine Rechnungen kannst du unter folgendem Link abrufen: %(link_invoices)s"
+
+#, python-format
+msgctxt "(MAILPOST)"
+msgid "(MAILPOST) with variables: %(portal_name)s"
+msgstr ""
+"Danke!\n"
+"\n"
+"Dein %(portal_name)s Support Team"
+
+#, python-format
+msgctxt "(MAILPRE)"
+msgid "(MAILPRE) with variables: %(username)s,"
+msgstr "Liebe*r %(username)s,"
+
+msgid "(MSG1) Your current Subscription was terminated."
+msgstr "Deine aktuelle Zahlung wurde eingestellt."
+
+msgid "(MSG2) There was an error terminating your subscription! Please contact the customer support!"
+msgstr "Es gab einen Fehler beim Kündigen deiner Monatszahlung! Bitte kontaktiere unseren Support!"
+
+msgid "API Endpoint URL"
+msgstr "API Endpoint URL"
+
+msgid "Account Holder"
+msgstr "Kontoinhaber"
+
+msgid "Active"
+msgstr "Active"
+
+msgctxt "(INF4-subscription status)"
+msgid "Active since"
+msgstr "Aktiv seit"
+
+msgid "Additional Invoice"
+msgstr "Weitere Rechnung"
+
+msgid "Additional Invoices"
+msgstr "Weitere Rechnungen"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgctxt "(INF8.1)"
+msgid "Adjust or terminate your Contribution"
+msgstr "Beitrag ändern oder Zahlungen beenden"
+
+msgctxt "(INF13)"
+msgid "All information about your past payments can be found in the invoice overview"
+msgstr "Sämtliche Informationen zu deinen vergangenen Zahlungen findest Du in der Rechnungsübersicht"
+
+msgctxt "(INF11)"
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "An error occured, and you cannot change your subscription amount at this time. Please contact our support!"
+msgstr "Es ist ein Fehler aufgetreten und Du kannst deinen Zahlungsbetrag aktuell nicht ändern. Bitte kontaktiere unseren Support!"
+
+msgctxt "(PRC4)"
+msgid "An unexpected error has occured during your payment."
+msgstr "Ein unerwarteter Fehler ist beim bearbeiten deiner Zahlung aufgetreten."
+
+#, python-format
+msgctxt "(INF16)"
+msgid "Attempted at %(date)s, but not completed."
+msgstr "Attempted at %(date)s, but not completed."
+
+msgid "Attempts of booking recurring payment"
+msgstr "Versuche eine wiederholte Zahlung zu buchen"
+
+msgid "BIC"
+msgstr "BIC"
+
+#, python-format
+msgctxt "(SC8)"
+msgid "Back to %(portal_name)s"
+msgstr "Weiter zu %(portal_name)s"
+
+msgid "Backend class used"
+msgstr "Backend class used"
+
+msgctxt "Invoice PDF, important!"
+msgid "Beneficiary"
+msgstr "Leistungsempfänger"
+
+msgid "Billing Address"
+msgstr "Rechnungsadresse"
+
+#, python-format
+msgctxt "(PF7)"
+msgid "By clicking on \"%(confirm_and_pay_button_text)s\" you grant Wechange eG permission to debit %(amount)s Euro %(debit_period)s (incl. %(vat_amount)s%% VAT) from you via %(payment_method)s."
+msgstr "Mit Klick auf \"%(confirm_and_pay_button_text)s\" erteilst Du der Wechange eG die Erlaubnis, %(amount)s Euro  %(debit_period)s (inkl. %(vat_amount)s%% MwSt.) per %(payment_method)s von dir abzubuchen."
+
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgid "Canceled"
+msgstr "Abgebrochen"
+
+msgctxt "(INF5-subscription status)"
+msgid "Cancelled"
+msgstr "Abgebrochen"
+
+msgid "Cancelled by User"
+msgstr "Vom Benutzer abgebrochen"
+
+msgid "Cancelled, but still active"
+msgstr "Cancelled, but still active"
+
+msgctxt "(POP1-repeat-rnd8)"
+msgid "Change happens on a small scale"
+msgstr "Dein Beitrag macht wechange.de möglich!"
+
+msgctxt "(PF25)"
+msgid "Change payment information"
+msgstr "Angaben ändern"
+
+msgctxt "(TS9)"
+msgid "Change payment information"
+msgstr "Zahlungsdaten ändern"
 
 msgctxt "(MS7)"
 msgid "Change your Contribution"
 msgstr "Ändere deinen Beitrag"
 
 msgctxt "(MS8)"
-msgid "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field."
-msgstr "Nutze den Schieberegler, um deinen Beitrag anzupassen. Gib alternativ einen höheren Beitrag direkt in das Textfeld ein."
+msgid "Change your debit period"
+msgstr "Ändere deinen Abbuchungszeitraum"
+
+msgid "Changing and making new payments is temporarily disabled while we are performing maintenance on our payment system. The service will be back soon. Please apologize the inconveniences!"
+msgstr "Das Ändern und Vornehmen neuer Zahlungen ist vorübergehend deaktiviert, während wir Wartungsarbeiten an unserem Zahlungssystem durchführen. Der Dienst wird bald wieder zur Verfügung stehen. Bitte entschuldige die Unannehmlichkeiten!"
+
+msgctxt "(POP6)"
+msgid "Choose amount"
+msgstr "Beitrag wählen"
+
+msgctxt "(PF15)"
+msgid "Choose your Contribution"
+msgstr "Wähle deinen Beitrag"
+
+msgctxt "(PF27)"
+msgid "Choose your billing interval"
+msgstr "Wähle deinen Abbuchungszeitraum"
+
+msgctxt "(PF15b)"
+msgid "Choose your new Contribution"
+msgstr "Wähle deinen neuen Beitrag"
+
+msgctxt "(PF27b)"
+msgid "Choose your new debiting period"
+msgstr "Wähle deinen neuen Abbuchungszeitraum"
+
+msgctxt "(POP4-release)"
+msgid "Choose your voluntary contribution to WECHANGE now. We count on you!"
+msgstr "Wähle jetzt deinen freiwilligen Beitrag für wechange.de. Wir zählen auf dich!"
+
+msgid "City"
+msgstr "Ort"
+
+msgctxt "(POP1-repeat-rnd5)"
+msgid "Come, be among the ones who pay!"
+msgstr "Durch deinen Beitrag bleiben wir unabhängig, sicher & werbefrei!"
+
+msgid "Completed At"
+msgstr "Abgeschlossen am"
+
+msgctxt "(PF4a)"
+msgid "Confirm Contribution Amount"
+msgstr "Höhe des Beitrags neu festlegen"
+
+msgctxt "(PF9 - legally binding!)"
+msgid "Confirm and pay"
+msgstr "Rechtsverbindlich bestätigen und zahlen"
+
+msgctxt "(PF17)"
+msgid "Confirm data and continue"
+msgstr "Angaben übernehmen und weiter"
+
+msgctxt "(PF15a)"
+msgid "Confirm your Contribution"
+msgstr "Bestätige deinen Beitrag"
+
+msgctxt "(PF27a)"
+msgid "Confirm your debiting period"
+msgstr "Höhe des Abbuchungszeitraums neu festlegen"
+
+msgctxt "(LN6)"
+msgid "Contact our Support"
+msgstr "Support kontaktieren"
+
+msgctxt "(LN5)"
+msgid "Contact support"
+msgstr "Support kontaktieren"
+
+msgctxt "(INF2)"
+msgid "Contribution Status"
+msgstr "Beitragsstatus"
 
 #, python-format
 msgctxt "(PF24)"
 msgid "Contribution amount includes %(vat_amount)s%% VAT."
 msgstr "Der Betrag enthält %(vat_amount)s%% MwSt."
 
-msgctxt "(MS8)"
-msgid "Change your debit period"
-msgstr "Ändere deinen Abbuchungszeitraum"
+msgid "Country"
+msgstr "Land"
 
-msgctxt "(MS5)"
-msgid "Modify Contribution Amount"
-msgstr "Beitrag ändern"
+msgid "Create additional invoices in Invoice API (threaded)"
+msgstr ""
 
-msgctxt "(MS6)"
-msgid "Terminate your Contribution"
-msgstr "Beitragszahlung beenden"
+msgid "Create invoice in Invoice API (threaded)"
+msgstr "Create invoice in Invoice API (threaded)"
 
-msgctxt "(PF30)"
-msgid "Your Contributions will end soon!"
-msgstr "Du hast deine Beitragszahlungen eingestellt."
+msgid "Created"
+msgstr "Erstellt"
 
-msgctxt "(PF31)"
-msgid "Your pre-paid contribution is valid until"
-msgstr "Dein bereits gezahlter Beitrag ist noch gültig bis"
+msgid "Created, but not finalized"
+msgstr "Erstellt, aber nicht finalisiert"
 
-msgctxt "(PF32)"
-msgid "We're sorry to see you go! To continue contributing, you can create a new Contribution right now."
-msgstr "Schade, dass du deine Zahlung eingestellt hast! Um die Zahlungen wieder aufzunehmen, lege einfach einen neuen Beitrag fest."
+msgid "Creating your invoice download is taking longer than expected."
+msgstr "Die Erstellung deiner Rechnung dauert länger als erwartet."
 
+msgid "Credit Card"
+msgstr "Kreditkarte"
+
+msgctxt "(FC1)"
+msgid "Current Payment Issues"
+msgstr "Aktuelle Zahlungsprobleme"
+
+#, python-format
+msgctxt "(POP2-newuser)"
+msgid "Dear %(username)s,"
+msgstr "Liebe/r %(username)s,"
+
+#, python-format
+msgctxt "(POP2-release)"
+msgid "Dear %(username)s,"
+msgstr "Liebe/r %(username)s,"
+
+#, python-format
+msgctxt "(POP2-repeat)"
+msgid "Dear %(username)s,"
+msgstr "Liebe/r %(username)s,"
+
+msgid "Debiting Amount"
+msgstr "Abbuchungsbetrag"
+
+msgid "Debiting Period"
+msgstr "Abbuchungszeitraum"
+
+msgid "Direct Debit (SEPA)"
+msgstr "Bankeinzug (SEPA)"
+
+msgid "Direct Request"
+msgstr "Direct Request"
+
+msgctxt "(TS7)"
+msgid "Do you really want to terminate your subscriptions? You can create a new contribution at any time."
+msgstr "Möchtest du deine Zahlungen wirklich beenden? Du kannst jederzeit einen neuen Beitrag einrichten."
+
+msgctxt "(POP1-repeat-rnd2)"
+msgid "Does not hurt, but does good for many"
+msgstr "Du bist wechange.de: Gemeinsam für die Plattform des Wandels!"
+
+msgid "Download Invoice (PDF)"
+msgstr "Rechnung herunterladen (PDF)"
+
+msgid "Downloaded and ready"
+msgstr "Heruntergeladen und bereit"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgctxt "Invoice PDF, important!"
+msgid "Electronic service"
+msgstr "Elektronische Dienstleistung"
+
+#, python-format
+msgid "Error: \"%(error_message)s\" (%(error_code)d)"
+msgstr "Fehler: \"%(error_message)s\" (%(error_code)d)"
+
+msgid "Expires"
+msgstr "Läuft ab"
+
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+msgid "File"
+msgstr "Datei"
+
+msgid "Finalized, but not downloaded"
+msgstr "Finalisiert, aber nicht heruntergeladen"
+
+msgid "Finally terminated by System"
+msgstr "Endgültig vom System terminiert"
+
+msgid "First name"
+msgstr "Vorname"
+
+#, python-format
 msgctxt "(PF33)"
 msgid "For accounting reasons we have to process your new payment immediately, but any time left on your old contribution will be added on to your new one. That means that your next payment would for example only be due on %(date)s for a monthly debiting period."
 msgstr "Aus buchhalterischen Gründen müssen deine erste Abbuchung sofort vornehmen, aber die verbleibende Zeit deines alten Beitrags wird dir für den neuen Beitrag gutgeschrieben. Das bedeutet, dass z.Bsp. bei einem monatlichen Abbuchungszeitraum deine nächste Zahlung erst am %(date)s fällig wäre."
 
-msgctxt "(PF40)"
-msgid "Update your payment details"
-msgstr "Zahlungsdaten ändern"
+msgid "From now on your new chosen contribution amount will be paid. "
+msgstr "Ab jetzt wird der von dir gewählte Betrag gezahlt. "
 
-msgctxt "(PF41)"
-msgid "You can choose a new payment method or update your payment details here."
-msgstr "Du kannst hier eine neue Zahlungsmethode auswählen oder deine Zahlungsdaten aktualisieren."
+msgid "Has Problems"
+msgstr "Hat Probleme"
 
-msgctxt "(PF43)"
-msgid "We have to process your first new payment immediately, but any time left on your current Contribution will be added on to your new one. That means that your next payment would for example only be due on %(date)s for a monthly debiting period."
-msgstr "Aus buchhalterischen Gründen müssen wir deine neue Abbuchung sofort vornehmen, aber die verbleibende Zeit deines aktuellen Beitrags wird dir für den neuen Beitrag gutgeschrieben. Das bedeutet, dass z.Bsp. bei einem monatlichen Abbuchungszeitraum deine nächste monatliche Zahlung erst am %(date)s fällig ist."
+msgid "Has been revoked"
+msgstr "Wurde abgewiesen"
+
+msgctxt "(POP1-repeat-rnd6)"
+msgid "How much are we worth to you?"
+msgstr "Komm, zahl' auch du!"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "If the contribution is not paid by you as a private individual, but in the name and on behalf of an institution, organisation or company, please enter the name and billing address of the organisation."
+msgstr "Wenn der Beitrag nicht von dir als Privatperson gezahlt wird, sondern im Namen und Auftrag einer Institution, Organisation oder eines Unternehmens, gib bitte Namen und Rechnungsadresse der Organisation ein."
+
+msgctxt "(FC5)"
+msgid "If you have any questions about the issue or would like assistance, please contact our support and provide us with the issue reference number!"
+msgstr "Wenn Du Fragen zu dem Problem hast oder Unterstützung möchtest, kontaktiere bitte unseren Support und teile uns die Problemreferenznummer mit!"
+
+msgctxt "(LN7)"
+msgid "If you have any questions about your Contribution or encountered any problems, please send an email to"
+msgstr "Falls du Fragen über unsere Beitragszahlungen hast, oder ein Problem aufgetreten ist, kontaktiere bitte unseren Support mit einer E-Mail an"
 
 msgctxt "(PF11x)"
 msgid "If you only want to adjust the amount or debiting period of your contribution using the same payment details, you can do it here"
 msgstr "Wenn du lediglich deine Beitragshöhe oder Abbuchungszeitraum anpassen und deine Zahlungsmethode beibehalten möchtest, kannst du das hier tun"
 
-msgctxt "(PF1)"
-msgid "Your Contribution"
-msgstr "Dein Beitrag"
+msgctxt "(FC9)"
+msgid "If you wish to continue contributing, please update your payment information, or contact our support! Sorry for the inconveniences!"
+msgstr "Wenn Du weiterhin einen monatlichen Beitrag zahlen möchtest, aktualisiere bitte deine Zahlungsinformationen oder kontaktiere unseren Support!"
+
+msgctxt "(PRC5)"
+msgid "If your payment has not been processed after a day, please contact our support!"
+msgstr "Falls deine Zahlung nach einem Tag noch nicht abgeschlossen ist, kontaktiere bitte unseren Support!"
 
 #, python-format
-msgctxt "(PF13)"
-msgid "You are using %(portal_name)s free of charge."
-msgstr "Du benutzt %(portal_name)s kostenlos."
+msgid "In the next step, you will be redirected to complete the payment process with the payment provider %(payment_provider)s."
+msgstr "Im nächsten Schritt wirst du weitergeleitet, um die Zahlung bei unserem Zahlungsdienstleister %(payment_provider)s abzuschließen."
 
+msgid "Invoice"
+msgstr "Rechnung"
+
+msgid "Invoice Provider Backend class used"
+msgstr "Invoice Provider Backend class used"
+
+msgid "Invoice State"
+msgstr "Rechnungsstatus"
+
+#, python-format
+msgid "Invoice for %(amount)s€ from %(date)s"
+msgstr "Rechnung über %(amount)s€ vom %(date)s"
+
+#, python-format
+msgid "Invoice from %(date)s"
+msgstr "Rechnung vom %(date)s"
+
+msgid "Invoices"
+msgstr "Rechnungen"
+
+msgid "Is Ready"
+msgstr "Bereit"
+
+msgid "Is postponed payment"
+msgstr "Ist verzögerte zahlung"
+
+msgid "Is reference payment"
+msgstr "Ist Referenzzahlung"
+
+msgctxt "(FC7)"
+msgid "Issue Details"
+msgstr "Problemdetails"
+
+msgctxt "(FC6)"
+msgid "Issue Reference Number"
+msgstr "Problemreferenznummer"
+
+msgid "Last Action At"
+msgstr "Letzte Aktion am"
+
+msgid "Last Order Id"
+msgstr "Letzte Bestell-ID"
+
+msgid "Last Payment"
+msgstr "Letzte Zahlung"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Last pre-notification at"
+msgstr "Letzte Vorbenachrichtigung am"
+
+msgctxt "(MS4)"
+msgid "Learn more"
+msgstr "Mehr erfahren"
+
+msgctxt "(PF2)"
+msgid "Learn more"
+msgstr "Mehr erfahren"
+
+msgctxt "(POP5)"
+msgid "Learn more"
+msgstr "Mehr erfahren"
+
+msgctxt "(URL-LABEL)"
+msgid "Link"
+msgstr "Link"
+
+msgid "Making postponed payments is currently not possible!"
+msgstr "Es ist aktuell nicht möglich, verzögerte Zahlungen zu machen!"
+
+msgctxt "(POP1-repeat-rnd3)"
+msgid "Many pennies make a dollar"
+msgstr "Dein Beitrag für ein gemeinschaftliches wechange.de!"
+
+msgctxt "(MS5)"
+msgid "Modify Contribution Amount"
+msgstr "Beitrag ändern"
+
+msgctxt "(MS5-rethink-cancelling)"
+msgid "Modify Contribution Amount"
+msgstr "Beitragshöhe anpassen"
+
+msgctxt "(PF8)"
+msgid "Modify Contribution Amount"
+msgstr "Beitragshöhe ändern"
+
+msgid "Monthly Amount"
+msgstr "Monatlicher Betrag"
+
+msgid "Monthly Contribution Payment (recurring)"
+msgstr "Monatliche Beitragszahlung (wiederkehrend)"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "New payments are currently disabled!"
+msgstr "Neue Zahlungen sind derzeit deaktiviert!"
+
+msgid "Next due date"
+msgstr "Nächstes Buchungsdatum"
+
+msgctxt "(INF7)"
+msgid "Next payment scheduled"
+msgstr "Die nächste geplante Zahlung erfolgt am"
+
+msgctxt "(PF18)"
+msgid "No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment."
+msgstr "Es wird noch keine Zahlung ausgelöst. Auf der Folgeseite erhältst Du noch einmal einen Überblick über Deine Angaben."
+
+msgctxt "(TS4) (explanation)"
+msgid "No payments have been made yet. Your Contribution will be cancelled."
+msgstr "Es wurde noch keine Zahlung veranlasst. Deine Zahlungen werden abgebrochen."
+
+msgid "Not created at provider."
+msgstr "Noch nicht beim Dienstleister erstellt."
+
+msgctxt "(POP7)"
+msgid "Not now"
+msgstr "Nein, jetzt nicht"
+
+msgid "Not started"
+msgstr "Noch nicht begonnen"
+
+msgctxt "(POP6-repeat)"
+msgid "Ok, choose amount now"
+msgstr "Ok, jetzt Beitrag wählen"
+
+msgid "Order Id"
+msgstr "Bestell-ID"
+
+msgid "Organisation"
+msgstr "Organisation"
+
+msgid "Past Contributions"
+msgstr "Vergangene Beiträge"
+
+msgctxt "(LN4)"
+msgid "Past Contributions"
+msgstr "Vergangene Beiträge"
+
+msgid "PayPal"
+msgstr "PayPal"
+
+msgid "Payment"
+msgstr "Zahlung"
+
+msgid "Payment Method"
+msgstr "Zahlungsart"
+
+msgid "Payment Purpose"
+msgstr "Zahlungszweck"
+
+msgid "Payment Status"
+msgstr "Zahlungsstatus"
+
+msgctxt "(SC1)"
+msgid "Payment Success"
+msgstr "Zahlung erfolgreich"
+
+msgid "Payment Transaction Log"
+msgstr "Zahlungstransaktions-Logs"
+
+msgid "Payment Transaction Logs"
+msgstr "Payment Transaction Logs"
+
+msgid "Payment Type"
+msgstr "Zahlungsart"
+
+msgid "Payment initiated but not completed by user yet"
+msgstr "Zahlung initiiert, aber noch nicht vom Benutzer abgeschlossen"
+
+msgid "Payment is currently only possible by SEPA direct debit. We are working on offering PayPal and credit card payments soon!"
+msgstr "Derzeit ist die Zahlung nur per SEPA-Lastschrift möglich. Wir arbeiten daran, demnächst PayPal- und Kreditkartenzahlungen anzubieten!"
+
+msgid "Payment processing"
+msgstr "Zahlung wird bearbeitet"
+
+msgctxt "(PRC4)"
+msgid "Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!"
+msgstr "Die Bearbeitung der Zahlung dauert länger als erwartet. Du kannst diese Seite jederzeit schließen und später wieder aufrufen. Wir entschuldigen die Verzögerung und danken dir für deine Geduld!"
+
+msgctxt "(PRC1)"
+msgid "Payment processing..."
+msgstr "Zahlung wird bearbeitet..."
+
+msgid "Payment shall be made on behalf of an organisation"
+msgstr "Die Zahlung erfolgt im Namen einer Organisation"
+
+msgid "Payments"
+msgstr "Zahlungen"
+
+msgctxt "(BS1)"
+msgid "Payments"
+msgstr "Zahlungen"
+
+msgctxt "(BS2)"
+msgid "Payments"
+msgstr "Zahlungen"
+
+msgctxt "(SC2)"
+msgid "Payments"
+msgstr "Zahlungen"
+
+msgid "Paypal"
+msgstr "Paypal"
+
+msgctxt "(PRC2)"
+msgid "Please complete your payment with the payment provider, or restart the payment process."
+msgstr "Bitte vervollständige deine Zahlung beim Zahlungsdienstleister oder starte den Bezahlvorgang neu."
+
+msgid "Please contact our support for assistance!"
+msgstr "Bitte kontaktiere unseren Support für Unterstützung!"
+
+msgctxt "(SC4)"
+msgid "Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!"
+msgstr "Bitte kontaktiere unseren Support! Keine Sorge, wir werden alles in Ordnung bringen. Mache bitte in der Zwischenzeit keine weiteren Zahlungen. Bitte entschuldige die Unannehmlichkeiten!"
+
+msgid "Please correct the errors in the highlighted fields!"
+msgstr "Bitte korrigiere die Fehler in den hervorgehobenen Feldern!"
+
+msgid "Please fill out all of the missing fields!"
+msgstr "Bitte fülle alle fehlenden Felder aus!"
+
+msgctxt "(LN7)"
+msgid "Please include this reference number in your e-mail"
+msgstr "Bitte gib in deiner E-Mail diese Referenznummer an"
+
+msgctxt "(FC4)"
+msgid "Please see below for details on the problem and review your selected payment method. If you wish to select a new payment method, simply update your payment information."
+msgstr "Bitte beachte die unten stehenden Hinweise zu dem Problem und überprüfe deine gewählte Zahlungsmethode. Wenn Du eine neue Zahlungsmethode auswählen möchtest, aktualisiere einfach deine Zahlungsinformationen."
+
+msgid "Please try again or contact our support for assistance!"
+msgstr "Bitte versuche es erneut oder kontaktiere unseren Support für Unterstützung!"
+
+msgctxt "(PRC3)"
+msgid "Please wait while your payment is being processed..."
+msgstr "Bitte warte während deine Zahlung bearbeitet wird..."
+
+msgid "Postal Code"
+msgstr "Postleitzahl"
+
+msgid "Pre-authorized for payment, but not yet paid"
+msgstr "Vor-authorisiert, aber noch nicht bezahlt"
+
+#, python-format
+msgctxt "(INF15)"
+msgid "Processing. Started at %(date)s."
+msgstr "Wir bearbeitet. Gestarted am %(date)s."
+
+msgid "Provider Invoice ID"
+msgstr "Dienstleister-Rechnungs-ID"
+
+msgid "Received Postback"
+msgstr "Received Postback"
+
+msgid "Reference Payment"
+msgstr "Referenzzahlung"
+
+msgid "Related to"
+msgstr ""
+
+msgctxt "(FC11)"
+msgid "Renew payment information"
+msgstr "Zahlungsdaten aktualisieren"
+
+msgid "Retracted"
+msgstr "Zurückgezogen"
+
+msgctxt "(PF19)"
+msgid "Review and Confirm Payment"
+msgstr "Angaben überprüfen und Zahlung bestätigen"
+
+msgid "Run/continue additional invoice in Invoice API (threaded)"
+msgstr ""
+
+msgid "Run/continue invoice in Invoice API (threaded)"
+msgstr "Run/continue invoice in Invoice API (threaded)"
+
+msgid "Select Payment Method"
+msgstr "Zahlungsmethode auswählen"
+
+msgctxt "(PF4)"
+msgid "Set amount of Contribution"
+msgstr "Höhe des Beitrags festlegen"
+
+msgctxt "(INF8.2)"
+msgid "Set up new Contribution"
+msgstr "Neuen Beitrag einrichten"
+
+msgctxt "(INF14)"
+msgid "Show Invoice overview"
+msgstr "Rechnungsübersicht anzeigen"
+
+msgctxt "(SC7)"
+msgid "Show payment overview"
+msgstr "Zahlungsübersicht anzeigen"
+
+msgctxt "(POP1-repeat-rnd7)"
+msgid "So that WECHANGE can be more than the sum of its parts"
+msgstr "Durch deinen Beitrag bleiben wir unabhängig, sicher & werbefrei!"
+
+msgctxt "(FC8)"
+msgid "Specific issue details cannot be displayed for this issue."
+msgstr "Speizifische Details können zu diesem Problem leider nicht angezeigt werden."
+
+#, python-format
+msgid "Started additional invoice creation for %(count)d of %(total)d selected payment(s) in background."
+msgstr ""
+
+#, python-format
+msgid "Started additional invoice creation for %(number)d payment(s) in background."
+msgstr ""
+
+#, python-format
+msgid "Started invoice creation for %(number)d payment(s) in background."
+msgstr "Started invoice creation for %(number)d payment(s) in background."
+
+msgid "Starting with the next payment your new debiting period and new amount will be used. "
+msgstr "Ab der nächsten Buchung wird dein neuer Betrag und Abbuchungszeitraum benutzt. "
+
+msgid "Starting with the next payment your new debiting period will be used. "
+msgstr "Ab der nächsten Buchung wird dein neuer Abbuchungszeitraum benutzt. "
+
+msgctxt "(TS1)"
+msgid "Stop payments"
+msgstr "Zahlungen einstellen"
+
+msgid "Subscription"
+msgstr "Abo"
+
+msgid "Subscription State"
+msgstr "Abo-Status"
+
+msgctxt "Invoice PDF, important!"
+msgid "Subscription-ID"
+msgstr "Abo-ID"
+
+msgid "Successfully paid"
+msgstr "Erfolgreich bezahlt"
+
+msgid "Suspended, because of payment errors"
+msgstr "Ausgesetzt, wegen Zahlungsfehlern"
+
+msgctxt "(TS6)"
+msgid "Terminate subscription"
+msgstr "Zahlungen beenden"
+
+msgctxt "(MS6)"
+msgid "Terminate your Contribution"
+msgstr "Beitragszahlung beenden"
+
+msgid "Terminated."
+msgstr "Terminated."
+
+#, python-format
+msgctxt "(PF23)"
+msgid "Thank you for supporting %(portal_name)s!"
+msgstr "Danke, dass Du %(portal_name)s unterstützt!"
+
+#, python-format
+msgid "Thank you for supporting %(portal_name)s. Every contribution counts!"
+msgstr "Danke, dass du %(portal_name)s mitträgst. Jeder Beitrag zählt!"
+
+msgctxt "(SC5)"
+msgid "Thank you for your Contribution!"
+msgstr "Vielen Dank für deinen Beitrag!"
+
+#, python-format
+msgid "Thank you for your support! You are helping to keep %(portal_name)s accessible for everyone."
+msgstr "Danke für deine Unterstützung! Du hilfst mit, %(portal_name)s für alle zugänglich zu machen."
+
+#, python-format
+msgid "Thank you for your valuable contribution! You are ensuring the continued development of %(portal_name)s."
+msgstr "Danke für deinen wertvollen Beitrag! Du sicherst die Weiterentwicklung von %(portal_name)s."
+
+#, python-format
+msgid "Thank you so much! Your contribution allows %(portal_name)s to grow and thrive."
+msgstr "Vielen Dank! Mit deinem Beitrag kann %(portal_name)s wachsen und gedeihen."
+
+#, python-format
+msgid "Thank you so much! Your contribution ensures that %(portal_name)s remains sustainable in the long term."
+msgstr "Vielen Dank! Mit deinem Beitrag sorgst du dafür, dass %(portal_name)s langfristig tragfähig bleibt."
+
+msgid "Thank you very much for your support!"
+msgstr "Vielen Dank für Deine Unterstützung!"
+
+msgid "The BIC you entered does not seem to be correct!"
+msgstr "Die eingegebene BIC scheint nicht korrekt zu sein!"
+
+msgid "The IBAN you entered does not seem to be correct!"
+msgstr "Die eingegebene IBAN scheint nicht korrekt zu sein!"
+
+msgid "The amount and debiting period you selected were the same as before, so we did not change anything!"
+msgstr "Der ausgewählte Beitrag und Abbuchungszeitraum ist der gleiche wie vorher. Wir haben deswegen nichts verändert!"
+
+msgid "The amount submitted does not seem to be a number!"
+msgstr "Der eingegebene Betrag scheint keine Zahl zu sein!"
+
+msgctxt "(POP1-repeat-rnd1)"
+msgid "The early bird catches the worm!"
+msgstr "wechange.de für alle, alle für wechange.de!"
+
+msgid "The entered payment information is invalid. Please make sure you entered everything correctly!"
+msgstr "Die eingegebenen Zahlungsdaten sind ungültig."
+
+msgctxt "(INF10)"
+msgid "The last payment was made on"
+msgstr "Die letzte Zahlung erfolgte am"
+
+msgid "The monthly amount is higher than the allowed maximum amount!"
+msgstr "Der monatliche Zahlungsbetrag ist höher als der erlaubte Maximalbetrag!"
+
+msgid "The monthly amount is lower than the allowed minimum amount!"
+msgstr "Der monatliche Zahlungsbetrag ist niedriger als der erlaubte Minimalbetrag!"
+
+msgctxt "(PF20a)"
+msgid "The next debit using your new payment information will be made immediately."
+msgstr "Die nächste Abbuchung mit deinen neuen Zahlungsdaten erfolgt sofort nach Bestätigung."
+
+msgctxt "(PF20)"
+msgid "The next debit will be made immediately."
+msgstr "Die nächste Abbuchung erfolgt sofort nach Bestätigung."
+
+msgid "The payment amount is higher than the allowed maximum amount!"
+msgstr "Der Zahlungsbetrag ist höher als der erlaubte Maximalbetrag!"
+
+msgid "The payment amount is lower than the allowed minimum amount!"
+msgstr "Der Zahlungsbetrag ist niedriger als der erlaubte Minimalbetrag!"
+
+msgid "The payment process was cancelled or could not be completed."
+msgstr "Der Zahlungsprozess wurde abgebrochen oder konnte nicht vollständig beendet werden."
+
+msgid "The payment provider could not be reached."
+msgstr "Der Zahlungsdienstleister konnte ist nicht erreichbar."
+
+msgid "The payment session could not be found."
+msgstr "Die Zahlungssession konnte nicht gefunden werden."
+
+msgctxt "(FC2)"
+msgid "There are issues with you current Contribution!"
+msgstr "Es gibt Probleme mit deinem Beitrag!"
+
+msgid "There was an error with your payment."
+msgstr "Es gab einen Fehler bei deiner Zahlung."
+
+#, python-format
+msgctxt "(PF7a)"
+msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. %(vat_amount)s%% VAT, which is shown on the invoice."
+msgstr "Es handelt sich hierbei nicht um eine Spende, sondern um eine freiwillige Zahlung für eine elektronische Dienstleistung. Der gewählte Beitrag ist der Bruttobetrag inkl. %(vat_amount)s%% MwSt., die auf der Rechnung ausgewiesen wird."
+
+#, python-format
 msgctxt "(PF14)"
 msgid ""
 "This is possible because other users are co-financing you.\n"
@@ -694,365 +987,225 @@ msgstr ""
 "Du kannst hier deinen Beitrag festlegen, mit dem du %(portal_name)s privat oder als Organisation unterstützt. Den Beitrag ziehen wir automatisch zum ausgewählten Abbuchungszeitraum ein und du bekommst eine Rechnung. Du kannst zwischen den Zahlungsarten Bankeinzug und Kreditkarte wählen. Deinen Beitrag kannst du jederzeit ändern kündigen, unterbrechen oder beenden, indem du auf \"Dein Beitrag\" in deinem Benutzermenü klickst.\n"
 "\t"
 
-msgid "Account Holder"
-msgstr "Kontoinhaber"
+msgid "This payment session has expired."
+msgstr "Diese Zahlungssession ist abgelaufen."
 
-msgid "IBAN"
-msgstr "IBAN"
+msgctxt "(TS2)"
+msgid "Too bad you want to end your contribution! Don't you want to reconsider? You can also choose a smaller amount. Every small contribution helps us. If you are dissatisfied with something, we would be happy to receive your feedback at support@wechange.de"
+msgstr "Schade, dass du deine Unterstützung beenden willst! Magst du es dir nicht noch einmal überlegen? Du kannst auch einen geringeren Betrag wählen. Jeder kleine Beitrag hilft uns weiter. Wenn du mit etwas unzufrieden bist, freuen wir uns über ein Feedback von dir an support@wechange.de!"
 
-msgid "Billing Address"
-msgstr "Rechnungsadresse"
+msgid "Transaction Type"
+msgstr "Transaction Type"
 
-msgid "Organisation"
-msgstr "Organisation"
-
-msgid "Name"
-msgstr "Name"
-
-msgid "Address"
-msgstr "Adresse"
-
-msgid "Postal Code"
-msgstr "Postleitzahl"
-
-msgid "City"
-msgstr "Ort"
-
-msgid "Country"
-msgstr "Land"
-
-msgid "Past Contributions"
-msgstr "Vergangene Beiträge"
+msgid "Unexpected response from payment provider."
+msgstr "Unbekanntes Ergebnis vom Zahlungsdienstleister."
 
 msgctxt "(PF1a)"
 msgid "Update payment information"
 msgstr "Zahlungsdaten ändern"
 
-msgctxt "(PF15a)"
-msgid "Confirm your Contribution"
-msgstr "Bestätige deinen Beitrag"
+msgctxt "(PF40)"
+msgid "Update your payment details"
+msgstr "Zahlungsdaten ändern"
 
-msgctxt "(PF15b)"
-msgid "Choose your new Contribution"
-msgstr "Wähle deinen neuen Beitrag"
-
-msgctxt "(PF15)"
-msgid "Choose your Contribution"
-msgstr "Wähle deinen Beitrag"
+msgctxt "(MS8)"
+msgid "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field."
+msgstr "Nutze den Schieberegler, um deinen Beitrag anzupassen. Gib alternativ einen höheren Beitrag direkt in das Textfeld ein."
 
 #, python-format
 msgctxt "(PF26)"
 msgid "Use the slider to select your monthly contribution as an individual or for your group. Alternatively, you can enter a higher amount directly in the text field. The contribution automatically includes %(vat_amount)s%% VAT and you will receive an invoice."
 msgstr "Nutze den Schieberegler, um deinen monatlichen Beitrag als Einzelperson oder für deine Gruppe auszuwählen. Gib alternativ einen höheren Beitrag direkt in das Textfeld ein. Der Beitrag enthält automatisch %(vat_amount)s%% MwSt und du bekommst eine Rechnung."
 
-msgctxt "(PF24x)"
-msgid "You may also choose a higher amount by entering it directly in the text box!"
-msgstr "Du kannst auch einen höheren Betrag wählen, indem du ihn direkt in das Textfeld eingibst!"
-
-msgctxt "(PF27a)"
-msgid "Confirm your debiting period"
-msgstr "Höhe des Abbuchungszeitraums neu festlegen"
-
-msgctxt "(PF27b)"
-msgid "Choose your new debiting period"
-msgstr "Wähle deinen neuen Abbuchungszeitraum"
-
-msgctxt "(PF27)"
-msgid "Choose your billing interval"
-msgstr "Wähle deinen Abbuchungszeitraum"
-
-msgctxt "(PF2)"
-msgid "Learn more"
-msgstr "Mehr erfahren"
-
-msgctxt "(PF4a)"
-msgid "Confirm Contribution Amount"
-msgstr "Höhe des Beitrags neu festlegen"
-
-msgctxt "(PF4)"
-msgid "Set amount of Contribution"
-msgstr "Höhe des Beitrags festlegen"
-
-msgctxt "(PF5)"
-msgid " Almost done! Please enter your account information below."
-msgstr "Fast geschafft! Gib bitte deine Zahlungsdaten ein. "
-
-msgid "Payment Method"
-msgstr "Zahlungsart"
-
-msgid "Payment is currently only possible by SEPA direct debit. We are working on offering PayPal and credit card payments soon!"
-msgstr "Derzeit ist die Zahlung nur per SEPA-Lastschrift möglich. Wir arbeiten daran, demnächst PayPal- und Kreditkartenzahlungen anzubieten!"
-
-msgid "Select Payment Method"
-msgstr "Zahlungsmethode auswählen"
-
-msgid "BIC"
-msgstr "BIC"
+msgid "User"
+msgstr "Benutzer"
 
 #, python-format
-msgid "In the next step, you will be redirected to complete the payment process with the payment provider %(payment_provider)s."
-msgstr "Im nächsten Schritt wirst du weitergeleitet, um die Zahlung bei unserem Zahlungsdienstleister %(payment_provider)s abzuschließen."
+msgctxt "Invoice PDF, important!"
+msgid "User fee for %(portal_name)s"
+msgstr "Nutzungsgebühr für %(portal_name)s"
 
-msgid "E-Mail"
-msgstr "E-Mail"
+msgid "Vendor Transaction Id"
+msgstr "Vendor Transaction Id"
 
-msgid "First name"
-msgstr "Vorname"
+msgctxt "(POP1-release)"
+msgid "WECHANGE becomes even fairer."
+msgstr "wechange.de wird jetzt noch fairer. "
 
-msgid "Last name"
-msgstr "Nachname"
+msgid "Waiting, becoming active at next payment due date"
+msgstr "Waiting, becoming active at next payment due date"
 
-msgid "Payment shall be made on behalf of an organisation"
-msgstr "Die Zahlung erfolgt im Namen einer Organisation"
+msgctxt "Invoice PDF, important!"
+msgid "We charge you for our services as follows:"
+msgstr "Unsere Leistungen stellen wir Ihnen wie folgt in Rechnung:"
 
-msgid "If the contribution is not paid by you as a private individual, but in the name and on behalf of an institution, organisation or company, please enter the name and billing address of the organisation."
-msgstr "Wenn der Beitrag nicht von dir als Privatperson gezahlt wird, sondern im Namen und Auftrag einer Institution, Organisation oder eines Unternehmens, gib bitte Namen und Rechnungsadresse der Organisation ein."
-
-msgctxt "(PF18)"
-msgid "No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment."
-msgstr "Es wird noch keine Zahlung ausgelöst. Auf der Folgeseite erhältst Du noch einmal einen Überblick über Deine Angaben."
-
-msgctxt "(PF8)"
-msgid "Modify Contribution Amount"
-msgstr "Beitragshöhe ändern"
-
-msgctxt "(PF17)"
-msgid "Confirm data and continue"
-msgstr "Angaben übernehmen und weiter"
-
-msgctxt "(PF19)"
-msgid "Review and Confirm Payment"
-msgstr "Angaben überprüfen und Zahlung bestätigen"
-
-msgctxt "(PF9 - legally binding!)"
-msgid "Confirm and pay"
-msgstr "Rechtsverbindlich bestätigen und zahlen"
+msgctxt "(FC3)"
+msgid "We encountered an error when we tried to book your most recent contribution. Your contribution is paused suspended until the issues are resolved."
+msgstr "Wir haben ein Problem bei der Abbuchung deines aktuellen Beitrags festgestellt. Dein Beitragszahlung ist ausgesetzt, bist die Probleme behoben wurden."
 
 #, python-format
-msgctxt "(PF7)"
-msgid "By clicking on \"%(confirm_and_pay_button_text)s\" you grant Wechange eG permission to debit %(amount)s Euro %(debit_period)s (incl. %(vat_amount)s%% VAT) from you via %(payment_method)s."
-msgstr "Mit Klick auf \"%(confirm_and_pay_button_text)s\" erteilst Du der Wechange eG die Erlaubnis, %(amount)s Euro  %(debit_period)s (inkl. %(vat_amount)s%% MwSt.) per %(payment_method)s von dir abzubuchen."
+msgctxt "(PF43)"
+msgid "We have to process your first new payment immediately, but any time left on your current Contribution will be added on to your new one. That means that your next payment would for example only be due on %(date)s for a monthly debiting period."
+msgstr "Aus buchhalterischen Gründen müssen wir deine neue Abbuchung sofort vornehmen, aber die verbleibende Zeit deines aktuellen Beitrags wird dir für den neuen Beitrag gutgeschrieben. Das bedeutet, dass z.Bsp. bei einem monatlichen Abbuchungszeitraum deine nächste monatliche Zahlung erst am %(date)s fällig ist."
 
-#, python-format
-msgctxt "(PF7a)"
-msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. %(vat_amount)s%% VAT, which is shown on the invoice."
-msgstr "Es handelt sich hierbei nicht um eine Spende, sondern um eine freiwillige Zahlung für eine elektronische Dienstleistung. Der gewählte Beitrag ist der Bruttobetrag inkl. %(vat_amount)s%% MwSt., die auf der Rechnung ausgewiesen wird."
+msgctxt "(MS3)"
+msgid ""
+"We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.\n"
+"\n"
+"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
+msgstr ""
+"Wir verstehen wechange.de als Gemeingut: Du zahlst für die Nutzung von wechange.de, was es dir wert ist. Mit jedem Euro hilfst du mit, wechange.de besser zu machen. Mit durchschnittlich 7 Euro pro Monat können wir die Plattform kostendeckend anbieten, alles darüber trägt unmittelbar zur Weiterentwicklung bei. \n"
+"\n"
+"Wenn du weniger oder gar nichts beitragen kannst, hast du dafür sicherlich gute Gründe. Doch bitte denk daran: Das ist nur möglich, weil andere Nutzer*innen dich mittragen!"
 
-msgctxt "(PF20a)"
-msgid "The next debit using your new payment information will be made immediately."
-msgstr "Die nächste Abbuchung mit deinen neuen Zahlungsdaten erfolgt sofort nach Bestätigung."
+msgctxt "(PF32)"
+msgid "We're sorry to see you go! To continue contributing, you can create a new Contribution right now."
+msgstr "Schade, dass du deine Zahlung eingestellt hast! Um die Zahlungen wieder aufzunehmen, lege einfach einen neuen Beitrag fest."
 
-msgctxt "(PF20)"
-msgid "The next debit will be made immediately."
-msgstr "Die nächste Abbuchung erfolgt sofort nach Bestätigung."
-
-msgctxt "(PF21)"
-msgid "Your %(debit_period)s payments will resume on %(date)s, after your old Contribution would have been due."
-msgstr "Deine %(debit_period)s Zahlungen werden am %(date)s fortgesetzt, einen Monat nachdem dein alter Beitrag fällig gewesen wäre."
-
-msgctxt "(PF22)"
-msgid "You can adjust the amount and debiting period of your contribution or terminate payments at any time by clicking “Your Contribution” in your user menu."
-msgstr "Du kannst die Höhe deines Beitrags und den Abbuchungszeitraum jederzeit anpassen oder die Zahlungen wieder beenden, indem Du auf \"Dein Beitrag\" in deinem Benutzermenü klickst. "
-
-#, python-format
-msgctxt "(PF23)"
-msgid "Thank you for supporting %(portal_name)s!"
-msgstr "Danke, dass Du %(portal_name)s unterstützt!"
-
-msgctxt "(PF25)"
-msgid "Change payment information"
-msgstr "Angaben ändern"
-
-msgctxt "(INF1)"
-msgid "Your payment details"
-msgstr "Deine Zahlungsdaten"
-
-msgctxt "(INF17)"
-msgid "Your Contribution"
-msgstr "Dein Beitrag"
-
-msgctxt "(INF10)"
-msgid "The last payment was made on"
-msgstr "Die letzte Zahlung erfolgte am"
-
-#, python-format
-msgctxt "(INF15)"
-msgid "Processing. Started at %(date)s."
-msgstr "Wir bearbeitet. Gestarted am %(date)s."
-
-#, python-format
-msgctxt "(INF16)"
-msgid "Attempted at %(date)s, but not completed."
-msgstr "Attempted at %(date)s, but not completed."
-
-msgctxt "(INF13)"
-msgid "All information about your past payments can be found in the invoice overview"
-msgstr "Sämtliche Informationen zu deinen vergangenen Zahlungen findest Du in der Rechnungsübersicht"
-
-msgctxt "(INF14)"
-msgid "Show Invoice overview"
-msgstr "Rechnungsübersicht anzeigen"
-
-msgctxt "(INF2)"
-msgid "Contribution Status"
-msgstr "Beitragsstatus"
+msgctxt "(TS3)"
+msgid "What happens when you terminate your subscription"
+msgstr "Wenn du deine Beitragszahlungen einstellst"
 
 msgctxt "(INF3-subscription status)"
 msgid "Will become active after your last Contribution expires."
 msgstr "Wird aktiv, sobald dein aktueller Beitrag ausläuft."
 
-msgctxt "(INF4-subscription status)"
-msgid "Active since"
-msgstr "Aktiv seit"
+msgctxt "(POP1-repeat-rnd4)"
+msgid "With small steps to big goals"
+msgstr "Dein Beitrag macht wechange.de möglich!"
 
-msgctxt "(INF5-subscription status)"
-msgid "Cancelled"
-msgstr "Abgebrochen"
+msgid "You already have an active subscription and cannot start another one!"
+msgstr "Du hast bereits eine Zahlung eingerichtet und kannst keine weitere einrichten!"
 
-msgid "Expires"
-msgstr "Läuft ab"
+#, python-format
+msgctxt "(PF13)"
+msgid "You are using %(portal_name)s free of charge."
+msgstr "Du benutzt %(portal_name)s kostenlos."
 
-msgctxt "(INF7)"
-msgid "Next payment scheduled"
-msgstr "Die nächste geplante Zahlung erfolgt am"
+msgctxt "(PF22)"
+msgid "You can adjust the amount and debiting period of your contribution or terminate payments at any time by clicking “Your Contribution” in your user menu."
+msgstr "Du kannst die Höhe deines Beitrags und den Abbuchungszeitraum jederzeit anpassen oder die Zahlungen wieder beenden, indem Du auf \"Dein Beitrag\" in deinem Benutzermenü klickst. "
 
-msgctxt "(INF6)"
-msgid "Your current contribution"
-msgstr "Dein aktueller Beitrag"
+msgid "You can cancel your current subscription here"
+msgstr "Du kannst deine laufende Zahlung hier beenden"
 
-msgctxt "(INF8.2)"
-msgid "Set up new Contribution"
-msgstr "Neuen Beitrag einrichten"
+msgctxt "(PF41)"
+msgid "You can choose a new payment method or update your payment details here."
+msgstr "Du kannst hier eine neue Zahlungsmethode auswählen oder deine Zahlungsdaten aktualisieren."
 
-msgctxt "(INF8.1)"
-msgid "Adjust or terminate your Contribution"
-msgstr "Beitrag ändern oder Zahlungen beenden"
+#, python-format
+msgid "You can contribute any amount up to %(max_amount)s by entering it here. For larger contributions, please contact our support!"
+msgstr "Du kannst einen beliebigen Betrag bis maximal %(max_amount)s beisteuern, indem du ihn direkt eingibst. Für größere Beiträge, kontaktiere bitte unseren Support!"
 
-msgctxt "(TS9)"
-msgid "Change payment information"
-msgstr "Zahlungsdaten ändern"
+msgid "You can view infos about your payments here"
+msgstr "Du kannst deine Zahlungsdaten hier einsehen"
 
-msgctxt "(PRC1)"
-msgid "Payment processing..."
-msgstr "Zahlung wird bearbeitet..."
+msgid "You cannot make any additional payments at this time. Please contact our support!"
+msgstr "Du kannst zur Zeit keine weiteren Zahlungen vornehmen. Bitte kontaktiere unseren Support!"
 
-msgctxt "(PRC2)"
-msgid "Please complete your payment with the payment provider, or restart the payment process."
-msgstr "Bitte vervollständige deine Zahlung beim Zahlungsdienstleister oder starte den Bezahlvorgang neu."
+msgid "You currently already have an active subscription!"
+msgstr "Du hast aktuell bereits eine laufende Zahlung!"
 
-msgctxt "(PRC3)"
-msgid "Please wait while your payment is being processed..."
-msgstr "Bitte warte während deine Zahlung bearbeitet wird..."
+msgid "You do not currently have a subscription!"
+msgstr "Du hast aktuell keine laufende Zahlung!"
 
-msgctxt "(PRC4)"
-msgid "Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!"
-msgstr "Die Bearbeitung der Zahlung dauert länger als erwartet. Du kannst diese Seite jederzeit schließen und später wieder aufrufen. Wir entschuldigen die Verzögerung und danken dir für deine Geduld!"
+msgid "You do not currently have an active subscription you could update!"
+msgstr "Du hast aktuell keine laufende Beitragszahlung, die Du aktualisieren könntest!"
 
-msgctxt "(PRC5)"
-msgid "If your payment has not been processed after a day, please contact our support!"
-msgstr "Falls deine Zahlung nach einem Tag noch nicht abgeschlossen ist, kontaktiere bitte unseren Support!"
-
-msgctxt "(PRC4)"
-msgid "An unexpected error has occured during your payment."
-msgstr "Ein unerwarteter Fehler ist beim bearbeiten deiner Zahlung aufgetreten."
-
-msgid "Please try again or contact our support for assistance!"
-msgstr "Bitte versuche es erneut oder kontaktiere unseren Support für Unterstützung!"
-
-msgctxt "(SC1)"
-msgid "Payment Success"
-msgstr "Zahlung erfolgreich"
-
-msgctxt "(SC2)"
-msgid "Payments"
-msgstr "Zahlungen"
-
-msgctxt "(SC3)"
-msgid "Your payment was processed successfully, but your Contribution could not be activated due to an internal server error."
-msgstr "Deine Zahlung wurde erfolgreich abgeschlossen, aber dein Beitrag konnte aufgrund eines Serverfehlers noch nicht aktiviert werden."
-
-msgctxt "(SC4)"
-msgid "Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!"
-msgstr "Bitte kontaktiere unseren Support! Keine Sorge, wir werden alles in Ordnung bringen. Mache bitte in der Zwischenzeit keine weiteren Zahlungen. Bitte entschuldige die Unannehmlichkeiten!"
-
-msgctxt "(SC5)"
-msgid "Thank you for your Contribution!"
-msgstr "Vielen Dank für deinen Beitrag!"
+msgctxt "(TS8)"
+msgid "You don't want to pay contributions anymore?"
+msgstr "Du möchtest ab sofort keine Beiträge mehr zahlen?"
 
 msgctxt "(SC6)"
 msgid "You're awesome! With your voluntary contribution we can further develop WECHANGE."
 msgstr "Du bist toll! Durch deinen freiwilligen Beitrag können wir wechange.de weiterentwickeln. "
 
+#, python-format
+msgctxt "(PF21)"
+msgid "Your %(debit_period)s payments will resume on %(date)s, after your old Contribution would have been due."
+msgstr "Deine %(debit_period)s Zahlungen werden am %(date)s fortgesetzt, einen Monat nachdem dein alter Beitrag fällig gewesen wäre."
+
+msgctxt "(INF17)"
+msgid "Your Contribution"
+msgstr "Dein Beitrag"
+
+msgctxt "(LN1)"
+msgid "Your Contribution"
+msgstr "Dein Beitrag"
+
+msgctxt "(MS1)"
+msgid "Your Contribution"
+msgstr "Dein Beitrag"
+
+msgctxt "(PF1)"
+msgid "Your Contribution"
+msgstr "Dein Beitrag"
+
+msgctxt "(PF30)"
+msgid "Your Contributions will end soon!"
+msgstr "Du hast deine Beitragszahlungen eingestellt."
+
+msgid "Your Invoices"
+msgstr "Deine Rechnungen"
+
+msgctxt "(LN3)"
+msgid "Your Invoices"
+msgstr "Deine Rechnungen"
+
 msgid "Your SEPA Mandate"
 msgstr "Dein SEPA Mandat"
 
-#, python-format
-msgctxt "(SC8)"
-msgid "Back to %(portal_name)s"
-msgstr "Weiter zu %(portal_name)s"
-
-msgctxt "(SC7)"
-msgid "Show payment overview"
-msgstr "Zahlungsübersicht anzeigen"
-
-msgctxt "(POP1-repeat-rnd1)"
-msgid "The early bird catches the worm!"
-msgstr "wechange.de für alle, alle für wechange.de!"
-
-msgctxt "(POP1-repeat-rnd2)"
-msgid "Does not hurt, but does good for many"
-msgstr "Du bist wechange.de: Gemeinsam für die Plattform des Wandels!"
-
-msgctxt "(POP1-repeat-rnd3)"
-msgid "Many pennies make a dollar"
-msgstr "Dein Beitrag für ein gemeinschaftliches wechange.de!"
-
-msgctxt "(POP1-repeat-rnd4)"
-msgid "With small steps to big goals"
-msgstr "Dein Beitrag macht wechange.de möglich!"
-
-msgctxt "(POP1-repeat-rnd5)"
-msgid "Come, be among the ones who pay!"
-msgstr "Durch deinen Beitrag bleiben wir unabhängig, sicher & werbefrei!"
-
-msgctxt "(POP1-repeat-rnd6)"
-msgid "How much are we worth to you?"
-msgstr "Komm, zahl' auch du!"
-
-msgctxt "(POP1-repeat-rnd7)"
-msgid "So that WECHANGE can be more than the sum of its parts"
-msgstr "Durch deinen Beitrag bleiben wir unabhängig, sicher & werbefrei!"
-
-msgctxt "(POP1-repeat-rnd8)"
-msgid "Change happens on a small scale"
-msgstr "Dein Beitrag macht wechange.de möglich!"
-
-#, python-format
-msgctxt "(POP2-repeat)"
-msgid "Dear %(username)s,"
-msgstr "Liebe/r %(username)s,"
-
-#, python-format
-msgctxt "(POP3-repeat)"
-msgid ""
-"you joined us at WECHANGE %(join_time_verbal)s - we are very happy about that! \n"
-"\n"
-"Please remember: WECHANGE is only free of charge because enough users* contribute voluntarily. With an average of 5 Euro per month, we can cover the costs of hosting the platform. Every small contribution helps!"
-msgstr ""
-"Du bist %(join_time_verbal)s zu uns zu wechange.de gekommen – das freut uns sehr! \n"
-"\n"
-"Wir hoffen das wechange.de dein Projekt maßgeblich unterstützt. Nun ist es Zeit, dass du wechange.de unterstützt, indem du deinen freiwilligen Beitrag einstellst. Mit 7 € pro Person pro Monat können wir die Plattform kostendeckend betreiben. Du gibst, was du dir leisten kannst, und trägst dazu bei, dass sich jeden Tag neue Projekte auf wechange.de anmelden und den Wandel vorantreiben können. Wir bedanken uns für deinen Beitrag! \n"
-"\n"
-"PS: Als Organisation könnt ihr den Beitrag für eure Mitglieder auch gesammelt bezahlen und eine Rechnung über den Gesamtbetrag erhalten. Falls du Fragen hast, kontaktiere gerne unseren Support unter support@wechange.de!"
+msgid "Your changes have been saved! "
+msgstr "Deine Änderungen wurden gespeichert! "
 
 msgctxt "(POP1-newuser)"
 msgid "Your contribution helps!"
 msgstr "Dein Beitrag hilft!"
 
 #, python-format
-msgctxt "(POP2-newuser)"
-msgid "Dear %(username)s,"
-msgstr "Liebe/r %(username)s,"
+msgctxt "(MS2)"
+msgid "Your current Contribution is %(amount)s Euro %(debit_period)s"
+msgstr "Dein Beitrag beträgt aktuell %(amount)s Euro %(debit_period)s"
+
+msgctxt "(INF6)"
+msgid "Your current contribution"
+msgstr "Dein aktueller Beitrag"
+
+msgid "Your invoice is still being prepared and will be ready for download shortly. Please return to this page in a few minutes."
+msgstr "Deine Rechnung wird aktuell vorbereitet und wird demnächst für den Download bereitstehen. Bitte rufe diese Seite in ein paar Minuten erneut auf."
+
+msgctxt "(INF1)"
+msgid "Your payment details"
+msgstr "Deine Zahlungsdaten"
+
+msgctxt "(LN2)"
+msgid "Your payment details"
+msgstr "Deine Zahlungsdaten"
+
+msgctxt "(SC3)"
+msgid "Your payment was processed successfully, but your Contribution could not be activated due to an internal server error."
+msgstr "Deine Zahlung wurde erfolgreich abgeschlossen, aber dein Beitrag konnte aufgrund eines Serverfehlers noch nicht aktiviert werden."
+
+msgctxt "(PF31)"
+msgid "Your pre-paid contribution is valid until"
+msgstr "Dein bereits gezahlter Beitrag ist noch gültig bis"
+
+msgid "Your subscription amount or debit poriod could not be changed because of an unexpected error. Please contact our support!"
+msgstr "Dein Zahlungsbetrag oder Abbuchungszeitraum konnten aufgrund eines unerwarteten Fehlers nicht geändert werden. Bitte kontaktiere unseren Support!"
+
+#, python-format
+msgctxt "(TS5)"
+msgid "Your subscription will be terminated and no future payments will be made. Your current payment status will remain active until %(date)s. You can reset the payments at any time."
+msgstr "Dein aktueller Zahlungsstatus bleibt bis zum %(date)s erhalten. Danach werden keine weiteren Abbuchungen mehr vorgenommen. Du kannst die Zahlungen jederzeit wieder neu einrichten. "
+
+#, python-format
+msgid "every month"
+msgid_plural "every %(months)s months"
+msgstr[0] "jeden Monat"
+msgstr[1] "jeden %(months)s-ten Monat"
+
+msgid "half-yearly"
+msgstr "halbjährlich"
 
 msgctxt "(POP3-newuser)"
 msgid ""
@@ -1068,14 +1221,11 @@ msgstr ""
 "\n"
 "Wir bedanken uns für deinen Beitrag! \n"
 
-msgctxt "(POP1-release)"
-msgid "WECHANGE becomes even fairer."
-msgstr "wechange.de wird jetzt noch fairer. "
+msgid "monthly"
+msgstr "monatlich"
 
-#, python-format
-msgctxt "(POP2-release)"
-msgid "Dear %(username)s,"
-msgstr "Liebe/r %(username)s,"
+msgid "quarterly"
+msgstr "vierteljährlich"
 
 msgctxt "(POP3-release)"
 msgid ""
@@ -1089,159 +1239,49 @@ msgstr ""
 "\n"
 "Wähle jetzt deinen freiwilligen Beitrag für wechange.de. Wir zählen auf dich!"
 
-msgctxt "(POP4-release)"
-msgid "Choose your voluntary contribution to WECHANGE now. We count on you!"
-msgstr "Wähle jetzt deinen freiwilligen Beitrag für wechange.de. Wir zählen auf dich!"
+msgid "yearly"
+msgstr "jährlich"
 
-msgctxt "(POP7)"
-msgid "Not now"
-msgstr "Nein, jetzt nicht"
-
-msgctxt "(POP5)"
-msgid "Learn more"
-msgstr "Mehr erfahren"
-
-msgctxt "(POP6-repeat)"
-msgid "Ok, choose amount now"
-msgstr "Ok, jetzt Beitrag wählen"
-
-msgctxt "(POP6)"
-msgid "Choose amount"
-msgstr "Beitrag wählen"
-
-msgid "New payments are currently disabled!"
-msgstr "Neue Zahlungen sind derzeit deaktiviert!"
-
-msgid "Changing and making new payments is temporarily disabled while we are performing maintenance on our payment system. The service will be back soon. Please apologize the inconveniences!"
-msgstr "Das Ändern und Vornehmen neuer Zahlungen ist vorübergehend deaktiviert, während wir Wartungsarbeiten an unserem Zahlungssystem durchführen. Der Dienst wird bald wieder zur Verfügung stehen. Bitte entschuldige die Unannehmlichkeiten!"
-
-msgid "You can view infos about your payments here"
-msgstr "Du kannst deine Zahlungsdaten hier einsehen"
-
-msgid "You can cancel your current subscription here"
-msgstr "Du kannst deine laufende Zahlung hier beenden"
-
-msgctxt "(FC2)"
-msgid "There are issues with you current Contribution!"
-msgstr "Es gibt Probleme mit deinem Beitrag!"
-
-msgctxt "(FC3)"
-msgid "We encountered an error when we tried to book your most recent contribution. Your contribution is paused suspended until the issues are resolved."
-msgstr "Wir haben ein Problem bei der Abbuchung deines aktuellen Beitrags festgestellt. Dein Beitragszahlung ist ausgesetzt, bist die Probleme behoben wurden."
-
-msgctxt "(FC4)"
-msgid "Please see below for details on the problem and review your selected payment method. If you wish to select a new payment method, simply update your payment information."
-msgstr "Bitte beachte die unten stehenden Hinweise zu dem Problem und überprüfe deine gewählte Zahlungsmethode. Wenn Du eine neue Zahlungsmethode auswählen möchtest, aktualisiere einfach deine Zahlungsinformationen."
-
-msgctxt "(FC5)"
-msgid "If you have any questions about the issue or would like assistance, please contact our support and provide us with the issue reference number!"
-msgstr "Wenn Du Fragen zu dem Problem hast oder Unterstützung möchtest, kontaktiere bitte unseren Support und teile uns die Problemreferenznummer mit!"
-
-msgctxt "(FC6)"
-msgid "Issue Reference Number"
-msgstr "Problemreferenznummer"
-
-msgctxt "(FC7)"
-msgid "Issue Details"
-msgstr "Problemdetails"
-
-msgctxt "(FC8)"
-msgid "Specific issue details cannot be displayed for this issue."
-msgstr "Speizifische Details können zu diesem Problem leider nicht angezeigt werden."
-
-msgctxt "(FC9)"
-msgid "If you wish to continue contributing, please update your payment information, or contact our support! Sorry for the inconveniences!"
-msgstr "Wenn Du weiterhin einen monatlichen Beitrag zahlen möchtest, aktualisiere bitte deine Zahlungsinformationen oder kontaktiere unseren Support!"
-
-msgctxt "(FC11)"
-msgid "Renew payment information"
-msgstr "Zahlungsdaten aktualisieren"
-
-msgid "Please correct the errors in the highlighted fields!"
-msgstr "Bitte korrigiere die Fehler in den hervorgehobenen Feldern!"
-
-msgid "Please fill out all of the missing fields!"
-msgstr "Bitte fülle alle fehlenden Felder aus!"
-
-msgid "You currently already have an active subscription!"
-msgstr "Du hast aktuell bereits eine laufende Zahlung!"
-
-msgid "The entered payment information is invalid. Please make sure you entered everything correctly!"
-msgstr "Die eingegebenen Zahlungsdaten sind ungültig."
-
-msgid "You already have an active subscription and cannot start another one!"
-msgstr "Du hast bereits eine Zahlung eingerichtet und kannst keine weitere einrichten!"
-
-msgid "You do not currently have an active subscription you could update!"
-msgstr "Du hast aktuell keine laufende Beitragszahlung, die Du aktualisieren könntest!"
-
-msgid "You do not currently have a subscription!"
-msgstr "Du hast aktuell keine laufende Zahlung!"
-
-msgid "An error occured, and you cannot change your subscription amount at this time. Please contact our support!"
-msgstr "Es ist ein Fehler aufgetreten und Du kannst deinen Zahlungsbetrag aktuell nicht ändern. Bitte kontaktiere unseren Support!"
-
-msgid "The amount and debiting period you selected were the same as before, so we did not change anything!"
-msgstr "Der ausgewählte Beitrag und Abbuchungszeitraum ist der gleiche wie vorher. Wir haben deswegen nichts verändert!"
-
-msgid "Your subscription amount or debit poriod could not be changed because of an unexpected error. Please contact our support!"
-msgstr "Dein Zahlungsbetrag oder Abbuchungszeitraum konnten aufgrund eines unerwarteten Fehlers nicht geändert werden. Bitte kontaktiere unseren Support!"
-
-msgid "Your changes have been saved! "
-msgstr "Deine Änderungen wurden gespeichert! "
-
-msgid "Starting with the next payment your new debiting period and new amount will be used. "
-msgstr "Ab der nächsten Buchung wird dein neuer Betrag und Abbuchungszeitraum benutzt. "
-
-msgid "From now on your new chosen contribution amount will be paid. "
-msgstr "Ab jetzt wird der von dir gewählte Betrag gezahlt. "
-
-msgid "Starting with the next payment your new debiting period will be used. "
-msgstr "Ab der nächsten Buchung wird dein neuer Abbuchungszeitraum benutzt. "
-
-msgid "Thank you very much for your support!"
-msgstr "Vielen Dank für Deine Unterstützung!"
-
-msgid "The amount submitted does not seem to be a number!"
-msgstr "Der eingegebene Betrag scheint keine Zahl zu sein!"
-
-msgid "The monthly amount is higher than the allowed maximum amount!"
-msgstr "Der monatliche Zahlungsbetrag ist höher als der erlaubte Maximalbetrag!"
-
-msgid "The monthly amount is lower than the allowed minimum amount!"
-msgstr "Der monatliche Zahlungsbetrag ist niedriger als der erlaubte Minimalbetrag!"
-
-msgid "The payment amount is higher than the allowed maximum amount!"
-msgstr "Der Zahlungsbetrag ist höher als der erlaubte Maximalbetrag!"
-
-msgid "The payment amount is lower than the allowed minimum amount!"
-msgstr "Der Zahlungsbetrag ist niedriger als der erlaubte Minimalbetrag!"
-
-msgid "The payment session could not be found."
-msgstr "Die Zahlungssession konnte nicht gefunden werden."
-
-msgid "The payment process was cancelled or could not be completed."
-msgstr "Der Zahlungsprozess wurde abgebrochen oder konnte nicht vollständig beendet werden."
-
-msgid "This payment session has expired."
-msgstr "Diese Zahlungssession ist abgelaufen."
-
-msgid "There was an error with your payment."
-msgstr "Es gab einen Fehler bei deiner Zahlung."
-
-msgid "(MSG1) Your current Subscription was terminated."
-msgstr "Deine aktuelle Zahlung wurde eingestellt."
-
-msgid "(MSG2) There was an error terminating your subscription! Please contact the customer support!"
-msgstr "Es gab einen Fehler beim Kündigen deiner Monatszahlung! Bitte kontaktiere unseren Support!"
-
-#~ msgid "Amount"
-#~ msgstr "Betrag"
+#, python-format
+msgctxt "(POP3-repeat)"
+msgid ""
+"you joined us at WECHANGE %(join_time_verbal)s - we are very happy about that! \n"
+"\n"
+"Please remember: WECHANGE is only free of charge because enough users* contribute voluntarily. With an average of 5 Euro per month, we can cover the costs of hosting the platform. Every small contribution helps!"
+msgstr ""
+"Du bist %(join_time_verbal)s zu uns zu wechange.de gekommen – das freut uns sehr! \n"
+"\n"
+"Wir hoffen das wechange.de dein Projekt maßgeblich unterstützt. Nun ist es Zeit, dass du wechange.de unterstützt, indem du deinen freiwilligen Beitrag einstellst. Mit 7 € pro Person pro Monat können wir die Plattform kostendeckend betreiben. Du gibst, was du dir leisten kannst, und trägst dazu bei, dass sich jeden Tag neue Projekte auf wechange.de anmelden und den Wandel vorantreiben können. Wir bedanken uns für deinen Beitrag! \n"
+"\n"
+"PS: Als Organisation könnt ihr den Beitrag für eure Mitglieder auch gesammelt bezahlen und eine Rechnung über den Gesamtbetrag erhalten. Falls du Fragen hast, kontaktiere gerne unseren Support unter support@wechange.de!"
 
 #~ msgctxt "(INF8.1)"
 #~ msgid "Adjust contribution amount or terminate your Contribution"
 #~ msgstr "Beitragshöhe ändern oder Zahlungen beenden"
 
+#~ msgid "Amount"
+#~ msgstr "Betrag"
+
+#~ msgctxt "(SLD4)"
+#~ msgid "Magnificent! With your support, the WECHANGE community can grow and prosper!"
+#~ msgstr "Großartig! Mit deiner Unterstützung kann die wechange.de Community prächtig wachsen und gedeihen!"
+
 #~ msgctxt "(POP7)"
 #~ msgid "No, maybe later"
 #~ msgstr "Nein, lieber später"
+
+#~ msgctxt "(SLD2)"
+#~ msgid "Thank you for helping us to develop WECHANGE."
+#~ msgstr "Danke, dass du uns hilfst, wechange.de weiterzuentwickeln."
+
+#~ msgctxt "(SLD1)"
+#~ msgid "Thank you. Every small contribution helps."
+#~ msgstr "Danke! Jeder kleine Beitrag hilft. "
+
+#~ msgctxt "(SLD3)"
+#~ msgid "Whoa! You're really helping us!"
+#~ msgstr "Wow! Du hilfst uns wirklich sehr!"
+
+#~ msgctxt "(PF24x)"
+#~ msgid "You may also choose a higher amount by entering it directly in the text box!"
+#~ msgstr "Du kannst auch einen höheren Betrag wählen, indem du ihn direkt in das Textfeld eingibst!"

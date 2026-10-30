@@ -56,7 +56,7 @@ class WechangePaymentsDefaultSettings(AppConf):
     # the displayed slider min amount
     MINIMUM_MONTHLY_AMOUNT = 1.0
     # the displayed slider max amount
-    MAXIMUM_MONTHLY_AMOUNT = 20.0
+    MAXIMUM_MONTHLY_AMOUNT = 50.0
     # the displayed slider default amount
     DEFAULT_MONTHLY_AMOUNT = 10.0
     

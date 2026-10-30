@@ -19,110 +19,32 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 
 #, python-format
-msgid "Started invoice creation for %(number)d payment(s) in background."
-msgstr ""
-
-msgid "Create invoice in Invoice API (threaded)"
-msgstr ""
-
-#, python-format
-msgid "Started additional invoice creation for %(number)d payment(s) in background."
-msgstr ""
-
-msgid "Create additional invoices in Invoice API (threaded)"
-msgstr ""
-
-msgid "Run/continue invoice in Invoice API (threaded)"
-msgstr ""
-
-#, python-format
-msgid "Started additional invoice creation for %(count)d of %(total)d selected payment(s) in background."
-msgstr ""
-
-msgid "Run/continue additional invoice in Invoice API (threaded)"
-msgstr ""
-
-msgctxt "Invoice PDF, important!"
-msgid "We charge you for our services as follows:"
-msgstr ""
-
-msgid "You cannot make any additional payments at this time. Please contact our support!"
-msgstr ""
-
-#, python-format
-msgid "Error: \"%(error_message)s\" (%(error_code)d)"
-msgstr ""
-
-msgid "Making postponed payments is currently not possible!"
-msgstr ""
-
-msgid "The payment provider could not be reached."
-msgstr ""
-
-msgid "Unexpected response from payment provider."
-msgstr ""
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "User fee for %(portal_name)s"
-msgstr ""
-
-#, python-format
-msgctxt "Invoice PDF, important!"
-msgid "Electronic service"
-msgstr ""
-
-msgctxt "Invoice PDF, important!"
-msgid "Beneficiary"
-msgstr ""
-
-msgctxt "Invoice PDF, important!"
-msgid "Subscription-ID"
-msgstr ""
-
-msgid "Direct Debit (SEPA)"
-msgstr ""
-
-msgid "Credit Card"
-msgstr ""
-
-msgid "Paypal"
-msgstr ""
-
-msgid "The IBAN you entered does not seem to be correct!"
-msgstr ""
-
-msgid "The BIC you entered does not seem to be correct!"
-msgstr ""
-
-#, python-format
-msgctxt "(MAILPRE)"
-msgid "(MAILPRE) with variables: %(username)s,"
-msgstr "Dear*r %(username)s,"
-
-#, python-format
-msgctxt "(MAILLINKS)"
-msgid "(MAILLINKS) %(link_payment_info)s %(link_invoices)s"
-msgstr ""
-"Further information about your Contribution can be found under: %(link_payment_info)s\n"
-"You can view your invoices under the following link: %(link_invoices)s"
-
-#, python-format
-msgctxt "(MAILPOST)"
-msgid "(MAILPOST) with variables: %(portal_name)s"
-msgstr ""
-"Thank you!\n"
+msgid ""
 "\n"
-"Your %(portal_name)s Support Team"
+"The SEPA payment will be debited from your account within the next few days. \n"
+"\n"
+"We will debit your subsequent %(debit_period)s payments on the %(payment_day)s. %(debit_period_schedule)s. If the due date falls on a weekend or a holiday, the debit date will be postponed to the next working day. Please make sure you have sufficient funds to avoid return debit fees.\n"
+"\n"
+"Details of your SEPA Direct Debit Mandate at a glance:\n"
+"\n"
+"Amount: %(amount)s EUR\n"
+"SEPA-Mandate-Reference: %(sepa_mandate)s\n"
+"Creditor-ID: %(sepa_creditor)s\n"
+"\n"
+"Your Account: \n"
+"Account Holder: %(account_holder)s\n"
+"IBAN: %(iban)s\n"
+" \n"
+msgstr ""
+
+msgctxt "(PF5)"
+msgid " Almost done! Please enter your account information below."
+msgstr ""
 
 #, python-format
-msgctxt "(MAIL2)"
-msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s %(payment_debit_period)s"
+msgctxt "(MS9)"
+msgid "(%(amount)s Euro per month)"
 msgstr ""
-"Thank you for your contribution! We have just initiated the debiting of your %(payment_debit_period)s contribution.\n"
-"\n"
-"Total amount (incl. %(vat_amount)s%% VAT): **%(payment_amount)s EUR**\n"
-"Payment method: %(payment_method)s"
 
 #, python-format
 msgctxt "(MAIL1a)"
@@ -145,12 +67,34 @@ msgstr ""
 "The next debit will be made on %(next_debit_date)s. Please make sure that your account has sufficient funds."
 
 #, python-format
+msgctxt "(MAIL1s)"
+msgid "(MAIL1s) with variables: %(portal_name)s"
+msgstr "Your Contribution for %(portal_name)s"
+
+#, python-format
+msgctxt "(MAIL2)"
+msgid "(MAIL2) with variables: %(payment_method)s %(payment_amount)s %(vat_amount)s %(payment_debit_period)s"
+msgstr ""
+"Thank you for your contribution! We have just initiated the debiting of your %(payment_debit_period)s contribution.\n"
+"\n"
+"Total amount (incl. %(vat_amount)s%% VAT): **%(payment_amount)s EUR**\n"
+"Payment method: %(payment_method)s"
+
+msgctxt "(MAIL2s)"
+msgid "(MAIL2s) with variables: -"
+msgstr "Your Contribution"
+
+#, python-format
 msgctxt "(MAIL3)"
 msgid "(MAIL3) with variables: %(subscription_amount)s %(next_debit_date)s %(subscription_debit_period)s"
 msgstr ""
 "You have changed your contribution to %(subscription_amount)s Euro %(subscription_debit_period)s.\n"
 "\n"
 "The next debit will be made on %(next_debit_date)s. Please make sure that your account has sufficient funds."
+
+msgctxt "(MAIL3s)"
+msgid "(MAIL3s) with variables: -"
+msgstr "Your Contribution was changed"
 
 #, python-format
 msgctxt "(MAIL4)"
@@ -161,6 +105,10 @@ msgstr ""
 "If you just want to change your payment details, please click here and set up the payment again: %(link_new_payment)s\n"
 "\n"
 "If you are dissatisfied with %(portal_name)s, please send your constructive feedback to %(support_email)s!"
+
+msgctxt "(MAIL4s)"
+msgid "(MAIL4s) with variables: -"
+msgstr "Your payments were terminated"
 
 #, python-format
 msgctxt "(MAIL5)"
@@ -173,6 +121,10 @@ msgstr ""
 "To continue your Contribution and support %(portal_name)s, please set up a new payment: %(link_new_payment)s\n"
 "\n"
 "Please make sure that your account is still valid and has sufficient funds!"
+
+msgctxt "(MAIL5s)"
+msgid "(MAIL5s) with variables: -"
+msgstr "Your payments were suspended"
 
 #, python-format
 msgctxt "(MAIL6)"
@@ -193,228 +145,47 @@ msgstr ""
 "\n"
 "If you have any questions please contact %(support_email)s."
 
-msgctxt "(MAIL2s)"
-msgid "(MAIL2s) with variables: -"
-msgstr "Your Contribution"
-
-#, python-format
-msgctxt "(MAIL1s)"
-msgid "(MAIL1s) with variables: %(portal_name)s"
-msgstr "Your Contribution for %(portal_name)s"
-
-msgctxt "(MAIL3s)"
-msgid "(MAIL3s) with variables: -"
-msgstr "Your Contribution was changed"
-
-msgctxt "(MAIL4s)"
-msgid "(MAIL4s) with variables: -"
-msgstr "Your payments were terminated"
-
-msgctxt "(MAIL5s)"
-msgid "(MAIL5s) with variables: -"
-msgstr "Your payments were suspended"
-
 msgctxt "(MAIL6s)"
 msgid "(MAIL6s) with variables: -"
 msgstr "Your SEPA Direct Debit advance notice for your Contribution"
 
-msgctxt "(URL-LABEL)"
-msgid "Link"
-msgstr "Link"
-
-msgid "monthly"
+#, python-format
+msgctxt "(MAILLINKS)"
+msgid "(MAILLINKS) %(link_payment_info)s %(link_invoices)s"
 msgstr ""
-
-msgid "quarterly"
-msgstr ""
-
-msgid "half-yearly"
-msgstr ""
-
-msgid "yearly"
-msgstr ""
+"Further information about your Contribution can be found under: %(link_payment_info)s\n"
+"You can view your invoices under the following link: %(link_invoices)s"
 
 #, python-format
-msgid "every month"
-msgid_plural "every %(months)s months"
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "Debiting Amount"
+msgctxt "(MAILPOST)"
+msgid "(MAILPOST) with variables: %(portal_name)s"
 msgstr ""
+"Thank you!\n"
+"\n"
+"Your %(portal_name)s Support Team"
 
-msgid "PayPal"
-msgstr ""
+#, python-format
+msgctxt "(MAILPRE)"
+msgid "(MAILPRE) with variables: %(username)s,"
+msgstr "Dear*r %(username)s,"
 
-msgid "Not started"
-msgstr ""
+msgid "(MSG1) Your current Subscription was terminated."
+msgstr "Your current Subscription was terminated."
 
-msgid "Payment initiated but not completed by user yet"
-msgstr ""
-
-msgid "Payment processing"
-msgstr ""
-
-msgid "Successfully paid"
-msgstr ""
-
-msgid "Pre-authorized for payment, but not yet paid"
-msgstr ""
-
-msgid "Failed"
-msgstr ""
-
-msgid "Retracted"
-msgstr ""
-
-msgid "Canceled"
-msgstr ""
-
-msgid "Vendor Transaction Id"
-msgstr ""
-
-msgid "Order Id"
-msgstr ""
-
-msgid "Last Order Id"
-msgstr ""
-
-msgid "Monthly Amount"
-msgstr ""
-
-msgid "Debiting Period"
-msgstr ""
-
-msgid "Payment Type"
-msgstr ""
-
-msgid "Last Action At"
-msgstr ""
-
-msgid "Completed At"
-msgstr ""
-
-msgid "Payment Status"
-msgstr ""
-
-msgid "Is reference payment"
-msgstr ""
-
-msgid "Is postponed payment"
-msgstr ""
-
-msgid "Has been revoked"
-msgstr ""
-
-msgid "Backend class used"
-msgstr ""
-
-msgid "Payment"
-msgstr ""
-
-msgid "Payments"
-msgstr ""
-
-msgid "Direct Request"
-msgstr ""
-
-msgid "Received Postback"
-msgstr ""
-
-msgid "Created"
-msgstr ""
+msgid "(MSG2) There was an error terminating your subscription! Please contact the customer support!"
+msgstr "There was an error terminating your subscription! Please contact the customer support!"
 
 msgid "API Endpoint URL"
 msgstr ""
 
-msgid "Transaction Type"
-msgstr ""
-
-msgid "Payment Transaction Log"
-msgstr ""
-
-msgid "Payment Transaction Logs"
-msgstr ""
-
-msgid "Terminated."
-msgstr ""
-
-msgid "Cancelled, but still active"
+msgid "Account Holder"
 msgstr ""
 
 msgid "Active"
 msgstr ""
 
-msgid "Waiting, becoming active at next payment due date"
-msgstr ""
-
-msgid "Suspended, because of payment errors"
-msgstr ""
-
-msgid "User"
-msgstr ""
-
-msgid "Reference Payment"
-msgstr ""
-
-msgid "Subscription State"
-msgstr ""
-
-msgid "Has Problems"
-msgstr ""
-
-msgid "Attempts of booking recurring payment"
-msgstr ""
-
-msgid "Next due date"
-msgstr ""
-
-msgid "Last pre-notification at"
-msgstr ""
-
-msgid "Last Payment"
-msgstr ""
-
-msgid "Cancelled by User"
-msgstr ""
-
-msgid "Finally terminated by System"
-msgstr ""
-
-msgid "Subscription"
-msgstr ""
-
-msgid "Not created at provider."
-msgstr ""
-
-msgid "Created, but not finalized"
-msgstr ""
-
-msgid "Finalized, but not downloaded"
-msgstr ""
-
-msgid "Downloaded and ready"
-msgstr ""
-
-msgid "Invoice State"
-msgstr ""
-
-msgid "Is Ready"
-msgstr ""
-
-msgid "File"
-msgstr ""
-
-msgid "Provider Invoice ID"
-msgstr ""
-
-msgid "Invoice Provider Backend class used"
-msgstr ""
-
-msgid "Invoice"
-msgstr ""
-
-msgid "Invoices"
+msgctxt "(INF4-subscription status)"
+msgid "Active since"
 msgstr ""
 
 msgid "Additional Invoice"
@@ -423,7 +194,502 @@ msgstr ""
 msgid "Additional Invoices"
 msgstr ""
 
-msgid "Related to"
+msgid "Address"
+msgstr ""
+
+msgctxt "(INF8.1)"
+msgid "Adjust or terminate your Contribution"
+msgstr ""
+
+msgctxt "(INF13)"
+msgid "All information about your past payments can be found in the invoice overview"
+msgstr ""
+
+msgctxt "(INF11)"
+msgid "Amount"
+msgstr ""
+
+msgid "An error occured, and you cannot change your subscription amount at this time. Please contact our support!"
+msgstr ""
+
+msgctxt "(PRC4)"
+msgid "An unexpected error has occured during your payment."
+msgstr ""
+
+#, python-format
+msgctxt "(INF16)"
+msgid "Attempted at %(date)s, but not completed."
+msgstr ""
+
+msgid "Attempts of booking recurring payment"
+msgstr ""
+
+msgid "BIC"
+msgstr ""
+
+#, python-format
+msgctxt "(SC8)"
+msgid "Back to %(portal_name)s"
+msgstr ""
+
+msgid "Backend class used"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "Beneficiary"
+msgstr ""
+
+msgid "Billing Address"
+msgstr ""
+
+#, python-format
+msgctxt "(PF7)"
+msgid "By clicking on \"%(confirm_and_pay_button_text)s\" you grant Wechange eG permission to debit %(amount)s Euro %(debit_period)s (incl. %(vat_amount)s%% VAT) from you via %(payment_method)s."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Canceled"
+msgstr ""
+
+msgctxt "(INF5-subscription status)"
+msgid "Cancelled"
+msgstr ""
+
+msgid "Cancelled by User"
+msgstr ""
+
+msgid "Cancelled, but still active"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd8)"
+msgid "Change happens on a small scale"
+msgstr "wechange.de for all, all for wechange.de"
+
+msgctxt "(PF25)"
+msgid "Change payment information"
+msgstr ""
+
+msgctxt "(TS9)"
+msgid "Change payment information"
+msgstr ""
+
+msgctxt "(MS7)"
+msgid "Change your Contribution"
+msgstr ""
+
+msgctxt "(MS8)"
+msgid "Change your debit period"
+msgstr ""
+
+msgid "Changing and making new payments is temporarily disabled while we are performing maintenance on our payment system. The service will be back soon. Please apologize the inconveniences!"
+msgstr ""
+
+msgctxt "(POP6)"
+msgid "Choose amount"
+msgstr ""
+
+msgctxt "(PF15)"
+msgid "Choose your Contribution"
+msgstr ""
+
+msgctxt "(PF27)"
+msgid "Choose your billing interval"
+msgstr ""
+
+msgctxt "(PF15b)"
+msgid "Choose your new Contribution"
+msgstr ""
+
+msgctxt "(PF27b)"
+msgid "Choose your new debiting period"
+msgstr ""
+
+msgctxt "(POP4-release)"
+msgid "Choose your voluntary contribution to WECHANGE now. We count on you!"
+msgstr "Choose your voluntary contribution to wechange.de now. We count on you!"
+
+msgid "City"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd5)"
+msgid "Come, be among the ones who pay!"
+msgstr "Your contribution supports Changemakers"
+
+msgid "Completed At"
+msgstr ""
+
+msgctxt "(PF4a)"
+msgid "Confirm Contribution Amount"
+msgstr ""
+
+msgctxt "(PF9 - legally binding!)"
+msgid "Confirm and pay"
+msgstr ""
+
+msgctxt "(PF17)"
+msgid "Confirm data and continue"
+msgstr ""
+
+msgctxt "(PF15a)"
+msgid "Confirm your Contribution"
+msgstr ""
+
+msgctxt "(PF27a)"
+msgid "Confirm your debiting period"
+msgstr ""
+
+msgctxt "(LN6)"
+msgid "Contact our Support"
+msgstr ""
+
+msgctxt "(LN5)"
+msgid "Contact support"
+msgstr ""
+
+msgctxt "(INF2)"
+msgid "Contribution Status"
+msgstr ""
+
+#, python-format
+msgctxt "(PF24)"
+msgid "Contribution amount includes %(vat_amount)s%% VAT."
+msgstr ""
+
+msgid "Country"
+msgstr ""
+
+msgid "Create additional invoices in Invoice API (threaded)"
+msgstr ""
+
+msgid "Create invoice in Invoice API (threaded)"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Created, but not finalized"
+msgstr ""
+
+msgid "Creating your invoice download is taking longer than expected."
+msgstr ""
+
+msgid "Credit Card"
+msgstr ""
+
+msgctxt "(FC1)"
+msgid "Current Payment Issues"
+msgstr ""
+
+#, python-format
+msgctxt "(POP2-newuser)"
+msgid "Dear %(username)s,"
+msgstr ""
+
+#, python-format
+msgctxt "(POP2-release)"
+msgid "Dear %(username)s,"
+msgstr ""
+
+#, python-format
+msgctxt "(POP2-repeat)"
+msgid "Dear %(username)s,"
+msgstr ""
+
+msgid "Debiting Amount"
+msgstr ""
+
+msgid "Debiting Period"
+msgstr ""
+
+msgid "Direct Debit (SEPA)"
+msgstr ""
+
+msgid "Direct Request"
+msgstr ""
+
+msgctxt "(TS7)"
+msgid "Do you really want to terminate your subscriptions? You can create a new contribution at any time."
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd2)"
+msgid "Does not hurt, but does good for many"
+msgstr "Everyone gives what they can afford!"
+
+msgid "Download Invoice (PDF)"
+msgstr ""
+
+msgid "Downloaded and ready"
+msgstr ""
+
+msgid "E-Mail"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "Electronic service"
+msgstr ""
+
+#, python-format
+msgid "Error: \"%(error_message)s\" (%(error_code)d)"
+msgstr ""
+
+msgid "Expires"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "Finalized, but not downloaded"
+msgstr ""
+
+msgid "Finally terminated by System"
+msgstr ""
+
+msgid "First name"
+msgstr ""
+
+#, python-format
+msgctxt "(PF33)"
+msgid "For accounting reasons we have to process your new payment immediately, but any time left on your old contribution will be added on to your new one. That means that your next payment would for example only be due on %(date)s for a monthly debiting period."
+msgstr ""
+
+msgid "From now on your new chosen contribution amount will be paid. "
+msgstr ""
+
+msgid "Has Problems"
+msgstr ""
+
+msgid "Has been revoked"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd6)"
+msgid "How much are we worth to you?"
+msgstr "wechange.de - proudly funded by its members!"
+
+msgid "IBAN"
+msgstr ""
+
+msgid "If the contribution is not paid by you as a private individual, but in the name and on behalf of an institution, organisation or company, please enter the name and billing address of the organisation."
+msgstr ""
+
+msgctxt "(FC5)"
+msgid "If you have any questions about the issue or would like assistance, please contact our support and provide us with the issue reference number!"
+msgstr ""
+
+msgctxt "(LN7)"
+msgid "If you have any questions about your Contribution or encountered any problems, please send an email to"
+msgstr ""
+
+msgctxt "(PF11x)"
+msgid "If you only want to adjust the amount or debiting period of your contribution using the same payment details, you can do it here"
+msgstr ""
+
+msgctxt "(FC9)"
+msgid "If you wish to continue contributing, please update your payment information, or contact our support! Sorry for the inconveniences!"
+msgstr ""
+
+msgctxt "(PRC5)"
+msgid "If your payment has not been processed after a day, please contact our support!"
+msgstr ""
+
+#, python-format
+msgid "In the next step, you will be redirected to complete the payment process with the payment provider %(payment_provider)s."
+msgstr ""
+
+msgid "Invoice"
+msgstr ""
+
+msgid "Invoice Provider Backend class used"
+msgstr ""
+
+msgid "Invoice State"
+msgstr ""
+
+#, python-format
+msgid "Invoice for %(amount)s€ from %(date)s"
+msgstr ""
+
+#, python-format
+msgid "Invoice from %(date)s"
+msgstr ""
+
+msgid "Invoices"
+msgstr ""
+
+msgid "Is Ready"
+msgstr ""
+
+msgid "Is postponed payment"
+msgstr ""
+
+msgid "Is reference payment"
+msgstr ""
+
+msgctxt "(FC7)"
+msgid "Issue Details"
+msgstr ""
+
+msgctxt "(FC6)"
+msgid "Issue Reference Number"
+msgstr ""
+
+msgid "Last Action At"
+msgstr ""
+
+msgid "Last Order Id"
+msgstr ""
+
+msgid "Last Payment"
+msgstr ""
+
+msgid "Last name"
+msgstr ""
+
+msgid "Last pre-notification at"
+msgstr ""
+
+msgctxt "(MS4)"
+msgid "Learn more"
+msgstr ""
+
+msgctxt "(PF2)"
+msgid "Learn more"
+msgstr ""
+
+msgctxt "(POP5)"
+msgid "Learn more"
+msgstr ""
+
+msgctxt "(URL-LABEL)"
+msgid "Link"
+msgstr "Link"
+
+msgid "Making postponed payments is currently not possible!"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd3)"
+msgid "Many pennies make a dollar"
+msgstr "wechange.de for all, all for wechange.de"
+
+msgctxt "(MS5)"
+msgid "Modify Contribution Amount"
+msgstr ""
+
+msgctxt "(MS5-rethink-cancelling)"
+msgid "Modify Contribution Amount"
+msgstr ""
+
+msgctxt "(PF8)"
+msgid "Modify Contribution Amount"
+msgstr ""
+
+msgid "Monthly Amount"
+msgstr ""
+
+msgid "Monthly Contribution Payment (recurring)"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "New payments are currently disabled!"
+msgstr ""
+
+msgid "Next due date"
+msgstr ""
+
+msgctxt "(INF7)"
+msgid "Next payment scheduled"
+msgstr ""
+
+msgctxt "(PF18)"
+msgid "No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment."
+msgstr ""
+
+msgctxt "(TS4) (explanation)"
+msgid "No payments have been made yet. Your Contribution will be cancelled."
+msgstr ""
+
+msgid "Not created at provider."
+msgstr ""
+
+msgctxt "(POP7)"
+msgid "Not now"
+msgstr ""
+
+msgid "Not started"
+msgstr ""
+
+msgctxt "(POP6-repeat)"
+msgid "Ok, choose amount now"
+msgstr ""
+
+msgid "Order Id"
+msgstr ""
+
+msgid "Organisation"
+msgstr ""
+
+msgid "Past Contributions"
+msgstr ""
+
+msgctxt "(LN4)"
+msgid "Past Contributions"
+msgstr ""
+
+msgid "PayPal"
+msgstr ""
+
+msgid "Payment"
+msgstr ""
+
+msgid "Payment Method"
+msgstr ""
+
+msgid "Payment Purpose"
+msgstr ""
+
+msgid "Payment Status"
+msgstr ""
+
+msgctxt "(SC1)"
+msgid "Payment Success"
+msgstr ""
+
+msgid "Payment Transaction Log"
+msgstr ""
+
+msgid "Payment Transaction Logs"
+msgstr ""
+
+msgid "Payment Type"
+msgstr ""
+
+msgid "Payment initiated but not completed by user yet"
+msgstr ""
+
+msgid "Payment is currently only possible by SEPA direct debit. We are working on offering PayPal and credit card payments soon!"
+msgstr ""
+
+msgid "Payment processing"
+msgstr ""
+
+msgctxt "(PRC4)"
+msgid "Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!"
+msgstr ""
+
+msgctxt "(PRC1)"
+msgid "Payment processing..."
+msgstr ""
+
+msgid "Payment shall be made on behalf of an organisation"
+msgstr ""
+
+msgid "Payments"
 msgstr ""
 
 msgctxt "(BS1)"
@@ -434,248 +700,255 @@ msgctxt "(BS2)"
 msgid "Payments"
 msgstr ""
 
-msgctxt "(TS1)"
-msgid "Stop payments"
+msgctxt "(SC2)"
+msgid "Payments"
 msgstr ""
 
-msgctxt "(TS2)"
-msgid "Too bad you want to end your contribution! Don't you want to reconsider? You can also choose a smaller amount. Every small contribution helps us. If you are dissatisfied with something, we would be happy to receive your feedback at support@wechange.de"
+msgid "Paypal"
 msgstr ""
 
-msgctxt "(TS3)"
-msgid "What happens when you terminate your subscription"
-msgstr ""
-
-msgctxt "(TS4) (explanation)"
-msgid "No payments have been made yet. Your Contribution will be cancelled."
-msgstr ""
-
-#, python-format
-msgctxt "(TS5)"
-msgid "Your subscription will be terminated and no future payments will be made. Your current payment status will remain active until %(date)s. You can reset the payments at any time."
-msgstr ""
-
-msgctxt "(MS5-rethink-cancelling)"
-msgid "Modify Contribution Amount"
-msgstr ""
-
-msgid "Cancel"
-msgstr ""
-
-msgctxt "(TS6)"
-msgid "Terminate subscription"
-msgstr ""
-
-msgctxt "(TS7)"
-msgid "Do you really want to terminate your subscriptions? You can create a new contribution at any time."
-msgstr ""
-
-msgctxt "(TS8)"
-msgid "You don't want to pay contributions anymore?"
-msgstr ""
-
-#, python-format
-msgid "You can contribute any amount up to %(max_amount)s by entering it here. For larger contributions, please contact our support!"
-msgstr ""
-
-msgctxt "(SLD1)"
-msgid "Thank you. Every small contribution helps."
-msgstr ""
-
-msgctxt "(SLD2)"
-msgid "Thank you for helping us to develop WECHANGE."
-msgstr "Thank you for helping us to develop wechange.de."
-
-msgctxt "(SLD3)"
-msgid "Whoa! You're really helping us!"
-msgstr ""
-
-msgctxt "(SLD4)"
-msgid "Magnificent! With your support, the WECHANGE community can grow and prosper!"
-msgstr "Magnificent! With your support, the wechange.de community can grow and prosper!"
-
-#, python-format
-msgid "Invoice from %(date)s"
-msgstr ""
-
-msgid "Your Invoices"
-msgstr ""
-
-msgid "Payment Purpose"
-msgstr ""
-
-msgid "Monthly Contribution Payment (recurring)"
-msgstr ""
-
-msgctxt "(INF11)"
-msgid "Amount"
-msgstr ""
-
-msgid "Download Invoice (PDF)"
-msgstr ""
-
-msgid "Creating your invoice download is taking longer than expected."
+msgctxt "(PRC2)"
+msgid "Please complete your payment with the payment provider, or restart the payment process."
 msgstr ""
 
 msgid "Please contact our support for assistance!"
 msgstr ""
 
-msgid "Your invoice is still being prepared and will be ready for download shortly. Please return to this page in a few minutes."
+msgctxt "(SC4)"
+msgid "Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!"
 msgstr ""
 
-#, python-format
-msgid "Invoice for %(amount)s€ from %(date)s"
+msgid "Please correct the errors in the highlighted fields!"
 msgstr ""
 
-msgctxt "(FC1)"
-msgid "Current Payment Issues"
-msgstr ""
-
-msgctxt "(LN1)"
-msgid "Your Contribution"
-msgstr ""
-
-msgctxt "(LN2)"
-msgid "Your payment details"
-msgstr ""
-
-msgctxt "(LN3)"
-msgid "Your Invoices"
-msgstr ""
-
-msgctxt "(LN4)"
-msgid "Past Contributions"
-msgstr ""
-
-msgctxt "(LN7)"
-msgid "If you have any questions about your Contribution or encountered any problems, please send an email to"
+msgid "Please fill out all of the missing fields!"
 msgstr ""
 
 msgctxt "(LN7)"
 msgid "Please include this reference number in your e-mail"
 msgstr ""
 
-msgctxt "(LN5)"
-msgid "Contact support"
+msgctxt "(FC4)"
+msgid "Please see below for details on the problem and review your selected payment method. If you wish to select a new payment method, simply update your payment information."
 msgstr ""
 
-msgctxt "(LN6)"
-msgid "Contact our Support"
+msgid "Please try again or contact our support for assistance!"
 msgstr ""
 
-#, python-format
-msgid ""
-"\n"
-"The SEPA payment will be debited from your account within the next few days. \n"
-"\n"
-"We will debit your subsequent %(debit_period)s payments on the %(payment_day)s. %(debit_period_schedule)s. If the due date falls on a weekend or a holiday, the debit date will be postponed to the next working day. Please make sure you have sufficient funds to avoid return debit fees.\n"
-"\n"
-"Details of your SEPA Direct Debit Mandate at a glance:\n"
-"\n"
-"Amount: %(amount)s EUR\n"
-"SEPA-Mandate-Reference: %(sepa_mandate)s\n"
-"Creditor-ID: %(sepa_creditor)s\n"
-"\n"
-"Your Account: \n"
-"Account Holder: %(account_holder)s\n"
-"IBAN: %(iban)s\n"
-" \n"
+msgctxt "(PRC3)"
+msgid "Please wait while your payment is being processed..."
 msgstr ""
 
-msgctxt "(MS1)"
-msgid "Your Contribution"
+msgid "Postal Code"
+msgstr ""
+
+msgid "Pre-authorized for payment, but not yet paid"
 msgstr ""
 
 #, python-format
-msgctxt "(MS2)"
-msgid "Your current Contribution is %(amount)s Euro %(debit_period)s"
+msgctxt "(INF15)"
+msgid "Processing. Started at %(date)s."
+msgstr ""
+
+msgid "Provider Invoice ID"
+msgstr ""
+
+msgid "Received Postback"
+msgstr ""
+
+msgid "Reference Payment"
+msgstr ""
+
+msgid "Related to"
+msgstr ""
+
+msgctxt "(FC11)"
+msgid "Renew payment information"
+msgstr ""
+
+msgid "Retracted"
+msgstr ""
+
+msgctxt "(PF19)"
+msgid "Review and Confirm Payment"
+msgstr ""
+
+msgid "Run/continue additional invoice in Invoice API (threaded)"
+msgstr ""
+
+msgid "Run/continue invoice in Invoice API (threaded)"
+msgstr ""
+
+msgid "Select Payment Method"
+msgstr ""
+
+msgctxt "(PF4)"
+msgid "Set amount of Contribution"
+msgstr ""
+
+msgctxt "(INF8.2)"
+msgid "Set up new Contribution"
+msgstr ""
+
+msgctxt "(INF14)"
+msgid "Show Invoice overview"
+msgstr ""
+
+msgctxt "(SC7)"
+msgid "Show payment overview"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd7)"
+msgid "So that WECHANGE can be more than the sum of its parts"
+msgstr "Everyone gives what they can afford!"
+
+msgctxt "(FC8)"
+msgid "Specific issue details cannot be displayed for this issue."
 msgstr ""
 
 #, python-format
-msgctxt "(MS9)"
-msgid "(%(amount)s Euro per month)"
-msgstr ""
-
-msgctxt "(MS3)"
-msgid ""
-"We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.\n"
-"\n"
-"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
-msgstr ""
-"We understand wechange.de as a common good: You pay for the use of wechange.de what it is worth to you. With every Euro you spend, you help us to make wechange.de better. With an average of 7 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.\n"
-"\n"
-"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
-
-msgctxt "(MS4)"
-msgid "Learn more"
-msgstr ""
-
-msgctxt "(MS7)"
-msgid "Change your Contribution"
-msgstr ""
-
-msgctxt "(MS8)"
-msgid "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field."
+msgid "Started additional invoice creation for %(count)d of %(total)d selected payment(s) in background."
 msgstr ""
 
 #, python-format
-msgctxt "(PF24)"
-msgid "Contribution amount includes %(vat_amount)s%% VAT."
+msgid "Started additional invoice creation for %(number)d payment(s) in background."
 msgstr ""
 
-msgctxt "(MS8)"
-msgid "Change your debit period"
+#, python-format
+msgid "Started invoice creation for %(number)d payment(s) in background."
 msgstr ""
 
-msgctxt "(MS5)"
-msgid "Modify Contribution Amount"
+msgid "Starting with the next payment your new debiting period and new amount will be used. "
+msgstr ""
+
+msgid "Starting with the next payment your new debiting period will be used. "
+msgstr ""
+
+msgctxt "(TS1)"
+msgid "Stop payments"
+msgstr ""
+
+msgid "Subscription"
+msgstr ""
+
+msgid "Subscription State"
+msgstr ""
+
+msgctxt "Invoice PDF, important!"
+msgid "Subscription-ID"
+msgstr ""
+
+msgid "Successfully paid"
+msgstr ""
+
+msgid "Suspended, because of payment errors"
+msgstr ""
+
+msgctxt "(TS6)"
+msgid "Terminate subscription"
 msgstr ""
 
 msgctxt "(MS6)"
 msgid "Terminate your Contribution"
 msgstr ""
 
-msgctxt "(PF30)"
-msgid "Your Contributions will end soon!"
-msgstr ""
-
-msgctxt "(PF31)"
-msgid "Your pre-paid contribution is valid until"
-msgstr ""
-
-msgctxt "(PF32)"
-msgid "We're sorry to see you go! To continue contributing, you can create a new Contribution right now."
+msgid "Terminated."
 msgstr ""
 
 #, python-format
-msgctxt "(PF33)"
-msgid "For accounting reasons we have to process your new payment immediately, but any time left on your old contribution will be added on to your new one. That means that your next payment would for example only be due on %(date)s for a monthly debiting period."
-msgstr ""
-
-msgctxt "(PF40)"
-msgid "Update your payment details"
-msgstr ""
-
-msgctxt "(PF41)"
-msgid "You can choose a new payment method or update your payment details here."
+msgctxt "(PF23)"
+msgid "Thank you for supporting %(portal_name)s!"
 msgstr ""
 
 #, python-format
-msgctxt "(PF43)"
-msgid "We have to process your first new payment immediately, but any time left on your current Contribution will be added on to your new one. That means that your next payment would for example only be due on %(date)s for a monthly debiting period."
+msgid "Thank you for supporting %(portal_name)s. Every contribution counts!"
 msgstr ""
 
-msgctxt "(PF11x)"
-msgid "If you only want to adjust the amount or debiting period of your contribution using the same payment details, you can do it here"
-msgstr ""
-
-msgctxt "(PF1)"
-msgid "Your Contribution"
+msgctxt "(SC5)"
+msgid "Thank you for your Contribution!"
 msgstr ""
 
 #, python-format
-msgctxt "(PF13)"
-msgid "You are using %(portal_name)s free of charge."
+msgid "Thank you for your support! You are helping to keep %(portal_name)s accessible for everyone."
+msgstr ""
+
+#, python-format
+msgid "Thank you for your valuable contribution! You are ensuring the continued development of %(portal_name)s."
+msgstr ""
+
+#, python-format
+msgid "Thank you so much! Your contribution allows %(portal_name)s to grow and thrive."
+msgstr ""
+
+#, python-format
+msgid "Thank you so much! Your contribution ensures that %(portal_name)s remains sustainable in the long term."
+msgstr ""
+
+msgid "Thank you very much for your support!"
+msgstr ""
+
+msgid "The BIC you entered does not seem to be correct!"
+msgstr ""
+
+msgid "The IBAN you entered does not seem to be correct!"
+msgstr ""
+
+msgid "The amount and debiting period you selected were the same as before, so we did not change anything!"
+msgstr ""
+
+msgid "The amount submitted does not seem to be a number!"
+msgstr ""
+
+msgctxt "(POP1-repeat-rnd1)"
+msgid "The early bird catches the worm!"
+msgstr "wechange.de - proudly funded by its members!"
+
+msgid "The entered payment information is invalid. Please make sure you entered everything correctly!"
+msgstr ""
+
+msgctxt "(INF10)"
+msgid "The last payment was made on"
+msgstr ""
+
+msgid "The monthly amount is higher than the allowed maximum amount!"
+msgstr ""
+
+msgid "The monthly amount is lower than the allowed minimum amount!"
+msgstr ""
+
+msgctxt "(PF20a)"
+msgid "The next debit using your new payment information will be made immediately."
+msgstr ""
+
+msgctxt "(PF20)"
+msgid "The next debit will be made immediately."
+msgstr ""
+
+msgid "The payment amount is higher than the allowed maximum amount!"
+msgstr ""
+
+msgid "The payment amount is lower than the allowed minimum amount!"
+msgstr ""
+
+msgid "The payment process was cancelled or could not be completed."
+msgstr ""
+
+msgid "The payment provider could not be reached."
+msgstr ""
+
+msgid "The payment session could not be found."
+msgstr ""
+
+msgctxt "(FC2)"
+msgid "There are issues with you current Contribution!"
+msgstr ""
+
+msgid "There was an error with your payment."
+msgstr ""
+
+#, python-format
+msgctxt "(PF7a)"
+msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. %(vat_amount)s%% VAT, which is shown on the invoice."
 msgstr ""
 
 #, fuzzy, python-format
@@ -711,50 +984,29 @@ msgstr ""
 "\n"
 "You can change, suspend or cancel your monthly contribution at any time by clicking on \"Your contribution\" in your user menu.\n"
 
-msgid "Account Holder"
+msgid "This payment session has expired."
 msgstr ""
 
-msgid "IBAN"
+msgctxt "(TS2)"
+msgid "Too bad you want to end your contribution! Don't you want to reconsider? You can also choose a smaller amount. Every small contribution helps us. If you are dissatisfied with something, we would be happy to receive your feedback at support@wechange.de"
 msgstr ""
 
-msgid "Billing Address"
+msgid "Transaction Type"
 msgstr ""
 
-msgid "Organisation"
-msgstr ""
-
-msgid "Name"
-msgstr ""
-
-msgid "Address"
-msgstr ""
-
-msgid "Postal Code"
-msgstr ""
-
-msgid "City"
-msgstr ""
-
-msgid "Country"
-msgstr ""
-
-msgid "Past Contributions"
+msgid "Unexpected response from payment provider."
 msgstr ""
 
 msgctxt "(PF1a)"
 msgid "Update payment information"
 msgstr ""
 
-msgctxt "(PF15a)"
-msgid "Confirm your Contribution"
+msgctxt "(PF40)"
+msgid "Update your payment details"
 msgstr ""
 
-msgctxt "(PF15b)"
-msgid "Choose your new Contribution"
-msgstr ""
-
-msgctxt "(PF15)"
-msgid "Choose your Contribution"
+msgctxt "(MS8)"
+msgid "Use the slider to adjust your current contribution. Alternatively, you can enter a higher amount directly in the text field."
 msgstr ""
 
 #, python-format
@@ -762,314 +1014,196 @@ msgctxt "(PF26)"
 msgid "Use the slider to select your monthly contribution as an individual or for your group. Alternatively, you can enter a higher amount directly in the text field. The contribution automatically includes %(vat_amount)s%% VAT and you will receive an invoice."
 msgstr ""
 
-msgctxt "(PF24x)"
-msgid "You may also choose a higher amount by entering it directly in the text box!"
-msgstr ""
-
-msgctxt "(PF27a)"
-msgid "Confirm your debiting period"
-msgstr ""
-
-msgctxt "(PF27b)"
-msgid "Choose your new debiting period"
-msgstr ""
-
-msgctxt "(PF27)"
-msgid "Choose your billing interval"
-msgstr ""
-
-msgctxt "(PF2)"
-msgid "Learn more"
-msgstr ""
-
-msgctxt "(PF4a)"
-msgid "Confirm Contribution Amount"
-msgstr ""
-
-msgctxt "(PF4)"
-msgid "Set amount of Contribution"
-msgstr ""
-
-msgctxt "(PF5)"
-msgid " Almost done! Please enter your account information below."
-msgstr ""
-
-msgid "Payment Method"
-msgstr ""
-
-msgid "Payment is currently only possible by SEPA direct debit. We are working on offering PayPal and credit card payments soon!"
-msgstr ""
-
-msgid "Select Payment Method"
-msgstr ""
-
-msgid "BIC"
+msgid "User"
 msgstr ""
 
 #, python-format
-msgid "In the next step, you will be redirected to complete the payment process with the payment provider %(payment_provider)s."
+msgctxt "Invoice PDF, important!"
+msgid "User fee for %(portal_name)s"
 msgstr ""
 
-msgid "E-Mail"
+msgid "Vendor Transaction Id"
 msgstr ""
 
-msgid "First name"
+msgctxt "(POP1-release)"
+msgid "WECHANGE becomes even fairer."
+msgstr "wechange.de becomes even fairer."
+
+msgid "Waiting, becoming active at next payment due date"
 msgstr ""
 
-msgid "Last name"
+msgctxt "Invoice PDF, important!"
+msgid "We charge you for our services as follows:"
 msgstr ""
 
-msgid "Payment shall be made on behalf of an organisation"
-msgstr ""
-
-msgid "If the contribution is not paid by you as a private individual, but in the name and on behalf of an institution, organisation or company, please enter the name and billing address of the organisation."
-msgstr ""
-
-msgctxt "(PF18)"
-msgid "No payment will be made yet. On the following page you will find an overview of your data and can confirm the payment."
-msgstr ""
-
-msgctxt "(PF8)"
-msgid "Modify Contribution Amount"
-msgstr ""
-
-msgctxt "(PF17)"
-msgid "Confirm data and continue"
-msgstr ""
-
-msgctxt "(PF19)"
-msgid "Review and Confirm Payment"
-msgstr ""
-
-msgctxt "(PF9 - legally binding!)"
-msgid "Confirm and pay"
+msgctxt "(FC3)"
+msgid "We encountered an error when we tried to book your most recent contribution. Your contribution is paused suspended until the issues are resolved."
 msgstr ""
 
 #, python-format
-msgctxt "(PF7)"
-msgid "By clicking on \"%(confirm_and_pay_button_text)s\" you grant Wechange eG permission to debit %(amount)s Euro %(debit_period)s (incl. %(vat_amount)s%% VAT) from you via %(payment_method)s."
+msgctxt "(PF43)"
+msgid "We have to process your first new payment immediately, but any time left on your current Contribution will be added on to your new one. That means that your next payment would for example only be due on %(date)s for a monthly debiting period."
 msgstr ""
 
-#, python-format
-msgctxt "(PF7a)"
-msgid "This is not a donation, but a voluntary payment for an electronic service. The chosen contribution is the gross amount incl. %(vat_amount)s%% VAT, which is shown on the invoice."
+msgctxt "(MS3)"
+msgid ""
+"We understand WECHANGE as a common good: You pay for the use of WECHANGE what it is worth to you. With every Euro you spend, you help us to make WECHANGE better. With an average of 5 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.\n"
+"\n"
+"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
+msgstr ""
+"We understand wechange.de as a common good: You pay for the use of wechange.de what it is worth to you. With every Euro you spend, you help us to make wechange.de better. With an average of 7 Euros per month, we can cover the costs of hosting the platform, everything above contributes directly to further development.\n"
+"\n"
+"If you can contribute less or nothing at all, we're sure you have good reasons. But please remember: This is only possible because other users support you!"
+
+msgctxt "(PF32)"
+msgid "We're sorry to see you go! To continue contributing, you can create a new Contribution right now."
 msgstr ""
 
-msgctxt "(PF20a)"
-msgid "The next debit using your new payment information will be made immediately."
-msgstr ""
-
-msgctxt "(PF20)"
-msgid "The next debit will be made immediately."
-msgstr ""
-
-#, python-format
-msgctxt "(PF21)"
-msgid "Your %(debit_period)s payments will resume on %(date)s, after your old Contribution would have been due."
-msgstr ""
-
-msgctxt "(PF22)"
-msgid "You can adjust the amount and debiting period of your contribution or terminate payments at any time by clicking “Your Contribution” in your user menu."
-msgstr ""
-
-#, python-format
-msgctxt "(PF23)"
-msgid "Thank you for supporting %(portal_name)s!"
-msgstr ""
-
-msgctxt "(PF25)"
-msgid "Change payment information"
-msgstr ""
-
-msgctxt "(INF1)"
-msgid "Your payment details"
-msgstr ""
-
-msgctxt "(INF17)"
-msgid "Your Contribution"
-msgstr ""
-
-msgctxt "(INF10)"
-msgid "The last payment was made on"
-msgstr ""
-
-#, python-format
-msgctxt "(INF15)"
-msgid "Processing. Started at %(date)s."
-msgstr ""
-
-#, python-format
-msgctxt "(INF16)"
-msgid "Attempted at %(date)s, but not completed."
-msgstr ""
-
-msgctxt "(INF13)"
-msgid "All information about your past payments can be found in the invoice overview"
-msgstr ""
-
-msgctxt "(INF14)"
-msgid "Show Invoice overview"
-msgstr ""
-
-msgctxt "(INF2)"
-msgid "Contribution Status"
+msgctxt "(TS3)"
+msgid "What happens when you terminate your subscription"
 msgstr ""
 
 msgctxt "(INF3-subscription status)"
 msgid "Will become active after your last Contribution expires."
 msgstr ""
 
-msgctxt "(INF4-subscription status)"
-msgid "Active since"
+msgctxt "(POP1-repeat-rnd4)"
+msgid "With small steps to big goals"
+msgstr "It’s time to give something back"
+
+msgid "You already have an active subscription and cannot start another one!"
 msgstr ""
 
-msgctxt "(INF5-subscription status)"
-msgid "Cancelled"
+#, python-format
+msgctxt "(PF13)"
+msgid "You are using %(portal_name)s free of charge."
 msgstr ""
 
-msgid "Expires"
+msgctxt "(PF22)"
+msgid "You can adjust the amount and debiting period of your contribution or terminate payments at any time by clicking “Your Contribution” in your user menu."
 msgstr ""
 
-msgctxt "(INF7)"
-msgid "Next payment scheduled"
+#, fuzzy
+#| msgid "(MSG1) Your current Subscription was terminated."
+msgid "You can cancel your current subscription here"
+msgstr "Your current Subscription was terminated."
+
+msgctxt "(PF41)"
+msgid "You can choose a new payment method or update your payment details here."
 msgstr ""
 
-msgctxt "(INF6)"
-msgid "Your current contribution"
+#, python-format
+msgid "You can contribute any amount up to %(max_amount)s by entering it here. For larger contributions, please contact our support!"
 msgstr ""
 
-msgctxt "(INF8.2)"
-msgid "Set up new Contribution"
+msgid "You can view infos about your payments here"
 msgstr ""
 
-msgctxt "(INF8.1)"
-msgid "Adjust or terminate your Contribution"
+msgid "You cannot make any additional payments at this time. Please contact our support!"
 msgstr ""
 
-msgctxt "(TS9)"
-msgid "Change payment information"
+msgid "You currently already have an active subscription!"
 msgstr ""
 
-msgctxt "(PRC1)"
-msgid "Payment processing..."
+msgid "You do not currently have a subscription!"
 msgstr ""
 
-msgctxt "(PRC2)"
-msgid "Please complete your payment with the payment provider, or restart the payment process."
+msgid "You do not currently have an active subscription you could update!"
 msgstr ""
 
-msgctxt "(PRC3)"
-msgid "Please wait while your payment is being processed..."
-msgstr ""
-
-msgctxt "(PRC4)"
-msgid "Payment processing is taking longer than expected. You may close this page and return to it any time. Please apologize the delay and thank you for your patience!"
-msgstr ""
-
-msgctxt "(PRC5)"
-msgid "If your payment has not been processed after a day, please contact our support!"
-msgstr ""
-
-msgctxt "(PRC4)"
-msgid "An unexpected error has occured during your payment."
-msgstr ""
-
-msgid "Please try again or contact our support for assistance!"
-msgstr ""
-
-msgctxt "(SC1)"
-msgid "Payment Success"
-msgstr ""
-
-msgctxt "(SC2)"
-msgid "Payments"
-msgstr ""
-
-msgctxt "(SC3)"
-msgid "Your payment was processed successfully, but your Contribution could not be activated due to an internal server error."
-msgstr ""
-
-msgctxt "(SC4)"
-msgid "Please contact the support. Don't worry, we will sort everything out! In the meantime, please do not make any additional payments! Please excuse the inconveniences!"
-msgstr ""
-
-msgctxt "(SC5)"
-msgid "Thank you for your Contribution!"
+msgctxt "(TS8)"
+msgid "You don't want to pay contributions anymore?"
 msgstr ""
 
 msgctxt "(SC6)"
 msgid "You're awesome! With your voluntary contribution we can further develop WECHANGE."
 msgstr "You're awesome! With your voluntary contribution we can further develop wechange.de."
 
+#, python-format
+msgctxt "(PF21)"
+msgid "Your %(debit_period)s payments will resume on %(date)s, after your old Contribution would have been due."
+msgstr ""
+
+msgctxt "(INF17)"
+msgid "Your Contribution"
+msgstr ""
+
+msgctxt "(LN1)"
+msgid "Your Contribution"
+msgstr ""
+
+msgctxt "(MS1)"
+msgid "Your Contribution"
+msgstr ""
+
+msgctxt "(PF1)"
+msgid "Your Contribution"
+msgstr ""
+
+msgctxt "(PF30)"
+msgid "Your Contributions will end soon!"
+msgstr ""
+
+msgid "Your Invoices"
+msgstr ""
+
+msgctxt "(LN3)"
+msgid "Your Invoices"
+msgstr ""
+
 msgid "Your SEPA Mandate"
 msgstr ""
 
-#, python-format
-msgctxt "(SC8)"
-msgid "Back to %(portal_name)s"
+msgid "Your changes have been saved! "
 msgstr ""
-
-msgctxt "(SC7)"
-msgid "Show payment overview"
-msgstr ""
-
-msgctxt "(POP1-repeat-rnd1)"
-msgid "The early bird catches the worm!"
-msgstr "wechange.de - proudly funded by its members!"
-
-msgctxt "(POP1-repeat-rnd2)"
-msgid "Does not hurt, but does good for many"
-msgstr "Everyone gives what they can afford!"
-
-msgctxt "(POP1-repeat-rnd3)"
-msgid "Many pennies make a dollar"
-msgstr "wechange.de for all, all for wechange.de"
-
-msgctxt "(POP1-repeat-rnd4)"
-msgid "With small steps to big goals"
-msgstr "It’s time to give something back"
-
-msgctxt "(POP1-repeat-rnd5)"
-msgid "Come, be among the ones who pay!"
-msgstr "Your contribution supports Changemakers"
-
-msgctxt "(POP1-repeat-rnd6)"
-msgid "How much are we worth to you?"
-msgstr "wechange.de - proudly funded by its members!"
-
-msgctxt "(POP1-repeat-rnd7)"
-msgid "So that WECHANGE can be more than the sum of its parts"
-msgstr "Everyone gives what they can afford!"
-
-msgctxt "(POP1-repeat-rnd8)"
-msgid "Change happens on a small scale"
-msgstr "wechange.de for all, all for wechange.de"
-
-#, python-format
-msgctxt "(POP2-repeat)"
-msgid "Dear %(username)s,"
-msgstr ""
-
-#, python-format
-msgctxt "(POP3-repeat)"
-msgid ""
-"you joined us at WECHANGE %(join_time_verbal)s - we are very happy about that! \n"
-"\n"
-"Please remember: WECHANGE is only free of charge because enough users* contribute voluntarily. With an average of 5 Euro per month, we can cover the costs of hosting the platform. Every small contribution helps!"
-msgstr ""
-"You joined us at wechange.de %(join_time_verbal)s - we are very happy about that! \n"
-"\n"
-"We hope wechange.de will be a strong supporter of your project. Now it’s time to support wechange.de by making your voluntary contribution. With € 7 per person per month we can cover the costs of running the platform. You give what you can afford and contribute to the creation of new projects on wechange.de every day to drive change. We thank you for your contribution!\n"
-"\n"
-"PS: Organizations and groups can also contribute and receive an invoice for their payment. If you have any questions, please contact our support at support@wechange.de!."
 
 msgctxt "(POP1-newuser)"
 msgid "Your contribution helps!"
 msgstr ""
 
 #, python-format
-msgctxt "(POP2-newuser)"
-msgid "Dear %(username)s,"
+msgctxt "(MS2)"
+msgid "Your current Contribution is %(amount)s Euro %(debit_period)s"
+msgstr ""
+
+msgctxt "(INF6)"
+msgid "Your current contribution"
+msgstr ""
+
+msgid "Your invoice is still being prepared and will be ready for download shortly. Please return to this page in a few minutes."
+msgstr ""
+
+msgctxt "(INF1)"
+msgid "Your payment details"
+msgstr ""
+
+msgctxt "(LN2)"
+msgid "Your payment details"
+msgstr ""
+
+msgctxt "(SC3)"
+msgid "Your payment was processed successfully, but your Contribution could not be activated due to an internal server error."
+msgstr ""
+
+msgctxt "(PF31)"
+msgid "Your pre-paid contribution is valid until"
+msgstr ""
+
+msgid "Your subscription amount or debit poriod could not be changed because of an unexpected error. Please contact our support!"
+msgstr ""
+
+#, python-format
+msgctxt "(TS5)"
+msgid "Your subscription will be terminated and no future payments will be made. Your current payment status will remain active until %(date)s. You can reset the payments at any time."
+msgstr ""
+
+#, python-format
+msgid "every month"
+msgid_plural "every %(months)s months"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "half-yearly"
 msgstr ""
 
 msgctxt "(POP3-newuser)"
@@ -1086,13 +1220,10 @@ msgstr ""
 "\n"
 "We thank you for your contribution!\n"
 
-msgctxt "(POP1-release)"
-msgid "WECHANGE becomes even fairer."
-msgstr "wechange.de becomes even fairer."
+msgid "monthly"
+msgstr ""
 
-#, python-format
-msgctxt "(POP2-release)"
-msgid "Dear %(username)s,"
+msgid "quarterly"
 msgstr ""
 
 msgctxt "(POP3-release)"
@@ -1105,150 +1236,26 @@ msgstr ""
 "\n"
 "Correspondingly, we invite you to pay for the use of wechange.de whatever feels right. Even with a very small contribution, you help us making wechange.de better. With an average of 7 Euros per month you enable us to cover the costs of hosting the platform. Beyond that your share is dedicated to further development."
 
-msgctxt "(POP4-release)"
-msgid "Choose your voluntary contribution to WECHANGE now. We count on you!"
-msgstr "Choose your voluntary contribution to wechange.de now. We count on you!"
-
-msgctxt "(POP7)"
-msgid "Not now"
+msgid "yearly"
 msgstr ""
 
-msgctxt "(POP5)"
-msgid "Learn more"
+#, python-format
+msgctxt "(POP3-repeat)"
+msgid ""
+"you joined us at WECHANGE %(join_time_verbal)s - we are very happy about that! \n"
+"\n"
+"Please remember: WECHANGE is only free of charge because enough users* contribute voluntarily. With an average of 5 Euro per month, we can cover the costs of hosting the platform. Every small contribution helps!"
 msgstr ""
+"You joined us at wechange.de %(join_time_verbal)s - we are very happy about that! \n"
+"\n"
+"We hope wechange.de will be a strong supporter of your project. Now it’s time to support wechange.de by making your voluntary contribution. With € 7 per person per month we can cover the costs of running the platform. You give what you can afford and contribute to the creation of new projects on wechange.de every day to drive change. We thank you for your contribution!\n"
+"\n"
+"PS: Organizations and groups can also contribute and receive an invoice for their payment. If you have any questions, please contact our support at support@wechange.de!."
 
-msgctxt "(POP6-repeat)"
-msgid "Ok, choose amount now"
-msgstr ""
+#~ msgctxt "(SLD4)"
+#~ msgid "Magnificent! With your support, the WECHANGE community can grow and prosper!"
+#~ msgstr "Magnificent! With your support, the wechange.de community can grow and prosper!"
 
-msgctxt "(POP6)"
-msgid "Choose amount"
-msgstr ""
-
-msgid "New payments are currently disabled!"
-msgstr ""
-
-msgid "Changing and making new payments is temporarily disabled while we are performing maintenance on our payment system. The service will be back soon. Please apologize the inconveniences!"
-msgstr ""
-
-msgid "You can view infos about your payments here"
-msgstr ""
-
-#, fuzzy
-#| msgid "(MSG1) Your current Subscription was terminated."
-msgid "You can cancel your current subscription here"
-msgstr "Your current Subscription was terminated."
-
-msgctxt "(FC2)"
-msgid "There are issues with you current Contribution!"
-msgstr ""
-
-msgctxt "(FC3)"
-msgid "We encountered an error when we tried to book your most recent contribution. Your contribution is paused suspended until the issues are resolved."
-msgstr ""
-
-msgctxt "(FC4)"
-msgid "Please see below for details on the problem and review your selected payment method. If you wish to select a new payment method, simply update your payment information."
-msgstr ""
-
-msgctxt "(FC5)"
-msgid "If you have any questions about the issue or would like assistance, please contact our support and provide us with the issue reference number!"
-msgstr ""
-
-msgctxt "(FC6)"
-msgid "Issue Reference Number"
-msgstr ""
-
-msgctxt "(FC7)"
-msgid "Issue Details"
-msgstr ""
-
-msgctxt "(FC8)"
-msgid "Specific issue details cannot be displayed for this issue."
-msgstr ""
-
-msgctxt "(FC9)"
-msgid "If you wish to continue contributing, please update your payment information, or contact our support! Sorry for the inconveniences!"
-msgstr ""
-
-msgctxt "(FC11)"
-msgid "Renew payment information"
-msgstr ""
-
-msgid "Please correct the errors in the highlighted fields!"
-msgstr ""
-
-msgid "Please fill out all of the missing fields!"
-msgstr ""
-
-msgid "You currently already have an active subscription!"
-msgstr ""
-
-msgid "The entered payment information is invalid. Please make sure you entered everything correctly!"
-msgstr ""
-
-msgid "You already have an active subscription and cannot start another one!"
-msgstr ""
-
-msgid "You do not currently have an active subscription you could update!"
-msgstr ""
-
-msgid "You do not currently have a subscription!"
-msgstr ""
-
-msgid "An error occured, and you cannot change your subscription amount at this time. Please contact our support!"
-msgstr ""
-
-msgid "The amount and debiting period you selected were the same as before, so we did not change anything!"
-msgstr ""
-
-msgid "Your subscription amount or debit poriod could not be changed because of an unexpected error. Please contact our support!"
-msgstr ""
-
-msgid "Your changes have been saved! "
-msgstr ""
-
-msgid "Starting with the next payment your new debiting period and new amount will be used. "
-msgstr ""
-
-msgid "From now on your new chosen contribution amount will be paid. "
-msgstr ""
-
-msgid "Starting with the next payment your new debiting period will be used. "
-msgstr ""
-
-msgid "Thank you very much for your support!"
-msgstr ""
-
-msgid "The amount submitted does not seem to be a number!"
-msgstr ""
-
-msgid "The monthly amount is higher than the allowed maximum amount!"
-msgstr ""
-
-msgid "The monthly amount is lower than the allowed minimum amount!"
-msgstr ""
-
-msgid "The payment amount is higher than the allowed maximum amount!"
-msgstr ""
-
-msgid "The payment amount is lower than the allowed minimum amount!"
-msgstr ""
-
-msgid "The payment session could not be found."
-msgstr ""
-
-msgid "The payment process was cancelled or could not be completed."
-msgstr ""
-
-msgid "This payment session has expired."
-msgstr ""
-
-msgid "There was an error with your payment."
-msgstr ""
-
-msgid "(MSG1) Your current Subscription was terminated."
-msgstr "Your current Subscription was terminated."
-
-msgid "(MSG2) There was an error terminating your subscription! Please contact the customer support!"
-msgstr "There was an error terminating your subscription! Please contact the customer support!"
+#~ msgctxt "(SLD2)"
+#~ msgid "Thank you for helping us to develop WECHANGE."
+#~ msgstr "Thank you for helping us to develop wechange.de."

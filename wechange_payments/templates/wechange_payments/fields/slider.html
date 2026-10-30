@@ -31,23 +31,23 @@
             </div>
             
             <div class="donation-outcome low-amount">
-                {% trans "Thank you. Every small contribution helps." context "(SLD1)" as sld1 %}
-                {{ sld1|linebreaksbr }}
+                {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}Thank you for supporting {{ portal_name }}. Every contribution counts!{% endblocktrans %}
             </div>
             
             <div class="donation-outcome medium-amount">
-                {% trans "Thank you for helping us to develop WECHANGE." context "(SLD2)" as sld2 %}
-                {{ sld2|linebreaksbr }}
+                {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}Thank you for your support! You are helping to keep {{ portal_name }} accessible for everyone.{% endblocktrans %}
             </div>
             
             <div class="donation-outcome high-amount">
-                {% trans "Whoa! You're really helping us!" context "(SLD3)" as sld3 %}
-                {{ sld3|linebreaksbr }}
+                {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}Thank you for your valuable contribution! You are ensuring the continued development of {{ portal_name }}.{% endblocktrans %}
             </div>
             
             <div class="donation-outcome very-high-amount">
-                {% trans "Magnificent! With your support, the WECHANGE community can grow and prosper!" context "(SLD4)" as sld4 %}
-                {{ sld4|linebreaksbr }}
+                {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}Thank you so much! Your contribution allows {{ portal_name }} to grow and thrive.{% endblocktrans %}
+            </div>
+            
+            <div class="donation-outcome extremely-high-amount">
+                {% blocktrans with portal_name=COSINNUS_CURRENT_PORTAL.name %}Thank you so much! Your contribution ensures that {{ portal_name }} remains sustainable in the long term.{% endblocktrans %}
             </div>
           
         </div>

@@ -53,8 +53,10 @@ $(function() {
 			$('.payment-slider .medium-amount').show();
 		} else if (ui.value < 15) {
 			$('.payment-slider .high-amount').show();
-		} else {
+		} else if (ui.value < 25) {
 			$('.payment-slider .very-high-amount').show();
+		} else {
+			$('.payment-slider .extremely-high-amount').show();
 		}
 
 		$('.payment-slider .max-amount-label').text(Math.max(ui.value, PAYMENTS_MAXIMUM_MONTHLY_AMOUNT) + ' €');
